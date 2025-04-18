@@ -1,4 +1,3 @@
-// src/App.jsx
 
 import React, { useEffect } from "react";
 import {
