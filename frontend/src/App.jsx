@@ -19,7 +19,6 @@ import UserProfile from "./pages/user/UserProfile";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 
-
 function App() {
 	const dispatch = useDispatch();
 
@@ -37,9 +36,8 @@ function AppContent() {
 				<Routes>
 					{/* --- Public Routes --- */}
 					<Route path="/" element={<HomePage />} />
-          <Route path="/forgot-password" element={<ForgotPassword/>}/>
-          <Route path="/reset-password" element={<ResetPassword/>}/>
-
+					<Route path="/forgot-password" element={<ForgotPassword />} />
+					<Route path="/reset-password" element={<ResetPassword />} />
 
 					{/* --- Public-only route (not for logged-in users) --- */}
 					<Route
@@ -50,9 +48,11 @@ function AppContent() {
 							</PublicRoute>
 						}
 					/>
-					<Route path="/profile" element={<UserProfile />} />
+
 					{/* --- Protected Routes --- */}
-					<Route element={<ProtectedRoute />}></Route>
+					<Route element={<ProtectedRoute />}>
+						<Route path="/profile" element={<UserProfile />} />
+					</Route>
 					{/* --- Catch-All Route --- */}
 				</Routes>
 			</main>
