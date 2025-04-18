@@ -9,7 +9,8 @@ import cors from "cors";
 import { connectDb } from "./db/db.js";
 import userRoutes from "./routes/user.routes.js";
 import scheduleUnverifiedUserCleanup from "./utils/killUnverifiedUser.js";
-
+import userSubscriptionRoutes from "./routes/userSubscription.routes.js"
+import analysisResultRoutes from "./routes/analysisResult.routes.js"
 dotenv.config();
 
 const app = express();
@@ -61,6 +62,8 @@ scheduleUnverifiedUserCleanup();
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/subscriptions", userSubscriptionRoutes);
+app.use("/api/analysis-results", analysisResultRoutes);
 
 // Root route
 app.get("/", (req, res) => {
