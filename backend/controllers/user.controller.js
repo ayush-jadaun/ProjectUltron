@@ -267,7 +267,7 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
 
     expiresIn: "15m", // Short expiry
   });
-  const resetUrl = `${process.env.CLIENT_URL}/api/users/reset-password?token=${resetToken}`; // Ensure CLIENT_URL is correct
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`; // Ensure CLIENT_URL is correct
 
   try {
     await sendEmail({
@@ -415,7 +415,7 @@ const sendVerificationEmailToUser = async (user) => {
     process.env.JWT_SECRET, 
     { expiresIn: "1d" } 
   );
-  const verificationUrl = `${process.env.CLIENT_URL}/api/users/verify-email?token=${verificationToken}`;
+  const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
 
   await sendEmail({
     to: user.email,
