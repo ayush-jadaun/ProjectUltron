@@ -21,7 +21,7 @@ const users = sequelize.define(
         },
         organization_name:{
             type:DataTypes.STRING,
-            allowNull:false,
+            allowNull:true,
         },
         contact_number:{
             type:DataTypes.STRING,
