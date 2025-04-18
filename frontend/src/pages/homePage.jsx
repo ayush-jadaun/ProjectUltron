@@ -75,9 +75,9 @@ const  HomePage=()=> {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-green-700 text-white p-4 shadow-md">
-        <div className="container mx-auto flex items-center">
-          <BellIcon className="mr-2" size={24} />
+        <div className="container mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold">Ultorn Alert</h1>
+          <button className="px-2 py-2 bg-green-900 text-white font-small rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">Login/SignUp</button>
         </div>
       </header>
 
