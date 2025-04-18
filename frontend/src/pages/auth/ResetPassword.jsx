@@ -1,9 +1,4 @@
-// src/pages/ResetPassword.jsx
 
-import React, { useState, useEffect } from "react";
-// Import useLocation instead of useParams
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import {
   Lock,
   LockOpen,
@@ -101,8 +96,7 @@ const ResetPassword = () => {
         toast.success("Password reset successfully!");
       })
       .catch((err) => {
-        // Error is handled by the slice and stored in `reduxError`
-        // toast.error(err || "Failed to reset password."); // Display error from slice
+
         setIsSubmitted(false);
       });
   };
@@ -265,5 +259,6 @@ const ResetPassword = () => {
     </div>
   );
 };
+
 
 export default ResetPassword;

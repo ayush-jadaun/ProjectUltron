@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Mail, Send, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
 import { handleForgetPassword, clearError } from "../../store/slices/authSlice"; // Adjust path as needed
 
-
 const ForgotPassword=()=> {
 	const [email, setEmail] = useState("");
 	const [isSubmitted, setIsSubmitted] = useState(false); // To show success message

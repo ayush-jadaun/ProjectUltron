@@ -13,8 +13,12 @@ import ProtectedRoute from "./utils/ProtectedRoutes";
 // Page Components
 import LoginSignup from "./pages/auth/LoginSignup";
 import HomePage from "./pages/homePage";
+
+import UserProfile from "./pages/user/UserProfile";
+
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+
 
 function App() {
 	const dispatch = useDispatch();
@@ -46,10 +50,9 @@ function AppContent() {
 							</PublicRoute>
 						}
 					/>
-
+					<Route path="/profile" element={<UserProfile />} />
 					{/* --- Protected Routes --- */}
 					<Route element={<ProtectedRoute />}></Route>
-
 					{/* --- Catch-All Route --- */}
 				</Routes>
 			</main>
