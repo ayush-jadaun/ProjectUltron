@@ -19,6 +19,7 @@ import UserProfile from "./pages/user/UserProfile";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Footer from "./components/Footer";
+import Navbar from "./components/Navbar";
 
 function App() {
 	const dispatch = useDispatch();
@@ -33,6 +34,7 @@ function App() {
 function AppContent() {
 	return (
 		<div className="flex flex-col min-h-screen">
+			<Navbar />
 			<main className="flex-grow">
 				<Routes>
 					{/* --- Public Routes --- */}

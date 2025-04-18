@@ -13,6 +13,7 @@ import {
 	Clock, // Added Clock
 } from "lucide-react";
 import EditProfileModal from "../../components/user/EditProfileModal";
+import EnvironmentBackgroundLayers from "../../assets/EnvironmentBackgroundLayers";
 
 const formatDate = (dateString) => {
 	if (!dateString) return "N/A";
@@ -91,7 +92,6 @@ const UserProfilePage = () => {
 		);
 	}
 
-	// --- User Data Available ---
 	const displayName =
 		user.user_type === "ngo" && user.organization_name
 			? user.organization_name
@@ -120,124 +120,99 @@ const UserProfilePage = () => {
 		<>
 			{" "}
 			{/* Use Fragment shorthand */}
-			<div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-12 px-4">
-				<div className="container mx-auto max-w-3xl">
-					<div className="bg-white rounded-xl shadow-lg overflow-hidden">
-						{/* --- Profile Header --- */}
-						<header className="bg-green-100 p-6 md:p-8 border-b border-green-200 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-							<div className="flex-shrink-0">
-								{/* Placeholder Image */}
-								<img
-									src={
-										user.avatarUrl ||
-										`https://ui-avatars.com/api/?name=${encodeURIComponent(
-											displayName
-										)}&background=10B981&color=fff&size=128`
-									} // Use a green background
-									alt="Profile Avatar"
-									className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white object-cover bg-gray-300 shadow-md"
-								/>
-							</div>
-							<div className="flex-grow">
-								<h1 className="text-2xl md:text-3xl font-bold text-green-900 mb-1">
-									{displayName}
-								</h1>
-								<span
-									className={`inline-block text-xs font-semibold px-3 py-1 rounded-full mb-2 ${badgeStyles}`}
-								>
-									{badgeText}
-								</span>
-								<div className="text-sm font-medium flex items-center justify-center md:justify-start gap-1.5 mt-1">
-									{verificationStatus}
-								</div>
-							</div>
-						</header>
+			<div className="min-h-screen">
+				<EnvironmentBackgroundLayers>
+					<div className="mt-22 container mx-auto max-w-3xl">
+						<div className="bg-white rounded-xl shadow-lg overflow-hidden">
+							{/* --- Profile Header --- */}
 
-						{/* --- Profile Details --- */}
-						<section className="p-6 md:p-8 space-y-5">
-							<h2 className="text-xl font-semibold text-green-800 border-b border-green-200 pb-2 mb-6 flex items-center gap-2">
-								<UserIcon size={20} className="text-green-600" />
-								Account Details
-							</h2>
+							{/* --- Profile Details --- */}
+							<section className="p-6 md:p-8 space-y-5">
+								<h2 className="text-xl font-semibold text-green-800 border-b border-green-200 pb-2 mb-6 flex items-center gap-2">
+									<UserIcon size={20} className="text-green-600" />
+									Account Details
+								</h2>
 
-							{/* Display Name (if different) */}
-							{user.user_type === "ngo" &&
-								user.name &&
-								user.name !== user.organization_name && (
+								{/* Display Name (if different) */}
+								{user.user_type === "ngo" &&
+									user.name &&
+									user.name !== user.organization_name && (
+										<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-gray-100">
+											<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
+												<UserIcon size={16} className="text-green-600" />{" "}
+												Contact Person:
+											</strong>
+											<span className="text-gray-800 text-left sm:text-right break-words">
+												{user.name}
+											</span>
+										</div>
+									)}
+								{/* Organization Name Detail (for NGOs) */}
+								{user.user_type === "ngo" && user.organization_name && (
 									<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-gray-100">
 										<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
-											<UserIcon size={16} className="text-green-600" /> Contact
-											Person:
+											<Building size={16} className="text-green-600" />{" "}
+											Organization:
 										</strong>
 										<span className="text-gray-800 text-left sm:text-right break-words">
-											{user.name}
+											{user.organization_name}
 										</span>
 									</div>
 								)}
-							{/* Organization Name Detail (for NGOs) */}
-							{user.user_type === "ngo" && user.organization_name && (
+								{/* Email */}
 								<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-gray-100">
 									<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
-										<Building size={16} className="text-green-600" />{" "}
-										Organization:
+										<Mail size={16} className="text-green-600" /> Email:
 									</strong>
 									<span className="text-gray-800 text-left sm:text-right break-words">
-										{user.organization_name}
+										{user.email}
 									</span>
 								</div>
-							)}
-							{/* Email */}
-							<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-gray-100">
-								<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
-									<Mail size={16} className="text-green-600" /> Email:
-								</strong>
-								<span className="text-gray-800 text-left sm:text-right break-words">
-									{user.email}
-								</span>
-							</div>
-							{/* Contact Number */}
-							<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-gray-100">
-								<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
-									<Phone size={16} className="text-green-600" /> Contact Number:
-								</strong>
-								<span className="text-gray-800 text-left sm:text-right">
-									{user.contact_number}
-								</span>
-							</div>
-							{/* Location */}
-							<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-gray-100">
-								<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
-									<MapPin size={16} className="text-green-600" /> Location:
-								</strong>
-								<span className="text-gray-800 text-left sm:text-right break-words">
-									{user.location}
-								</span>
-							</div>
-							{/* Member Since */}
-							<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3">
-								<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
-									<Clock size={16} className="text-green-600" />{" "}
-									{/* Replaced Font Awesome */}
-									Member Since:
-								</strong>
-								<span className="text-gray-800 text-left sm:text-right">
-									{formatDate(user.createdAt)}
-								</span>
-							</div>
-						</section>
+								{/* Contact Number */}
+								<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-gray-100">
+									<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
+										<Phone size={16} className="text-green-600" /> Contact
+										Number:
+									</strong>
+									<span className="text-gray-800 text-left sm:text-right">
+										{user.contact_number}
+									</span>
+								</div>
+								{/* Location */}
+								<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-gray-100">
+									<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
+										<MapPin size={16} className="text-green-600" /> Location:
+									</strong>
+									<span className="text-gray-800 text-left sm:text-right break-words">
+										{user.location}
+									</span>
+								</div>
+								{/* Member Since */}
+								<div className="detail-item flex flex-col sm:flex-row justify-between sm:items-center py-3">
+									<strong className="text-gray-600 font-medium mb-1 sm:mb-0 flex items-center gap-2">
+										<Clock size={16} className="text-green-600" />{" "}
+										{/* Replaced Font Awesome */}
+										Member Since:
+									</strong>
+									<span className="text-gray-800 text-left sm:text-right">
+										{formatDate(user.createdAt)}
+									</span>
+								</div>
+							</section>
 
-						{/* --- Profile Actions --- */}
-						<footer className="bg-gray-50 p-6 md:p-8 border-t border-green-200 text-right">
-							<button
-								onClick={handleEditProfile} // Calls the function to open the modal
-								className="inline-flex items-center gap-2 px-6 py-2 bg-green-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150"
-							>
-								<Edit size={16} />
-								Update Information
-							</button>
-						</footer>
+							{/* --- Profile Actions --- */}
+							<footer className="bg-gray-50 p-6 md:p-8 border-t border-green-200 text-right">
+								<button
+									onClick={handleEditProfile} // Calls the function to open the modal
+									className="inline-flex items-center gap-2 px-6 py-2 bg-green-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150"
+								>
+									<Edit size={16} />
+									Update Information
+								</button>
+							</footer>
+						</div>
 					</div>
-				</div>
+				</EnvironmentBackgroundLayers>
 			</div>
 			{/* --- Conditionally Render Modal --- */}
 			{isEditModalOpen && (

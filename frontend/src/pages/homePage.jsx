@@ -117,54 +117,6 @@ const HomePage = () => {
 		// Remove the overall bg-gray-50 as the Background component will provide the base
 		<div className="min-h-screen">
 			{/* Header remains outside the background component to stay solid and sticky */}
-			<header className="bg-green-700 text-white p-4 shadow-md sticky top-0 z-20">
-				{" "}
-				{/* Increased z-index */}
-				<div className="container mx-auto flex items-center justify-between">
-					<div className="flex items-center">
-						<BellIcon className="mr-2 hidden sm:block" size={24} />
-						<h1 className="text-xl font-bold">Ultron Alert</h1>
-					</div>
-					<div>
-						{isAuthenticated ? (
-							<div className="flex items-center space-x-3 sm:space-x-4">
-								<button
-									className="flex items-center px-3 py-1.5 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-									onClick={onProfileClick}
-									title="View Profile" // Added title for clarity
-								>
-									<User size={16} className="mr-1.5" /> {/* Added User icon */}
-									<span className="hidden md:inline">
-										{/* Show name only on medium screens and up */}
-										{user?.name?.split(" ")[0] || user?.email}{" "}
-										{/* Show first name or email */}
-									</span>
-								</button>
-								<button
-									onClick={onLogoutClick}
-									disabled={authLoading}
-									className={`flex items-center px-3 py-1.5 sm:px-4 ${
-										authLoading
-											? "bg-orange-400 cursor-not-allowed"
-											: "bg-orange-600 hover:bg-orange-700"
-									} text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors`}
-								>
-									<LogOut size={16} className="mr-1" />
-									Logout
-								</button>
-							</div>
-						) : (
-							<button
-								onClick={onLoginClick}
-								className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-							>
-								<LogIn size={16} className="mr-1" />
-								Login / Sign Up
-							</button>
-						)}
-					</div>
-				</div>
-			</header>
 
 			{/* Wrap the main content and footer within the background component */}
 			<EnvironmentBackgroundLayers>
