@@ -110,6 +110,7 @@ export const handleSignUp = createAsyncThunk(
         email,
         password,
         location,
+        contact_number,
       });
 
       return response.data; 
