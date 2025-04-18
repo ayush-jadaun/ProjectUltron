@@ -13,7 +13,8 @@ import ProtectedRoute from "./utils/ProtectedRoutes";
 // Page Components
 import LoginSignup from "./pages/auth/LoginSignup";
 import HomePage from "./pages/homePage";
-import ForgotPassword from "./pages/auth/ForgetPassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 function App() {
 	const dispatch = useDispatch();
@@ -33,6 +34,8 @@ function AppContent() {
 					{/* --- Public Routes --- */}
 					<Route path="/" element={<HomePage />} />
           <Route path="/forgot-password" element={<ForgotPassword/>}/>
+          <Route path="/reset-password" element={<ResetPassword/>}/>
+
 
 					{/* --- Public-only route (not for logged-in users) --- */}
 					<Route
