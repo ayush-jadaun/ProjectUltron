@@ -6,7 +6,7 @@ import helmet from "helmet";
 import hpp from "hpp";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-
+import { connectDb } from "./db/db.js";
 dotenv.config();
 
 const app = express();
@@ -52,6 +52,9 @@ app.use(
     ],
   })
 );
+
+// Database connection
+connectDb()
 
 
 // Global Error Handler
