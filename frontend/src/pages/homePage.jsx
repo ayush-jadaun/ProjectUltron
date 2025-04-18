@@ -16,6 +16,7 @@ import {
 import { handleLogout } from "../store/slices/authSlice";
 // Corrected import path assumption - place it in components or assets folder
 import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
+import Footer from "../components/Footer";
 
 const HomePage = () => {
 	// --- Existing State ---
@@ -364,19 +365,6 @@ const HomePage = () => {
 						</form>
 					</div>
 				</main>
-
-				{/* Footer is also inside the background component */}
-				<footer className="mt-16 bg-gray-100/80 backdrop-blur-sm py-8 px-4">
-					{" "}
-					{/* Made footer semi-transparent */}
-					<div className="container mx-auto text-center text-gray-700">
-						<p className="mb-4">
-							© {new Date().getFullYear()} Ultron Alert - Environmental
-							Monitoring
-						</p>
-						<p className="text-sm">Hack36 8.0 Project</p>
-					</div>
-				</footer>
 			</EnvironmentBackgroundLayers>
 		</div>
 	);

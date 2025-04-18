@@ -18,6 +18,7 @@ import UserProfile from "./pages/user/UserProfile";
 
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import Footer from "./components/Footer";
 
 function App() {
 	const dispatch = useDispatch();
@@ -56,6 +57,7 @@ function AppContent() {
 					{/* --- Catch-All Route --- */}
 				</Routes>
 			</main>
+			<Footer />
 		</div>
 	);
 }
