@@ -7,6 +7,7 @@ import hpp from "hpp";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { connectDb } from "./db/db.js";
+import userRoutes from "./routes/user.routes.js"
 dotenv.config();
 
 const app = express();
@@ -55,6 +56,14 @@ app.use(
 
 // Database connection
 connectDb()
+
+
+
+
+// routes
+
+app.use("/api/users",userRoutes)
+
 
 
 // Global Error Handler
