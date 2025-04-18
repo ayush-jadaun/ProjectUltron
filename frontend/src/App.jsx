@@ -97,7 +97,7 @@ function App() {
       <header className="bg-green-700 text-white p-4 shadow-md">
         <div className="container mx-auto flex items-center">
           <BellIcon className="mr-2" size={24} />
-          <h1 className="text-xl font-bold">EcoAlert Notification System</h1>
+          <h1 className="text-xl font-bold">Ultorn Alert</h1>
         </div>
       </header>
 
