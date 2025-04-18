@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Lock, LockOpen, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
-import { handleResetPassword, clearError } from "../slices/authSlice"; // Adjust path as needed
-import toast from "react-hot-toast"; // Optional: if you want toast notifications
+import { handleResetPassword, clearError } from "../../store/slices/authSlice"; // Adjust path as needed
 
 function ResetPassword() {
 	const [password, setPassword] = useState("");

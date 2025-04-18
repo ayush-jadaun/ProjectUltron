@@ -3,10 +3,9 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Mail, Send, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
-import { handleForgetPassword, clearError } from "../store/slices/authSlice"; // Adjust path as needed
-import toast from "react-hot-toast"; // Optional: if you want toast notifications
+import { handleForgetPassword, clearError } from "../../store/slices/authSlice"; // Adjust path as needed
 
-function ForgotPassword() {
+const ForgotPassword=()=> {
 	const [email, setEmail] = useState("");
 	const [isSubmitted, setIsSubmitted] = useState(false); // To show success message
 

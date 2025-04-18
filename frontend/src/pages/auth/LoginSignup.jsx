@@ -17,7 +17,7 @@ import {
 import { handleSignIn, handleSignUp, clearError } from "../../store/slices/authSlice"; // Import your auth actions
 
 
-function LoginSignup() {
+const LoginSignup=()=> {
   const [isLogin, setIsLogin] = useState(true); // Default to login view
   const [formData, setFormData] = useState({
     name: "",
