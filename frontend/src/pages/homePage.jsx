@@ -404,7 +404,7 @@ const HomePage = () => {
 					<p className="mb-4">
 						© {new Date().getFullYear()} Ultron Alert - Environmental Monitoring
 					</p>
-					<p className="text-sm">Hackathon Project</p>
+					<p className="text-sm">Hack36 8.0 Project</p>
 				</div>
 			</footer>
 		</div>
