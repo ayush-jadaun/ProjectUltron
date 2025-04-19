@@ -10,7 +10,7 @@ import {
   Zap,
   Award,
   Clock,
-  MapPin
+  MapPin,
 } from "lucide-react";
 import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
 
@@ -41,64 +41,68 @@ const AboutUs = () => {
       name: "Ayush Jadaun",
       role: "Full Stack Developer",
       bio: "Passionate about sustainable tech solutions and environmental conservation.",
-      image: "/team/ayush-j.jpg" // Replace with actual path
+      image: "/team/ayush-j.jpg", // Replace with actual path
     },
     {
       name: "Ayush Agarwal",
       role: "Full Stack Developer",
       bio: "Specializes in creating intuitive interfaces for environmental monitoring systems.",
-      image: "/team/ayush-a.jpg" // Replace with actual path
-    }
+      image: "/team/ayush-a.jpg", // Replace with actual path
+    },
   ];
 
   const coreValues = [
-    { 
-      name: "Sustainability", 
+    {
+      name: "Sustainability",
       icon: <Leaf className="text-green-500" />,
       color: "green",
-      description: "Promoting ecological balance and conservation in all our initiatives."
+      description:
+        "Promoting ecological balance and conservation in all our initiatives.",
     },
-    { 
-      name: "Integrity", 
+    {
+      name: "Integrity",
       icon: <Shield className="text-blue-500" />,
       color: "blue",
-      description: "Maintaining transparency and ethical standards in our data and operations."
+      description:
+        "Maintaining transparency and ethical standards in our data and operations.",
     },
-    { 
-      name: "Innovation", 
+    {
+      name: "Innovation",
       icon: <Zap className="text-amber-500" />,
       color: "amber",
-      description: "Constantly exploring new technological solutions to environmental challenges."
+      description:
+        "Constantly exploring new technological solutions to environmental challenges.",
     },
-    { 
-      name: "Passion", 
+    {
+      name: "Passion",
       icon: <Heart className="text-red-500" />,
       color: "red",
-      description: "Driven by a genuine love for our planet and its ecosystems."
-    }
+      description:
+        "Driven by a genuine love for our planet and its ecosystems.",
+    },
   ];
 
   const achievements = [
     {
       number: "1",
       text: "Project",
-      icon: <Award />
+      icon: <Award />,
     },
     {
       number: "5K+",
       text: "Connections",
-      icon: <Globe />
+      icon: <Globe />,
     },
     {
       number: "2",
       text: "Environmentalists",
-      icon: <Clock />
+      icon: <Clock />,
     },
     {
       number: "8.0",
       text: "Hack36",
-      icon: <MapPin />
-    }
+      icon: <MapPin />,
+    },
   ];
 
   return (
@@ -116,7 +120,7 @@ const AboutUs = () => {
             className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 md:p-12 border border-green-100 mb-16 relative overflow-hidden transform transition-all"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-blue-50/50 opacity-50 z-0"></div>
-            
+
             <div className="relative z-10">
               <motion.div
                 initial={{ opacity: 0 }}
@@ -124,7 +128,7 @@ const AboutUs = () => {
                 transition={{ duration: 1 }}
                 className="w-20 h-1 bg-gradient-to-r from-green-400 to-green-600 rounded-full mb-6"
               />
-              
+
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -133,38 +137,54 @@ const AboutUs = () => {
               >
                 About Project Ultron
               </motion.h1>
-              
+
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-lg md:text-xl text-gray-700 mb-10 leading-relaxed max-w-2xl"
               >
-                We are a dedicated team of environmental specialists, technologists, and conservation advocates united by one mission: protecting our planet through cutting-edge technology and real-time monitoring solutions.
+                We are a dedicated team of environmental specialists,
+                technologists, and conservation advocates united by one mission:
+                protecting our planet through cutting-edge technology and
+                real-time monitoring solutions. Inspired by Tony Stark's Project
+                Ultron, which envisioned a security shield around Earth to
+                protect from alien threats, our initiative instead focuses on
+                safeguarding our world from human-caused environmental
+                damage—creating the protective shield our planet needs not from
+                external forces, but from ourselves.
               </motion.p>
-              
+
               <div className="grid md:grid-cols-2 gap-8 mb-10">
                 <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-green-100/80 transform transition-all hover:shadow-lg">
                   <div className="flex items-center mb-4">
                     <div className="p-3 bg-green-100 rounded-lg mr-4">
                       <Target size={24} className="text-green-600" />
                     </div>
-                    <h2 className="text-xl font-semibold text-green-700">Our Mission</h2>
+                    <h2 className="text-xl font-semibold text-green-700">
+                      Our Mission
+                    </h2>
                   </div>
                   <p className="text-gray-600 leading-relaxed">
-                    To empower individuals and organizations with real-time environmental data and early warning systems, enabling proactive conservation efforts worldwide.
+                    To empower individuals and organizations with real-time
+                    environmental data and early warning systems, enabling
+                    proactive conservation efforts worldwide.
                   </p>
                 </div>
-                
+
                 <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-green-100/80 transform transition-all hover:shadow-lg">
                   <div className="flex items-center mb-4">
                     <div className="p-3 bg-blue-100 rounded-lg mr-4">
                       <Globe size={24} className="text-blue-600" />
                     </div>
-                    <h2 className="text-xl font-semibold text-blue-700">Our Vision</h2>
+                    <h2 className="text-xl font-semibold text-blue-700">
+                      Our Vision
+                    </h2>
                   </div>
                   <p className="text-gray-600 leading-relaxed">
-                    A world where environmental monitoring and protection are accessible to everyone, creating a global network of informed environmental stewards.
+                    A world where environmental monitoring and protection are
+                    accessible to everyone, creating a global network of
+                    informed environmental stewards.
                   </p>
                 </div>
               </div>
@@ -172,21 +192,23 @@ const AboutUs = () => {
           </motion.section>
 
           {/* Stats Section */}
-          <motion.section 
-            variants={itemVariants}
-            className="mb-16"
-          >
+          <motion.section variants={itemVariants} className="mb-16">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {achievements.map((item, index) => (
-                <motion.div 
+                <motion.div
                   key={index}
                   whileHover={{ y: -5 }}
                   className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-green-100 text-center hover:shadow-lg transition-all duration-300"
                 >
                   <div className="rounded-full bg-green-100 p-3 w-14 h-14 flex items-center justify-center mx-auto mb-3">
-                    {React.cloneElement(item.icon, { size: 24, className: "text-green-600" })}
+                    {React.cloneElement(item.icon, {
+                      size: 24,
+                      className: "text-green-600",
+                    })}
                   </div>
-                  <h3 className="text-2xl font-bold text-green-700 mb-1">{item.number}</h3>
+                  <h3 className="text-2xl font-bold text-green-700 mb-1">
+                    {item.number}
+                  </h3>
                   <p className="text-gray-600 text-sm">{item.text}</p>
                 </motion.div>
               ))}
@@ -194,10 +216,7 @@ const AboutUs = () => {
           </motion.section>
 
           {/* Core Values Section */}
-          <motion.section
-            variants={itemVariants}
-            className="mb-16"
-          >
+          <motion.section variants={itemVariants} className="mb-16">
             <div className="text-center mb-10">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
@@ -210,21 +229,26 @@ const AboutUs = () => {
               </motion.h2>
               <div className="w-16 h-1 bg-green-500 mx-auto mb-6"></div>
               <p className="text-gray-600 max-w-xl mx-auto">
-                These principles guide our work and shape our approach to environmental monitoring and conservation.
+                These principles guide our work and shape our approach to
+                environmental monitoring and conservation.
               </p>
             </div>
-            
+
             <div className="grid md:grid-cols-4 gap-6">
               {coreValues.map((value, index) => (
-                <motion.div 
+                <motion.div
                   key={index}
                   whileHover={{ y: -5 }}
                   className={`bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-${value.color}-100 hover:shadow-xl transition-all duration-300`}
                 >
-                  <div className={`rounded-full bg-${value.color}-100 p-3 w-14 h-14 flex items-center justify-center mx-auto mb-4`}>
+                  <div
+                    className={`rounded-full bg-${value.color}-100 p-3 w-14 h-14 flex items-center justify-center mx-auto mb-4`}
+                  >
                     {value.icon}
                   </div>
-                  <h3 className={`text-xl font-semibold text-${value.color}-600 mb-3 text-center`}>
+                  <h3
+                    className={`text-xl font-semibold text-${value.color}-600 mb-3 text-center`}
+                  >
                     {value.name}
                   </h3>
                   <p className="text-gray-600 text-center text-sm">
@@ -236,10 +260,7 @@ const AboutUs = () => {
           </motion.section>
 
           {/* Team Section */}
-          <motion.section
-            variants={itemVariants}
-            className="mb-16"
-          >
+          <motion.section variants={itemVariants} className="mb-16">
             <div className="text-center mb-10">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
@@ -252,7 +273,8 @@ const AboutUs = () => {
               </motion.h2>
               <div className="w-16 h-1 bg-green-500 mx-auto mb-6"></div>
               <p className="text-gray-600 max-w-xl mx-auto">
-                Passionate experts working together to create innovative environmental solutions.
+                Passionate experts working together to create innovative
+                environmental solutions.
               </p>
             </div>
 
@@ -281,9 +303,7 @@ const AboutUs = () => {
                     <p className="text-green-500 text-sm font-medium mb-3">
                       {member.role}
                     </p>
-                    <p className="text-gray-600 text-sm">
-                      {member.bio}
-                    </p>
+                    <p className="text-gray-600 text-sm">{member.bio}</p>
                   </div>
                 </motion.div>
               ))}
@@ -311,7 +331,8 @@ const AboutUs = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-white/90 max-w-xl mx-auto mb-8"
             >
-              Ready to make a difference? Connect with us to learn more about our environmental monitoring solutions and how you can contribute.
+              Ready to make a difference? Connect with us to learn more about
+              our environmental monitoring solutions and how you can contribute.
             </motion.p>
             <motion.button
               whileHover={{ scale: 1.05 }}
