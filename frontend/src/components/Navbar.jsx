@@ -74,11 +74,11 @@ const getPageColors = (pathname) => {
 			};
 		default:
 			return {
-				gradient: "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700",
+				gradient: "bg-gradient-to-r from-green-600 via-green-800 to-green-800",
 				text: "text-white",
 				hover: "hover:bg-gray-700",
 				activeGlow: "shadow-[0_0_15px_rgba(75,85,99,0.5)]",
-				button: "bg-gray-700 hover:bg-gray-600",
+				button: "bg-green-600 hover:bg-green-700",
 				border: "border-gray-600",
 			};
 	}
