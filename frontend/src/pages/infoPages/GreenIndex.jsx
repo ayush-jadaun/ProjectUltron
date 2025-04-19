@@ -1,10 +1,10 @@
 // src/pages/HomePage.jsx
 
 import React from "react";
-import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
-import forestImage from "../assets/images/forest.webp";
-import deforestationSvg from "../assets/images/deforestation.svg"; // Add an SVG related to deforestation
-import solutionSvg from "../assets/images/deforrestation (1).svg"; // Optional: Solutions-themed SVG
+import EnvironmentBackgroundLayers from "../../assets/EnvironmentBackgroundLayers";
+import forestImage from "../../assets/images/forest.webp";
+import deforestationSvg from "../../assets/images/deforestation.svg"; // Add an SVG related to deforestation
+import solutionSvg from "../../assets/images/deforrestation (1).svg"; // Optional: Solutions-themed SVG
 
 const GreenIndex = () => {
 	return (
