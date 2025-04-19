@@ -15,7 +15,7 @@ export const fetchUserAnalysisResults = createAsyncThunk(
   async ({ analysis_type, alert_triggered }, { rejectWithValue }) => {
     try {
       const response = await api.get("/analysis-results", {
-        params: { analysis_type, alert_triggered },
+        params: { page, limit, analysis_type, alert_triggered }
       });
       return response.data.data.results; // assuming data shape includes .results
     } catch (error) {
@@ -32,7 +32,7 @@ export const fetchAnalysisResultById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.get(`/analysis-results/${id}`);
-      return response.data.data.result;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch analysis result"
@@ -44,12 +44,12 @@ export const fetchAnalysisResultById = createAsyncThunk(
 // Get results by subscription
 export const fetchResultsBySubscription = createAsyncThunk(
   "analysis/fetchResultsBySubscription",
-  async ({ subscriptionId }, { rejectWithValue }) => {
+  async ({ subscriptionId, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await api.get(
-        `/analysis-results/subscription/${subscriptionId}`
-      );
-      return response.data.data.results;
+      const response = await api.get(`/analysis-results/subscription/${subscriptionId}`, {
+        params: { page, limit }
+      });
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch subscription results"
@@ -81,6 +81,12 @@ const analysisSlice = createSlice({
     alertSummary: null,
     loading: false,
     error: null,
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalCount: 0,
+      limit: 10
+    }
   },
   reducers: {
     clearCurrentResult: (state) => {
@@ -125,7 +131,13 @@ const analysisSlice = createSlice({
       })
       .addCase(fetchResultsBySubscription.fulfilled, (state, action) => {
         state.loading = false;
-        state.results = action.payload;
+        state.results = action.payload.results;
+        state.pagination = {
+          currentPage: action.payload.currentPage,
+          totalPages: action.payload.totalPages,
+          totalCount: action.payload.totalCount,
+          limit: action.payload.limit
+        };
       })
       .addCase(fetchResultsBySubscription.rejected, (state, action) => {
         state.loading = false;
