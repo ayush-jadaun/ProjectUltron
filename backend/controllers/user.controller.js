@@ -130,12 +130,14 @@ export const loginUser = asyncHandler(async (req, res, next) => {
   );
 
   // Set cookie options
-  const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // Consider 'lax' for production if needed
-    maxAge: 1 * 60 * 60 * 1000, // 1 hour in milliseconds
-  };
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
+  path: "/",
+  maxAge: 1 * 60 * 60 * 1000,
+};
 
   res.cookie("token", token, cookieOptions);
 
