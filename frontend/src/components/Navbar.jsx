@@ -3,7 +3,6 @@ import { handleLogout } from "../store/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { BellIcon, LogIn, LogOut, User } from "lucide-react";
 import { useAsyncError, useNavigate } from "react-router-dom";
-import GreenIndex from "../pages/GreenIndex";
 
 const Navbar = () => {
 	const [selectedRegions, setSelectedRegions] = useState([]);
@@ -103,7 +102,13 @@ const Navbar = () => {
 			<div className="container mx-auto flex items-center justify-between">
 				<div className="flex items-center">
 					<BellIcon className="mr-2 hidden sm:block" size={24} />
-					<h1 className="text-xl font-bold">Ultron Alert</h1>
+					<h1 className="text-xl font-bold pr-2">Ultron Alert</h1>
+					<button
+						onClick={() => navigate("/")}
+						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+					>
+						Home
+					</button>
 				</div>
 
 				<div className="flex items-center space-x-3">
@@ -118,6 +123,12 @@ const Navbar = () => {
 						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
 					>
 						Floods
+					</button>
+					<button
+						onClick={() => navigate("/ice")}
+						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+					>
+						Glaciers
 					</button>
 					{isAuthenticated ? (
 						<>

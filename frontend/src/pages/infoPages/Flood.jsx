@@ -1,8 +1,8 @@
 import React from "react";
-import floodImage from "../assets/images/floodingtop.jpg";
-import floodSvg from "../assets/images/flood.svg";
-import rescueSvg from "../assets/images/flood2.svg";
-import EnvironmentFloodingLayers from "../assets/EnvironmentFloodingLayers";
+import floodImage from "../../assets/images/floodingtop.jpg";
+import floodSvg from "../../assets/images/flood.svg";
+import rescueSvg from "../../assets/images/flood2.svg";
+import EnvironmentFloodingLayers from "../../assets/EnvironmentFloodingLayers";
 
 const Flood = () => {
 	return (
