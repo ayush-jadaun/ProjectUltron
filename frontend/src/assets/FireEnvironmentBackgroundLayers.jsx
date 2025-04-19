@@ -193,6 +193,11 @@ const FireEnvironmentBackgroundLayers = ({ children }) => {
 					</div>
 				</motion.div>
 
+<<<<<<<<< Temporary merge branch 1
+				{/* Fire blocks similar to Mario */}
+				<div className="absolute bottom-[calc(25%-5px)] left-[30%]">
+					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2  border-r-2 border-b-2 border-orange-700 flex items-center justify-center">
+=========
 				{/* Fire blocks */}
 				<motion.div 
 					className="absolute bottom-[calc(25%-5px)] left-[30%]"
@@ -207,12 +212,29 @@ const FireEnvironmentBackgroundLayers = ({ children }) => {
 					}}
 				>
 					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2 border-yellow-400 border-r-2 border-b-2 border-orange-700 flex items-center justify-center shadow-lg">
+>>>>>>>>> Temporary merge branch 2
 						<div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-300 rounded-sm"></div>
 					</div>
 				</motion.div>
 
+<<<<<<<<< Temporary merge branch 1
 				<div className="absolute bottom-[calc(25%-5px)] left-[60%] scale-75">
-					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2 border-yellow-400 border-r-2 border-b-2 border-orange-700 flex items-center justify-center opacity-95">
+					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2  border-r-2 border-b-2 border-orange-700 flex items-center justify-center opacity-95">
+=========
+				<motion.div 
+					className="absolute bottom-[calc(25%-5px)] left-[60%] scale-75"
+					animate={{
+						y: [0, -3, 0],
+						scale: [1, 1.05, 1]
+					}}
+					transition={{
+						duration: 2.5,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2 border-yellow-400 border-r-2 border-b-2 border-orange-700 flex items-center justify-center opacity-95 shadow-lg">
+>>>>>>>>> Temporary merge branch 2
 						<div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-300 rounded-sm"></div>
 					</div>
 				</motion.div>
