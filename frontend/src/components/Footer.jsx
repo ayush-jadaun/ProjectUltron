@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 const getPageGradients = (pathname) => {
 	switch (pathname) {
@@ -83,31 +83,33 @@ const Footer = () => {
 
 					{/* Simple navigation links */}
 					<div className="flex space-x-6 mb-6">
-						<a
-							href="#"
+						<Link
+							to="/about"
 							className={`${theme.hover} transition-colors duration-300`}
 						>
 							About
-						</a>
-						<a
-							href="#"
+						</Link>
+						<Link
+							to="/contact"
 							className={`${theme.hover} transition-colors duration-300`}
 						>
 							Contact
-						</a>
-						<a
-							href="#"
+						</Link>
+						<Link
+							to="/privacy-policy"
 							className={`${theme.hover} transition-colors duration-300`}
 						>
 							Privacy Policy
-						</a>
+						</Link>
 					</div>
 				</div>
 
 				{/* Social icons */}
 				<div className="flex justify-center space-x-4 mt-4 mb-4">
 					<a
-						href="#"
+						href="https://facebook.com"
+						target="_blank"
+						rel="noopener noreferrer"
 						className={`rounded-full p-2 ${theme.hover} transition-colors duration-300`}
 					>
 						<svg
@@ -124,7 +126,9 @@ const Footer = () => {
 						</svg>
 					</a>
 					<a
-						href="#"
+						href="https://twitter.com"
+						target="_blank"
+						rel="noopener noreferrer"
 						className={`rounded-full p-2 ${theme.hover} transition-colors duration-300`}
 					>
 						<svg
@@ -137,7 +141,9 @@ const Footer = () => {
 						</svg>
 					</a>
 					<a
-						href="#"
+						href="https://instagram.com"
+						target="_blank"
+						rel="noopener noreferrer"
 						className={`rounded-full p-2 ${theme.hover} transition-colors duration-300`}
 					>
 						<svg
@@ -154,7 +160,9 @@ const Footer = () => {
 						</svg>
 					</a>
 					<a
-						href="#"
+						href="https://github.com"
+						target="_blank"
+						rel="noopener noreferrer"
 						className={`rounded-full p-2 ${theme.hover} transition-colors duration-300`}
 					>
 						<svg
