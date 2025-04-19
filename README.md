@@ -1,5 +1,7 @@
 # Project Ultron - Advanced Environmental Monitoring System
 
+#Build at Hack36 8.0
+
 ## Overview
 Project Ultron is a sophisticated environmental monitoring system designed to track and analyze various environmental phenomena. The platform provides real-time data visualization, historical analysis, and predictive insights for environmental changes.
 
@@ -121,20 +123,3 @@ frontend/
 - Historical change comparison
 - Environmental condition indicators
 
-## Contributing
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-- Environmental data providers
-- Open-source community
-- Contributing developers
-
-## Contact
-For any inquiries or support, please contact us through the Contact page of the application.
