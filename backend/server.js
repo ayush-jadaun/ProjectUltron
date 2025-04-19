@@ -12,6 +12,7 @@ import scheduleUnverifiedUserCleanup from "./utils/killUnverifiedUser.js";
 import userSubscriptionRoutes from "./routes/userSubscription.routes.js"
 import analysisResultRoutes from "./routes/analysisResult.routes.js"
 import cronService from "./services/cron.service.js";
+import geeRoutes from "./routes/geeReports.js"
 dotenv.config();
 
 const app = express();
@@ -66,6 +67,7 @@ scheduleUnverifiedUserCleanup();
 app.use("/api/users", userRoutes);
 app.use("/api/subscriptions", userSubscriptionRoutes);
 app.use("/api/analysis-results", analysisResultRoutes);
+app.use("/api/gee-reports",geeRoutes)
 
 // Root route
 app.get("/", (req, res) => {

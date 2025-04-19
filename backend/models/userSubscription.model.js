@@ -42,6 +42,14 @@ const UserSubscription = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+    threshold_fire_protection: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    days_back_fire_protection: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     threshold_glacier: {
       type: DataTypes.FLOAT,
       allowNull: true,
