@@ -24,8 +24,7 @@ import SubscribeLocationPage from "./pages/SubscribeLocationPage"
 import GreenIndex from "./pages/infoPages/GreenIndex";
 import Flood from "./pages/infoPages/Flood";
 import Glaciers from "./pages/infoPages/Glaciers";
-
-import SubscribeLocationPage from "./pages/SubscribeLocationPage"; // Corrected import if needed
+import Beach from "./pages/infoPages/Beach";
 
 function App() {
   // const dispatch = useDispatch(); // No longer needed here
@@ -56,6 +55,7 @@ function AppContent() {
           <Route path="/green" element={<GreenIndex />} />
           <Route path="/flood" element={<Flood />} />
           <Route path="/ice" element={<Glaciers />} />
+          <Route path="/coast" element={<Beach />} />
           {/* <Route path="/coastal" element={<CoastalErosion />} /> */}
           <Route
             path="/reset-password/:resetToken"

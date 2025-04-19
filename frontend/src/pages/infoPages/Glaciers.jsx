@@ -7,9 +7,14 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 const Glaciers = () => {
   const [isCaseStudyOpen, setIsCaseStudyOpen] = useState(false);
+  const [isMoreStudiesOpen, setIsMoreStudiesOpen] = useState(false);
 
   const toggleCaseStudy = () => {
     setIsCaseStudyOpen(!isCaseStudyOpen);
+  };
+
+  const toggleMoreStudies = () => {
+    setIsMoreStudiesOpen(!isMoreStudiesOpen);
   };
 
   return (
@@ -228,31 +233,46 @@ const Glaciers = () => {
                   </ul>
                 </div>
 
-                <div className="flex justify-between items-center border-t border-blue-200 pt-4">
-                  <blockquote className="italic text-gray-700 pl-4 border-l-4 border-blue-300">
-                    "What happens in the Arctic doesn't stay in the Arctic. The
-                    loss of Greenland's ice affects weather patterns and sea
-                    levels worldwide."
-                    <footer className="text-sm font-medium text-blue-800 mt-1">
-                      — Dr. Jason Box, Glaciologist, Geological Survey of
-                      Denmark and Greenland
-                    </footer>
-                  </blockquote>
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm transition">
-                    Full Study
-                  </button>
+                <div
+                  className="cursor-pointer flex items-center justify-between p-4 mt-4 bg-blue-100 rounded-lg border border-blue-300"
+                  onClick={toggleMoreStudies}
+                >
+                  <h3 className="text-lg font-medium text-blue-800">
+                    View More Case Studies
+                  </h3>
+                  {isMoreStudiesOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </div>
+
+                <div
+                  className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                    isMoreStudiesOpen
+                      ? "max-h-screen opacity-100 pt-4"
+                      : "max-h-0 opacity-0"
+                  }`}
+                >
+                  <ul className="list-disc pl-6 text-gray-700 space-y-3 pt-2">
+                    <li>
+                      <b>Antarctica's Pine Island Glacier:</b> Rapid retreat patterns indicating potential collapse scenarios in the coming decades.
+                    </li>
+                    <li>
+                      <b>Himalayan Glacier Response:</b> High-altitude glaciers showing different retreat patterns than polar regions.
+                    </li>
+                    <li>
+                      <b>Alpine Glacier Recession:</b> Local impacts on water security and tourism in European mountain communities.
+                    </li>
+                    <li>
+                      <b>Arctic Sea Ice Minimum:</b> Annual patterns showing accelerating loss of summer sea ice coverage.
+                    </li>
+                  </ul>
                 </div>
               </div>
             </section>
 
             <footer className="text-center mt-8">
-              <p className="text-blue-800 text-lg mb-4">
+              <p className="text-blue-800 text-lg">
                 ❄️ Together, we can slow the melt and preserve Earth's frozen
                 wonders.
               </p>
-              <button className="bg-blue-700 hover:bg-blue-800 text-white py-2 px-6 rounded-xl shadow-md transition">
-                Explore More
-              </button>
             </footer>
           </div>
         </main>
