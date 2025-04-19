@@ -86,4 +86,5 @@ const UserSubscription = sequelize.define(
 UserSubscription.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(UserSubscription, { foreignKey: "userId" });
 
+
 export default UserSubscription;

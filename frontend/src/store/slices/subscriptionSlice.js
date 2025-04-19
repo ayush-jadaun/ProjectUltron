@@ -12,13 +12,12 @@ const api = axios.create({
 
 // ==================== Thunks ====================
 
-// Create new subscription (accepts all backend fields)
+// Create new subscription
 export const createSubscription = createAsyncThunk(
   "subscription/createSubscription",
   async (subscriptionData, { rejectWithValue }) => {
     try {
       const response = await api.post("/subscriptions", subscriptionData);
-      // Return the subscription object directly
       return response.data.data.subscription || response.data.data;
     } catch (error) {
       return rejectWithValue(
@@ -34,7 +33,6 @@ export const fetchUserSubscriptions = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/subscriptions");
-      // Return the array of subscriptions
       return response.data.data.subscriptions || response.data.data;
     } catch (error) {
       return rejectWithValue(
@@ -129,7 +127,6 @@ const subscriptionSlice = createSlice({
       .addCase(createSubscription.fulfilled, (state, action) => {
         state.creating = false;
         state.createSuccess = true;
-        // Add new subscription to list
         state.subscriptions.unshift(action.payload);
       })
       .addCase(createSubscription.rejected, (state, action) => {
@@ -172,14 +169,12 @@ const subscriptionSlice = createSlice({
       .addCase(updateSubscription.fulfilled, (state, action) => {
         state.updating = false;
         state.updateSuccess = true;
-        // Update in list if present
         const index = state.subscriptions.findIndex(
           (sub) => sub.id === action.payload.id
         );
         if (index !== -1) {
           state.subscriptions[index] = action.payload;
         }
-        // Update current if it matches
         if (state.currentSubscription?.id === action.payload.id) {
           state.currentSubscription = action.payload;
         }
