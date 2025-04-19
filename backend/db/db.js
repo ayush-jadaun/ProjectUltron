@@ -26,16 +26,16 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
 });
 
 // Sync Database
-sequelize
-  .sync({force:true})
-  .then(() => {
-    console.log("Database & tables have been updated!");
-  })
-  .catch((error) => {
-    console.error("Error updating database schema:", error);
-  });
+// sequelize
+//   .sync({force:true})
+//   .then(() => {
+//     console.log("Database & tables have been updated!");
+//   })
+//   .catch((error) => {
+//     console.error("Error updating database schema:", error);
+//   });
 
-// Connect to Database
+// // Connect to Database
 export const connectDb = asyncHandler(async () => {
   try {
     await sequelize.authenticate();
@@ -47,7 +47,7 @@ export const connectDb = asyncHandler(async () => {
     import("../models/analysisResult.model.js");
     
     // Sync Database
-    await sequelize.sync({ force: true });
+    await sequelize.sync();
     console.log("Database & tables have been recreated!");
   } catch (error) {
     console.error("Error connecting to database:", error);
