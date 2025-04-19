@@ -43,8 +43,8 @@ export async function generateGEEReport(req, res) {
             regionGeoJson,
             regionId,
             credentialsPath,
-            thresholdPercent, // percent of area flooded (optional)
-            bufferMeters // buffer for point geometry (optional)
+            thresholdPercent,
+            bufferMeters
           );
           break;
         case "GLACIER":
@@ -52,8 +52,8 @@ export async function generateGEEReport(req, res) {
             regionGeoJson,
             regionId,
             credentialsPath,
-            thresholdPercent, // percent of area lost (optional)
-            bufferMeters // buffer for point geometry (optional)
+            thresholdPercent,
+            bufferMeters
           );
           break;
         case "COASTAL_EROSION":
@@ -61,7 +61,7 @@ export async function generateGEEReport(req, res) {
             regionGeoJson,
             regionId,
             credentialsPath,
-            threshold // shoreline retreat threshold (meters)
+            threshold
           );
           break;
         default:
@@ -85,8 +85,25 @@ export async function generateGEEReport(req, res) {
       };
     }
 
-    // Always respond with valid JSON
-    return res.json({ success: true, result: analysisResult });
+    // Ensure images are present if returned by service, else null
+    const start_image_url =
+      analysisResult && analysisResult.start_image_url
+        ? analysisResult.start_image_url
+        : null;
+    const end_image_url =
+      analysisResult && analysisResult.end_image_url
+        ? analysisResult.end_image_url
+        : null;
+
+    // Always respond with valid JSON, including images if available
+    return res.json({
+      success: true,
+      result: {
+        ...analysisResult,
+        start_image_url,
+        end_image_url,
+      },
+    });
   } catch (err) {
     console.error("Error generating report:", err);
     return res.status(500).json({ success: false, error: err.message });
