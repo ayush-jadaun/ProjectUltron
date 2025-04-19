@@ -28,6 +28,7 @@ import Glaciers from "./pages/infoPages/Glaciers";
 import Beach from "./pages/infoPages/Beach";
 import Fire from "./pages/infoPages/Fire";
 import HistoricalChangePage from "./pages/HistoricalChangePage";
+
 function App() {
   // const dispatch = useDispatch(); // No longer needed here
 
