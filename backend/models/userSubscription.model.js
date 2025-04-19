@@ -41,6 +41,19 @@ const UserSubscription = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    threshold_glacier: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    buffer_glacier: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    threshold_coastal_erosion: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: null,
+    },
 
     alert_categories: {
       type: DataTypes.ARRAY(DataTypes.STRING), // e.g., ['DEFORESTATION', 'FLOODING']
