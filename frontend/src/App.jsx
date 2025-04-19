@@ -24,13 +24,13 @@ import Navbar from "./components/Navbar";
 import GreenIndex from "./pages/infoPages/GreenIndex";
 import Flood from "./pages/infoPages/Flood";
 import Glaciers from "./pages/infoPages/Glaciers";
-
+import SubscribeLocationPage from "./pages/SubscribeLocationPage"; // Corrected import if needed
 function App() {
   // const dispatch = useDispatch(); // No longer needed here
 
   // You might still want to dispatch checkAuthStatus somewhere,
   // perhaps once when the app loads, independent of routing,
-  // or inside the Navbar component if user info is displayed there.
+  // or inside the Navbar component if user   info is displayed there.
   // useEffect(() => {
   //   dispatch(checkAuthStatus());
   // }, [dispatch]);
