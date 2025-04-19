@@ -11,9 +11,9 @@ from pathlib import Path
 DEFAULT_FLOOD_ALERT_THRESHOLD_PERCENT = 5.0  # Alert if > 5% of area is newly flooded
 
 # --- UPDATE THESE FOR RECENT/BACKGROUND ANALYSIS WINDOW ---
-RECENT_FLOOD_PERIOD_DAYS = 6             # Analyze flooding over the last 6 days (matches Sentinel-1 update cadence)
+RECENT_FLOOD_PERIOD_DAYS = 14             # Analyze flooding over the last 6 days (matches Sentinel-1 update cadence)
 BASELINE_PERIOD_OFFSET_YEARS = 1         # Look 1 year back for baseline
-BASELINE_PERIOD_DURATION_DAYS = 6        # Duration of the baseline period window (6 days)
+BASELINE_PERIOD_DURATION_DAYS = 14        # Duration of the baseline period window (6 days)
 # ----------------------------------------------------------
 
 S1_COLLECTION = 'COPERNICUS/S1_GRD'
@@ -54,8 +54,8 @@ def check_flooding(region_geometry, threshold_percent, buffer_radius_meters):
     Compares recent water extent to a baseline period.
     """
     try:
-        # --- Define Time Periods ---
-        end_date_recent = ee.Date(datetime.datetime.utcnow())
+        from datetime import timezone
+        end_date_recent = ee.Date(datetime.datetime.now(timezone.utc))
         start_date_recent = end_date_recent.advance(-RECENT_FLOOD_PERIOD_DAYS, 'day')
 
         # Baseline period (e.g., same timeframe one year ago)
@@ -82,10 +82,38 @@ def check_flooding(region_geometry, threshold_percent, buffer_radius_meters):
 
         # --- Process Recent Period ---
         recent_s1 = s1_collection.filterDate(start_date_recent, end_date_recent)
-        recent_water_composite = recent_s1.map(apply_water_threshold).median().unmask(0).clip(region_geometry)
+        recent_count = recent_s1.size().getInfo()
+        if recent_count == 0:
+            msg = f"No Sentinel-1 images available for the recent period {start_date_recent.getInfo()} to {end_date_recent.getInfo()}."
+            print(f"ERROR: {msg}", file=sys.stderr)
+            return {
+                "status": "error",
+                "message": msg,
+                "alert_triggered": False,
+                "flooded_area_sqkm": None,
+                "flooded_percentage": None,
+                "threshold_percent": threshold_percent,
+                "buffer_radius_meters": buffer_radius_meters
+            }
 
         # --- Process Baseline Period ---
         baseline_s1 = s1_collection.filterDate(start_date_baseline, end_date_baseline)
+        baseline_count = baseline_s1.size().getInfo()
+        if baseline_count == 0:
+            msg = f"No Sentinel-1 images available for the baseline period {start_date_baseline.getInfo()} to {end_date_baseline.getInfo()}."
+            print(f"ERROR: {msg}", file=sys.stderr)
+            return {
+                "status": "error",
+                "message": msg,
+                "alert_triggered": False,
+                "flooded_area_sqkm": None,
+                "flooded_percentage": None,
+                "threshold_percent": threshold_percent,
+                "buffer_radius_meters": buffer_radius_meters
+            }
+
+        recent_water_composite = recent_s1.map(apply_water_threshold).median().unmask(0).clip(region_geometry)
+
         try:
             recent_orbits = recent_s1.aggregate_array('relativeOrbitNumber_start').distinct().getInfo()
             if recent_orbits:
@@ -95,6 +123,21 @@ def check_flooding(region_geometry, threshold_percent, buffer_radius_meters):
                 print("WARNING: No recent S1 images found to determine orbit numbers for baseline filtering.", file=sys.stderr)
         except Exception as orbit_err:
             print(f"WARNING: Could not filter baseline by orbit number: {orbit_err}", file=sys.stderr)
+
+        # Re-check that baseline_s1 is not now empty
+        baseline_count2 = baseline_s1.size().getInfo()
+        if baseline_count2 == 0:
+            msg = f"No Sentinel-1 images available for the baseline period after orbit filtering."
+            print(f"ERROR: {msg}", file=sys.stderr)
+            return {
+                "status": "error",
+                "message": msg,
+                "alert_triggered": False,
+                "flooded_area_sqkm": None,
+                "flooded_percentage": None,
+                "threshold_percent": threshold_percent,
+                "buffer_radius_meters": buffer_radius_meters
+            }
 
         baseline_water_composite = baseline_s1.map(apply_water_threshold).median().unmask(0).clip(region_geometry)
 
@@ -217,9 +260,9 @@ def check_flooding(region_geometry, threshold_percent, buffer_radius_meters):
         error_str = str(gee_error)
         print(f"ERROR: GEE computation failed: {error_str}", file=sys.stderr)
         if "Collection.loadTable: No features found for query" in error_str or "ImageCollection.mosaic: Tile error" in error_str or "No bands available for" in error_str:
-             message = f"GEE Error: Likely no Sentinel-1 images found for one or both periods in the specified region. Check dates and region coordinates. Details: {error_str}"
+            message = f"GEE Error: Likely no Sentinel-1 images found for one or both periods in the specified region. Check dates and region coordinates. Details: {error_str}"
         else:
-             message = f"GEE Computation Error: {error_str}"
+            message = f"GEE Computation Error: {error_str}"
         return {
             "status": "error",
             "message": message,
@@ -268,10 +311,10 @@ if __name__ == "__main__":
         print(json.dumps({"status": "error", "message": f"Invalid Stdin Parameters: {e}", "region_id": region_id}))
         sys.exit(1)
     except Exception as e:
-         print(f"ERROR: Unexpected error processing input: {e}", file=sys.stderr)
-         print(traceback.format_exc(), file=sys.stderr)
-         print(json.dumps({"status": "error", "message": f"Unexpected error processing input: {e}", "region_id": region_id}))
-         sys.exit(1)
+        print(f"ERROR: Unexpected error processing input: {e}", file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+        print(json.dumps({"status": "error", "message": f"Unexpected error processing input: {e}", "region_id": region_id}))
+        sys.exit(1)
 
     if not initialize_gee(credentials_path_from_arg):
         print(json.dumps({"status": "error", "message": "GEE initialization failed.", "region_id": region_id}))
@@ -283,7 +326,7 @@ if __name__ == "__main__":
         geom_type = geojson_geometry.get('type')
         coords = geojson_geometry.get('coordinates')
         if not geom_type or not coords:
-             raise ValueError("Invalid GeoJSON structure: Missing 'type' or 'coordinates'.")
+            raise ValueError("Invalid GeoJSON structure: Missing 'type' or 'coordinates'.")
 
         if geom_type == 'Polygon':
             ee_geometry = ee.Geometry.Polygon(coords)
@@ -291,7 +334,7 @@ if __name__ == "__main__":
             ee_geometry = ee.Geometry.MultiPolygon(coords)
         elif geom_type == 'Point':
             if not isinstance(coords, list) or len(coords) != 2:
-                 raise ValueError("Invalid Point coordinates.")
+                raise ValueError("Invalid Point coordinates.")
             ee_geometry = ee.Geometry.Point(coords).buffer(buffer_radius)
             effective_buffer = buffer_radius
         else:
@@ -302,9 +345,9 @@ if __name__ == "__main__":
         print(json.dumps({"status": "error", "message": f"Invalid GeoJSON Geometry: {e}", "region_id": region_id}))
         sys.exit(1)
     except ee.EEException as e:
-         print(f"ERROR: GEE error processing geometry: {e}", file=sys.stderr)
-         print(json.dumps({"status": "error", "message": f"GEE error processing geometry: {e}", "region_id": region_id}))
-         sys.exit(1)
+        print(f"ERROR: GEE error processing geometry: {e}", file=sys.stderr)
+        print(json.dumps({"status": "error", "message": f"GEE error processing geometry: {e}", "region_id": region_id}))
+        sys.exit(1)
     except Exception as e:
         print(f"ERROR: Unexpected error converting GeoJSON: {e}", file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)

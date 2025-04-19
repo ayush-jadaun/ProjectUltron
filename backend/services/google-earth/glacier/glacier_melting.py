@@ -11,8 +11,8 @@ from pathlib import Path
 DEFAULT_GLACIER_ALERT_THRESHOLD_PERCENT = 2.0  # Alert if > 2% glacier area loss
 
 # --- UPDATE THESE FOR RECENT/BACKGROUND ANALYSIS WINDOW ---
-RECENT_PERIOD_DAYS = 6    # Analyze the last 6 days
-BASELINE_PERIOD_YEARS_AGO = 10
+RECENT_PERIOD_DAYS = 90  # Analyze the last 6 days
+BASELINE_PERIOD_YEARS_AGO = 90
 BASELINE_PERIOD_DURATION_DAYS = 6  # Baseline is a 6-day window as well
 BASELINE_FALLBACK_YEARS = [8, 9, 11, 12]  # Fallback years to try if primary baseline has no data
 # ----------------------------------------------------------
