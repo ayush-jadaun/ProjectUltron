@@ -88,20 +88,34 @@ const HomePage = () => {
 		}
 
 		setIsSaving(true);
+		
+		// Create GeoJSON for the selected regions
+		const regionGeometry = selectedRegions.length === 1 
+			? {
+					type: "Point",
+					coordinates: [selectedRegions[0].lng, selectedRegions[0].lat],
+			  }
+			: {
+					type: "MultiPoint",
+					coordinates: selectedRegions.map(region => [region.lng, region.lat]),
+			  };
+
 		const subscriptionData = {
 			subscription_name: "Environmental Alerts",
-			region_geometry: {
-				type: "Point",
-				coordinates: [selectedRegions[0].lng, selectedRegions[0].lat],
-			},
+			region_geometry: regionGeometry,
 			alert_categories: selectedTopics,
 			is_active: true,
 		};
 
+		// Log the data being sent
+		console.log("Sending subscription data:", subscriptionData);
+
 		try {
-			await dispatch(createSubscription(subscriptionData)).unwrap();
+			const result = await dispatch(createSubscription(subscriptionData)).unwrap();
+			console.log("Subscription created successfully:", result);
 			setSaveSuccess(true);
 			setTimeout(() => setSaveSuccess(false), 3000);
+			
 			// Clear form after successful submission
 			setSelectedRegions([]);
 			setTopics({
@@ -115,6 +129,7 @@ const HomePage = () => {
 			setNotifyMethod("email");
 		} catch (error) {
 			console.error("Failed to save preferences:", error);
+			alert(error.message || "Failed to save preferences. Please try again.");
 		} finally {
 			setIsSaving(false);
 		}

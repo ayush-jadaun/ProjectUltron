@@ -6,9 +6,9 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 
 import sequelize from "../db/db.js";
-import User from "../models/User.js";
-import UserSubscription from "../models/UserSubscription.js";
-import AnalysisResult from "../models/AnalysisResult.js";
+import User from "../models/user.model.js";
+import UserSubscription from "../models/userSubscription.model.js";
+import AnalysisResult from "../models/analysisResult.model.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,7 +16,8 @@ const pythonScriptsDir = path.resolve(
   __dirname,
   "..",
   "services",
-  "google-earth"
+  "google-earth",
+  "deforestation"
 );
 
 function runGeeScript(
@@ -294,7 +295,7 @@ async function processSubscription(subscription, credentialsPath) {
   console.log(`--- Finished Processing Subscription ID: ${subscriptionId} ---`);
 }
 
-async function runAllChecks() {
+export async function runAllChecks() {
   console.log("--- Starting Orchestration: Run All Checks (Sequelize) ---");
 
   const rawCredentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
