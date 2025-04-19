@@ -43,31 +43,36 @@ export const createSubscription = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Create
-  const subscription = await UserSubscription.create({
-    userId,
-    subscription_name: subscription_name || `Subscription ${Date.now()}`,
-    region_name,
-    region_geometry,
-    alert_categories,
-    threshold_deforestation: threshold_deforestation ?? null,
-    threshold_flooding: threshold_flooding ?? null,
-    buffer_flooding: buffer_flooding ?? null,
-    threshold_glacier: threshold_glacier ?? null,
-    buffer_glacier: buffer_glacier ?? null,
-    threshold_coastal_erosion: threshold_coastal_erosion ?? null,
-    is_active: is_active !== undefined ? is_active : true,
-  });
+  try {
+    // Create
+    const subscription = await UserSubscription.create({
+      userId,
+      subscription_name: subscription_name || `Subscription ${Date.now()}`,
+      region_name,
+      region_geometry,
+      alert_categories,
+      threshold_deforestation: threshold_deforestation ?? null,
+      threshold_flooding: threshold_flooding ?? null,
+      buffer_flooding: buffer_flooding ?? null,
+      threshold_glacier: threshold_glacier ?? null,
+      buffer_glacier: buffer_glacier ?? null,
+      threshold_coastal_erosion: threshold_coastal_erosion ?? null,
+      is_active: is_active !== undefined ? is_active : true,
+    });
 
-  res
-    .status(201)
-    .json(
-      new ApiResponse(
-        201,
-        { subscription },
-        "Subscription created successfully"
-      )
-    );
+    res
+      .status(201)
+      .json(
+        new ApiResponse(
+          201,
+          { subscription },
+          "Subscription created successfully"
+        )
+      );
+  } catch (err) {
+    console.error("Create Subscription Error:", err); // for debugging
+    return next(new ApiError(err.message, 500));
+  }
 });
 
 /*
