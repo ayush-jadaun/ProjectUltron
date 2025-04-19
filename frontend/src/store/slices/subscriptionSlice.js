@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Setup axios instance
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   withCredentials: true,
@@ -9,13 +10,16 @@ const api = axios.create({
   },
 });
 
-// Create new subscription
+// ==================== Thunks ====================
+
+// Create new subscription (accepts all backend fields)
 export const createSubscription = createAsyncThunk(
   "subscription/createSubscription",
   async (subscriptionData, { rejectWithValue }) => {
     try {
       const response = await api.post("/subscriptions", subscriptionData);
-      return response.data.data;
+      // Return the subscription object directly
+      return response.data.data.subscription || response.data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to create subscription"
@@ -24,13 +28,14 @@ export const createSubscription = createAsyncThunk(
   }
 );
 
-// Get user's subscriptions
+// Get all subscriptions for the logged-in user
 export const fetchUserSubscriptions = createAsyncThunk(
   "subscription/fetchUserSubscriptions",
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/subscriptions");
-      return response.data.data;
+      // Return the array of subscriptions
+      return response.data.data.subscriptions || response.data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch subscriptions"
@@ -39,13 +44,13 @@ export const fetchUserSubscriptions = createAsyncThunk(
   }
 );
 
-// Get subscription by ID
+// Get a single subscription by ID
 export const fetchSubscriptionById = createAsyncThunk(
   "subscription/fetchSubscriptionById",
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.get(`/subscriptions/${id}`);
-      return response.data.data;
+      return response.data.data.subscription || response.data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch subscription"
@@ -54,13 +59,13 @@ export const fetchSubscriptionById = createAsyncThunk(
   }
 );
 
-// Update subscription
+// Update a subscription
 export const updateSubscription = createAsyncThunk(
   "subscription/updateSubscription",
   async ({ id, updateData }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/subscriptions/${id}`, updateData);
-      return response.data.data;
+      return response.data.data.subscription || response.data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to update subscription"
@@ -69,7 +74,7 @@ export const updateSubscription = createAsyncThunk(
   }
 );
 
-// Delete subscription
+// Delete a subscription
 export const deleteSubscription = createAsyncThunk(
   "subscription/deleteSubscription",
   async (id, { rejectWithValue }) => {
@@ -84,6 +89,8 @@ export const deleteSubscription = createAsyncThunk(
   }
 );
 
+// ==================== Slice ====================
+
 const subscriptionSlice = createSlice({
   name: "subscription",
   initialState: {
@@ -93,7 +100,10 @@ const subscriptionSlice = createSlice({
     error: null,
     creating: false,
     updating: false,
-    deleting: false
+    deleting: false,
+    createSuccess: false,
+    updateSuccess: false,
+    deleteSuccess: false,
   },
   reducers: {
     clearCurrentSubscription: (state) => {
@@ -101,21 +111,30 @@ const subscriptionSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
-    }
+    },
+    resetSuccessFlags: (state) => {
+      state.createSuccess = false;
+      state.updateSuccess = false;
+      state.deleteSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
       // Create Subscription
       .addCase(createSubscription.pending, (state) => {
         state.creating = true;
+        state.createSuccess = false;
         state.error = null;
       })
       .addCase(createSubscription.fulfilled, (state, action) => {
         state.creating = false;
-        state.subscriptions.push(action.payload);
+        state.createSuccess = true;
+        // Add new subscription to list
+        state.subscriptions.unshift(action.payload);
       })
       .addCase(createSubscription.rejected, (state, action) => {
         state.creating = false;
+        state.createSuccess = false;
         state.error = action.payload;
       })
       // Fetch User Subscriptions
@@ -125,7 +144,7 @@ const subscriptionSlice = createSlice({
       })
       .addCase(fetchUserSubscriptions.fulfilled, (state, action) => {
         state.loading = false;
-        state.subscriptions = action.payload;
+        state.subscriptions = action.payload || [];
       })
       .addCase(fetchUserSubscriptions.rejected, (state, action) => {
         state.loading = false;
@@ -147,40 +166,53 @@ const subscriptionSlice = createSlice({
       // Update Subscription
       .addCase(updateSubscription.pending, (state) => {
         state.updating = true;
+        state.updateSuccess = false;
         state.error = null;
       })
       .addCase(updateSubscription.fulfilled, (state, action) => {
         state.updating = false;
-        const index = state.subscriptions.findIndex(sub => sub.id === action.payload.id);
+        state.updateSuccess = true;
+        // Update in list if present
+        const index = state.subscriptions.findIndex(
+          (sub) => sub.id === action.payload.id
+        );
         if (index !== -1) {
           state.subscriptions[index] = action.payload;
         }
+        // Update current if it matches
         if (state.currentSubscription?.id === action.payload.id) {
           state.currentSubscription = action.payload;
         }
       })
       .addCase(updateSubscription.rejected, (state, action) => {
         state.updating = false;
+        state.updateSuccess = false;
         state.error = action.payload;
       })
       // Delete Subscription
       .addCase(deleteSubscription.pending, (state) => {
         state.deleting = true;
+        state.deleteSuccess = false;
         state.error = null;
       })
       .addCase(deleteSubscription.fulfilled, (state, action) => {
         state.deleting = false;
-        state.subscriptions = state.subscriptions.filter(sub => sub.id !== action.payload);
+        state.deleteSuccess = true;
+        state.subscriptions = state.subscriptions.filter(
+          (sub) => sub.id !== action.payload
+        );
         if (state.currentSubscription?.id === action.payload) {
           state.currentSubscription = null;
         }
       })
       .addCase(deleteSubscription.rejected, (state, action) => {
         state.deleting = false;
+        state.deleteSuccess = false;
         state.error = action.payload;
       });
-  }
+  },
 });
 
-export const { clearCurrentSubscription, clearError } = subscriptionSlice.actions;
-export default subscriptionSlice.reducer; 
+export const { clearCurrentSubscription, clearError, resetSuccessFlags } =
+  subscriptionSlice.actions;
+export default subscriptionSlice.reducer;

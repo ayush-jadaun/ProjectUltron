@@ -20,6 +20,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+
 import GreenIndex from "./pages/infoPages/GreenIndex";
 import Flood from "./pages/infoPages/Flood";
 import Glaciers from "./pages/infoPages/Glaciers";
@@ -62,6 +63,7 @@ function AppContent() {
           <Route path="/profile" element={<UserProfile />} />
           {/* --- Analysis Page (now public) --- */}
           <Route path="/analysis" element={<AnalysisPage />} />
+          <Route path="/map" element={<SubscribeLocationPage />} />
           {/* --- Public-only route (not for logged-in users) --- */}
           <Route
             path="/login"

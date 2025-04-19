@@ -7,7 +7,7 @@ import sequelize from "../db/db.js";
 import User from "../models/user.model.js";
 import UserSubscription from "../models/userSubscription.model.js";
 import AnalysisResult from "../models/analysisResult.model.js";
-
+import { sendAlertNotification } from "../utils/alertNotifier.js";
 // --- Import flooding and glacier melting runners ---
 import { runFloodCheck } from "../services/google-earth/flooding/flooding.js";
 import { runGlacierMeltingCheck } from "../services/google-earth/glacier/glacier_melting.js";
@@ -215,6 +215,10 @@ function normalizeCategory(category) {
     .toUpperCase();
 }
 
+
+
+// ...rest of your file...
+
 async function saveAnalysisResult(resultData) {
   if (!resultData) {
     console.error("No analysis data provided to save.");
@@ -224,6 +228,8 @@ async function saveAnalysisResult(resultData) {
   resultData.analysis_type = resultData.analysis_type || "UNKNOWN";
   resultData.status = resultData.status || "error";
   resultData.alert_triggered = resultData.alert_triggered === true;
+
+  // Date field normalization as before...
   const dateFields = [
     "recent_period_start",
     "recent_period_end",
@@ -249,6 +255,21 @@ async function saveAnalysisResult(resultData) {
     const createdResult = await AnalysisResult.create(resultData);
     console.log("--- Sequelize Insert Success ---");
     console.log("Inserted:", createdResult.toJSON());
+
+    // ----- NOTIFY USER IF ALERT TRIGGERED -----
+    if (createdResult.alert_triggered) {
+      // Fetch the user (for email/notification)
+      const user = await User.findByPk(createdResult.user_id);
+      if (user) {
+        await sendAlertNotification({
+          user,
+          subscriptionId: createdResult.subscription_id,
+          analysisType: createdResult.analysis_type,
+          details: createdResult.details,
+        });
+      }
+    }
+
     return { success: true, data: createdResult.toJSON() };
   } catch (insertError) {
     console.error("--- Sequelize Insert Error ---");
