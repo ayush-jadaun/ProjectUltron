@@ -1,6 +1,5 @@
 import sequelize from "../db/db.js"; 
 import { DataTypes } from "sequelize";
-import sequelize from "../db/db.js"; // Adjust path as needed
 import User from "./user.model.js";
 // Import User model if you have associations defined here
 
@@ -47,16 +46,7 @@ const UserSubscription = sequelize.define(
   {
     timestamps: true, 
     tableName: "user_subscriptions", 
-    indexes: [
-   
-      {
-        fields: ["userId"],
-      },
- 
-      {
-        fields: ["is_active"],
-      },
-    ],
+
   }
 );
 

@@ -1,0 +1,192 @@
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  MailWarning,
+  Home,
+  LogIn,
+} from "lucide-react";
+import {
+  handleEmailVerification,
+  clearError,
+} from "../../store/slices/authSlice"; // Adjust path as needed
+
+const VerifyEmail = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const token = searchParams.get("token");
+
+  const { loading, error, isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
+  const [verificationStatus, setVerificationStatus] = useState("pending"); // 'pending', 'success', 'error', 'alreadyVerified', 'noToken'
+
+  useEffect(() => {
+    // Clear any previous auth errors when the component mounts
+    dispatch(clearError());
+
+    if (!token) {
+      setVerificationStatus("noToken");
+      return; // Stop processing if no token is found
+    }
+
+    // Set status to pending explicitly when token exists and we start dispatching
+    setVerificationStatus("pending");
+    dispatch(handleEmailVerification(token))
+      .unwrap()
+      .then(() => {
+        // Fulfilled: Verification successful, user is now authenticated
+        setVerificationStatus("success");
+        // Optional: Redirect after a short delay
+        // setTimeout(() => navigate('/dashboard'), 3000);
+      })
+      .catch((errMessage) => {
+        // Rejected: Check the error message from the slice
+        if (errMessage?.includes("already verified")) {
+          setVerificationStatus("alreadyVerified");
+        } else {
+          setVerificationStatus("error");
+        }
+        // The error message itself is stored in the Redux state `error`
+      });
+
+    // Cleanup function (optional, clearError might be sufficient)
+    // return () => {
+    //     dispatch(clearError());
+    // };
+  }, [dispatch, token]); // Depend on dispatch and token
+
+  const renderContent = () => {
+    if (verificationStatus === "noToken") {
+      return (
+        <div className="text-center space-y-4">
+          <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
+          <h3 className="text-xl font-semibold text-red-700">
+            Invalid Verification Link
+          </h3>
+          <p className="text-gray-600">
+            The verification link is missing the required token. Please ensure
+            you copied the entire link from your email.
+          </p>
+          <Link
+            to="/login"
+            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+          >
+            <LogIn size={18} className="mr-2" /> Go to Login
+          </Link>
+        </div>
+      );
+    }
+
+    if (loading || verificationStatus === "pending") {
+      return (
+        <div className="text-center space-y-4">
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-green-600" />
+          <h3 className="text-xl font-semibold text-gray-700">
+            Verifying your email...
+          </h3>
+          <p className="text-gray-500">Please wait a moment.</p>
+        </div>
+      );
+    }
+
+    if (verificationStatus === "success" && isAuthenticated) {
+      return (
+        <div className="text-center space-y-4">
+          <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+          <h3 className="text-xl font-semibold text-green-700">
+            Email Verified Successfully!
+          </h3>
+          <p className="text-gray-600">
+            Your account is now active. You have been automatically logged in.
+          </p>
+          <Link
+            to="/dashboard" // Or your main authenticated route
+            className="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors"
+          >
+            <Home size={18} className="mr-2" /> Go to Dashboard
+          </Link>
+        </div>
+      );
+    }
+
+    if (verificationStatus === "alreadyVerified") {
+      return (
+        <div className="text-center space-y-4">
+          <CheckCircle className="mx-auto h-12 w-12 text-blue-500" />
+          <h3 className="text-xl font-semibold text-blue-700">
+            Email Already Verified
+          </h3>
+          <p className="text-gray-600">
+            This email address has already been verified. You can log in to your
+            account.
+          </p>
+          <Link
+            to="/login"
+            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+          >
+            <LogIn size={18} className="mr-2" /> Go to Login
+          </Link>
+        </div>
+      );
+    }
+
+    // Covers 'error' status
+    if (error || verificationStatus === "error") {
+      return (
+        <div className="text-center space-y-4">
+          <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
+          <h3 className="text-xl font-semibold text-red-700">
+            Verification Failed
+          </h3>
+          <p className="text-gray-600">
+            {error ||
+              "The verification link may be invalid or expired. Please try requesting a new verification email."}
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-3 mt-4">
+            <Link
+              to="/request-verification" // Link to request a new email
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700"
+            >
+              <MailWarning size={18} className="mr-2" /> Resend Verification
+              Email
+            </Link>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <LogIn size={18} className="mr-2" /> Back to Login
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    // Fallback - should ideally not be reached if logic is sound
+    return (
+      <div className="text-center text-gray-500">
+        Checking verification status...
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col justify-center items-center px-4">
+      <main className="w-full max-w-md">
+        <div className="bg-white rounded-xl shadow-2xl p-8 space-y-6 border border-gray-200">
+          {renderContent()}
+        </div>
+      </main>
+      <footer className="mt-8 text-center text-gray-500 text-sm">
+        © {new Date().getFullYear()} Project Ultron. Environmental Monitoring.
+      </footer>
+    </div>
+  );
+};
+
+export default VerifyEmail;

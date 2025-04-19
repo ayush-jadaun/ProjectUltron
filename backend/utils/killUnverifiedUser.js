@@ -18,7 +18,7 @@ async function scheduleUnverifiedUserCleanup() {
 
             const result = await User.destroy({
                 where: {
-                    isVerified: false,
+                    is_verified: false,
                     createdAt: {
                         [Op.lte]: thresholdTime,
                     },
