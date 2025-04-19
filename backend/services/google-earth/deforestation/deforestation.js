@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
  * @param {number} [threshold] - Optional NDVI drop threshold
  * @returns {Promise<Object>} - Analysis results
  */
-function runDeforestationCheck(
+export function runDeforestationCheck(
   regionGeoJson,
   regionId,
   credentialsPath,

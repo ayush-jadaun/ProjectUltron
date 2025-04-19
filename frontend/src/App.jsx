@@ -24,6 +24,7 @@ import SubscribeLocationPage from "./pages/SubscribeLocationPage"
 import GreenIndex from "./pages/infoPages/GreenIndex";
 import Flood from "./pages/infoPages/Flood";
 import Glaciers from "./pages/infoPages/Glaciers";
+import HistoricalChangePage from "./pages/HistoricalChangePage";
 
 import SubscribeLocationPage from "./pages/SubscribeLocationPage"; // Corrected import if needed
 
@@ -56,6 +57,7 @@ function AppContent() {
           <Route path="/green" element={<GreenIndex />} />
           <Route path="/flood" element={<Flood />} />
           <Route path="/ice" element={<Glaciers />} />
+          <Route path="/history" element={<HistoricalChangePage />} />
           {/* <Route path="/coastal" element={<CoastalErosion />} /> */}
           <Route
             path="/reset-password/:resetToken"
