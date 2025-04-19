@@ -68,9 +68,7 @@ const HomePage = () => {
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6 }}
-
 								className="text-4xl font-bold mb-6 bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent"
-
 							>
 								Take Action for Our Planet
 							</motion.h1>
@@ -137,7 +135,12 @@ const HomePage = () => {
 								whileHover={{ y: -3 }}
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
-								<div className="rounded-full bg-green-50 p-2 mb-2">
+								<div
+									className="rounded-full bg-green-50 p-2 mb-2"
+									onClick={() => {
+										navigate("/green");
+									}}
+								>
 									<LeafIcon size={20} className="text-green-500" />
 								</div>
 								<h3 className="text-sm font-semibold text-green-600">
@@ -151,11 +154,16 @@ const HomePage = () => {
 								whileHover={{ y: -3 }}
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
-								<div className="rounded-full bg-blue-50 p-2 mb-2">
+								<div
+									className="rounded-full bg-blue-50 p-2 mb-2"
+									onClick={() => {
+										navigate("/flood");
+									}}
+								>
 									<DropletIcon size={20} className="text-blue-500" />
 								</div>
 								<h3 className="text-sm font-semibold text-blue-600">
-									Flooding
+									Floods
 								</h3>
 							</motion.div>
 
@@ -165,7 +173,12 @@ const HomePage = () => {
 								whileHover={{ y: -3 }}
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
-								<div className="rounded-full bg-gray-50 p-2 mb-2">
+								<div
+									className="rounded-full bg-gray-50 p-2 mb-2"
+									onClick={() => {
+										navigate("/coast");
+									}}
+								>
 									<AlertTriangleIcon size={20} className="text-gray-500" />
 								</div>
 								<h3 className="text-sm font-semibold text-gray-600">Coastal</h3>
@@ -177,10 +190,15 @@ const HomePage = () => {
 								whileHover={{ y: -3 }}
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
-								<div className="rounded-full bg-red-50 p-2 mb-2">
+								<div
+									className="rounded-full bg-red-50 p-2 mb-2"
+									onClick={() => {
+										navigate("/fire");
+									}}
+								>
 									<FlameIcon size={20} className="text-red-500" />
 								</div>
-								<h3 className="text-sm font-semibold text-red-600">Wildfire</h3>
+								<h3 className="text-sm font-semibold text-red-600">Wildfires</h3>
 							</motion.div>
 
 							{/* Glacier Melting */}
@@ -189,7 +207,12 @@ const HomePage = () => {
 								whileHover={{ y: -3 }}
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
-								<div className="rounded-full bg-cyan-50 p-2 mb-2">
+								<div
+									className="rounded-full bg-cyan-50 p-2 mb-2"
+									onClick={() => {
+										navigate("/ice");
+									}}
+								>
 									<ThermometerIcon size={20} className="text-cyan-500" />
 								</div>
 								<h3 className="text-sm font-semibold text-cyan-600">

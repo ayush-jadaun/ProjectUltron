@@ -191,7 +191,7 @@ const Navbar = () => {
 							to="/"
 							className="flex-shrink-0 flex items-center space-x-2 transition-transform hover:scale-105"
 						>
-							<span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 drop-shadow-lg">
+							<span className="text-s md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 drop-shadow-lg">
 								Project Ultron
 							</span>
 						</Link>
@@ -277,7 +277,7 @@ const Navbar = () => {
 							<div className="flex items-center space-x-2">
 								<Link
 									to="/profile"
-									className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+									className={`px-2 py-1 md:px-4 md:py-2 rounded-md text-sm font-medium transition-all duration-300 ${
 										location.pathname === "/profile"
 											? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
 											: `${colors.hover} opacity-80 hover:opacity-100`
@@ -298,7 +298,7 @@ const Navbar = () => {
 								</Link>
 								<button
 									onClick={onLogoutClick}
-									className={`${colors.button} px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${colors.border} shadow-md`}
+									className={`${colors.button} px-2 py-1 md:px-4 md:py-2 rounded-md text-sm font-medium transition-all duration-300 border ${colors.border} shadow-md`}
 								>
 									<LogOut size={16} className="inline mr-1" />
 									Logout
@@ -307,7 +307,7 @@ const Navbar = () => {
 						) : (
 							<button
 								onClick={onLoginClick}
-								className={`${colors.button} px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${colors.border} shadow-md`}
+								className={`${colors.button} px-2 py-1 md:px-4 md:py-2 rounded-md text-sm font-medium transition-all duration-300 border ${colors.border} shadow-md`}
 							>
 								<LogIn size={16} className="inline mr-1" />
 								Login/SignUp
@@ -316,7 +316,7 @@ const Navbar = () => {
 
 						{/* Mobile menu button */}
 						<button
-							className="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+							className="md:hidden p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
 							onClick={toggleMobileMenu}
 						>
 							{mobileMenuOpen ? (
