@@ -68,7 +68,7 @@ const HomePage = () => {
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6 }}
-								className="text-4xl font-bold mb-6 bg-gradient-to-r from-green-800 to-blue-500 bg-clip-text text-transparent"
+								className="text-4xl font-bold mb-6 bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent"
 							>
 								Take Action for Our Planet
 							</motion.h1>
@@ -76,12 +76,11 @@ const HomePage = () => {
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: 0.2 }}
-								className="text-lg text-gray-600 mb-5 leading-relaxed"
+								className="text-lg text-gray-600 mb-8 leading-relaxed"
 							>
-								Project Ultron helps you stay informed about environmental changes in
-								regions you care about. Get timely notifications about
-								deforestation, flooding, air pollution, and other ecological
-								issues.
+								helps you stay informed about environmental changes in regions
+								you care about. Get timely notifications about deforestation,
+								flooding, air pollution, and other ecological issues.
 							</motion.p>
 							<motion.div
 								initial={{ opacity: 0, y: 20 }}
@@ -197,7 +196,32 @@ const HomePage = () => {
 							</motion.div>
 						</div>
 					</motion.section>
-
+					<motion.section
+						variants={itemVariants}
+						className="bg-gradient-to-r from-sky-700 via-green-600 to-sky-700 text-white rounded-xl shadow-lg p-8 text-center relative overflow-hidden mb-20"
+					>
+						<div className="relative z-10">
+							<motion.h2
+								initial={{ opacity: 0, y: 20 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								viewport={{ once: true }}
+								transition={{ duration: 0.6 }}
+								className="text-2xl font-bold mb-4"
+							>
+								Statellite Image Comparator
+							</motion.h2>
+							<motion.p
+								initial={{ opacity: 0, y: 20 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								viewport={{ once: true }}
+								transition={{ duration: 0.6, delay: 0.2 }}
+								className="text-lg mb-6"
+							>
+								Compare satellite images of regions over time to see the impact
+								of deforestation, flooding and other environmental changes.
+							</motion.p>
+						</div>
+					</motion.section>
 					{/* Call to Action */}
 					<motion.section
 						variants={itemVariants}

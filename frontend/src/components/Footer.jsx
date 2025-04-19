@@ -55,7 +55,7 @@ const getPageGradients = (pathname) => {
 			};
 		default:
 			return {
-				bg: "bg-gradient-to-r from-gray-900 to-gray-700",
+				bg: "bg-gradient-to-t from-green-600 via-green-800 to-green-800",
 				border: "border-gray-500",
 				text: "text-white",
 				hover: "hover:text-gray-200",
