@@ -28,6 +28,9 @@ import Glaciers from "./pages/infoPages/Glaciers";
 import Beach from "./pages/infoPages/Beach";
 import Fire from "./pages/infoPages/Fire";
 import HistoricalChangePage from "./pages/HistoricalChangePage";
+import AboutUs from "./pages/AboutUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Contact from "./pages/Contact";
 
 function App() {
   // const dispatch = useDispatch(); // No longer needed here
@@ -61,7 +64,9 @@ function AppContent() {
           <Route path="/fire" element={<Fire />} />
 
           <Route path="/coast" element={<Beach />} />
-
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/history" element={<HistoricalChangePage />} />
 
           {/* <Route path="/coastal" element={<CoastalErosion />} /> */}
