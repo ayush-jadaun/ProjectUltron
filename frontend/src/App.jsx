@@ -14,8 +14,10 @@ import PublicRoute from "./utils/PublicRoutes"; // Still used for /login
 // Page Components
 import LoginSignup from "./pages/auth/LoginSignup";
 import HomePage from "./pages/homePage";
-import UserProfile from "./pages/user/UserProfile"; // Corrected import if needed
+
+import UserProfile from "./pages/user/UserProfile";
 import AnalysisPage from "./pages/analysisPage";
+
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Footer from "./components/Footer";
@@ -39,36 +41,27 @@ function App() {
 }
 
 function AppContent() {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-grow">
-        <Routes>
-          {/* --- Now essentially all Public Routes --- */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route
-            path="/reset-password/:resetToken"
-            element={<ResetPassword />}
-          />{" "}
-          {/* Assuming token in URL */}
-          {/* --- User Profile (now public) --- */}
-          <Route path="/profile" element={<UserProfile />} />
-          {/* --- Analysis Page (now public) --- */}
-          <Route path="/analysis" element={<AnalysisPage />} />
-          {/* --- Public-only route (not for logged-in users) --- */}
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                {" "}
-                {/* Keeps redirecting logged-in users away from /login */}
-                <LoginSignup />
-              </PublicRoute>
-            }
-          />
-          {/* --- Example Structure for when Protected Routes are re-enabled --- */}
-          {/*
+	return (
+		<div className="flex flex-col min-h-screen">
+			<Navbar />
+			<main className="flex-grow">
+				<Routes>
+					{/* --- Public Routes --- */}
+					<Route path="/" element={<HomePage />} />
+					<Route path="/forgot-password" element={<ForgotPassword />} />
+					<Route path="/reset-password" element={<ResetPassword />} />
+
+					{/* --- Public-only route (not for logged-in users) --- */}
+					<Route
+						path="/login"
+						element={
+							<PublicRoute>
+								<LoginSignup />
+							</PublicRoute>
+						}
+					/>
+
+					{/* --- Protected Routes --- */}
 					<Route
 						path="/profile"
 						element={

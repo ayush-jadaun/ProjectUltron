@@ -12,12 +12,12 @@ const api = axios.create({
 // Get user's analysis results
 export const fetchUserAnalysisResults = createAsyncThunk(
   "analysis/fetchUserAnalysisResults",
-  async ({ page = 1, limit = 10, analysis_type, alert_triggered }, { rejectWithValue }) => {
+  async ({ analysis_type, alert_triggered }, { rejectWithValue }) => {
     try {
       const response = await api.get("/analysis-results", {
         params: { page, limit, analysis_type, alert_triggered }
       });
-      return response.data.data;
+      return response.data.data.results; // assuming data shape includes .results
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch analysis results"
@@ -32,7 +32,7 @@ export const fetchAnalysisResultById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.get(`/analysis-results/${id}`);
-      return response.data.data.result;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch analysis result"
@@ -94,7 +94,7 @@ const analysisSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -105,13 +105,7 @@ const analysisSlice = createSlice({
       })
       .addCase(fetchUserAnalysisResults.fulfilled, (state, action) => {
         state.loading = false;
-        state.results = action.payload.results;
-        state.pagination = {
-          currentPage: action.payload.currentPage,
-          totalPages: action.payload.totalPages,
-          totalCount: action.payload.totalCount,
-          limit: action.payload.limit
-        };
+        state.results = action.payload;
       })
       .addCase(fetchUserAnalysisResults.rejected, (state, action) => {
         state.loading = false;
@@ -162,8 +156,8 @@ const analysisSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-  }
+  },
 });
 
 export const { clearCurrentResult, clearError } = analysisSlice.actions;
-export default analysisSlice.reducer; 
+export default analysisSlice.reducer;

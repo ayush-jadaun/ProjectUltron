@@ -1,7 +1,8 @@
-
 import sequelize from "../db/db.js"; 
 import { DataTypes } from "sequelize";
+import sequelize from "../db/db.js"; // Adjust path as needed
 import User from "./user.model.js";
+// Import User model if you have associations defined here
 
 const UserSubscription = sequelize.define(
   "UserSubscription", 
@@ -16,35 +17,30 @@ const UserSubscription = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: User, 
-        key: "id", 
+        model: "users", // Make sure this matches your users table name
+        key: "id",
       },
     },
-
-    subscription_name: {
+    region_name: {
+      // Assuming you have a name field
       type: DataTypes.STRING,
-      allowNull: true, 
+      allowNull: true,
     },
-
     region_geometry: {
-      type: DataTypes.JSONB, 
+      type: DataTypes.JSONB, // Or DataTypes.GEOMETRY for PostGIS
       allowNull: false,
-      comment:
-        "GeoJSON representation of the subscribed region (e.g., Point, Polygon)",
     },
 
 
     alert_categories: {
-      type: DataTypes.ARRAY(DataTypes.TEXT), 
+      type: DataTypes.ARRAY(DataTypes.STRING), // e.g., ['DEFORESTATION', 'FLOODING']
       allowNull: false,
-      defaultValue: [], 
-      comment: "List of environmental categories monitored for this region",
+      defaultValue: [],
     },
- 
     is_active: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true, 
+      defaultValue: true,
     },
 
   },
