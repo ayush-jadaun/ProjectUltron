@@ -8,6 +8,7 @@ import {
 	AlertTriangleIcon,
 	DropletIcon,
 	ThermometerIcon,
+	FlameIcon,
 } from "lucide-react";
 import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
 
@@ -101,7 +102,7 @@ const HomePage = () => {
 						<h2 className="text-2xl font-bold text-center text-green-700 mb-8">
 							Key Focus Areas
 						</h2>
-						<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+						<div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
 							{/* Deforestation */}
 							<div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-sm flex flex-col items-center text-center">
 								<div className="rounded-full bg-green-50 p-3 mb-3">
@@ -130,7 +131,7 @@ const HomePage = () => {
 								</p>
 							</div>
 
-							{/* Air Pollution */}
+							{/*Coastal*/}
 							<div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-sm flex flex-col items-center text-center">
 								<div className="rounded-full bg-gray-50 p-3 mb-3">
 									<AlertTriangleIcon size={24} className="text-gray-500" />
@@ -144,7 +145,19 @@ const HomePage = () => {
 									authorities.
 								</p>
 							</div>
-
+							<div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-sm flex flex-col items-center text-center">
+								<div className="rounded-full bg-red-50 p-3 mb-3">
+									<FlameIcon size={24} className="text-red-500" />
+								</div>
+								<h3 className="text-lg font-semibold text-red-600 mb-2">
+									Wildfire Prevention
+								</h3>
+								<p className="text-gray-600 text-sm">
+									Monitor high-risk areas and implement early warning systems to
+									protect communities and preserve natural habitats from
+									devastating wildfires.
+								</p>
+							</div>
 							{/* Glacier Melting */}
 							<div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-sm flex flex-col items-center text-center">
 								<div className="rounded-full bg-cyan-50 p-3 mb-3">
