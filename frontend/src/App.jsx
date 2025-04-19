@@ -15,7 +15,7 @@ import LoginSignup from "./pages/auth/LoginSignup";
 import HomePage from "./pages/homePage";
 
 import UserProfile from "./pages/user/UserProfile";
-import AnalysisPage from "./pages/analysisPage";
+import AnalysisPage from "./pages/user/analysisPage";
 
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
@@ -33,6 +33,23 @@ function App() {
 }
 
 function AppContent() {
+	const { loading: authLoading } = useSelector((state) => state.auth);
+
+	if (authLoading) {
+		return (
+			<div className="flex flex-col min-h-screen">
+				<Navbar />
+				<main className="flex-grow flex items-center justify-center">
+					<div className="text-center">
+						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+						<p className="mt-4 text-gray-600">Loading...</p>
+					</div>
+				</main>
+				<Footer />
+			</div>
+		);
+	}
+
 	return (
 		<div className="flex flex-col min-h-screen">
 			<Navbar />

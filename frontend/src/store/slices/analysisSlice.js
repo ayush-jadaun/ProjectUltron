@@ -12,10 +12,10 @@ const api = axios.create({
 // Get user's analysis results
 export const fetchUserAnalysisResults = createAsyncThunk(
   "analysis/fetchUserAnalysisResults",
-  async ({ page = 1, limit = 10, analysis_type, alert_triggered }, { rejectWithValue }) => {
+  async ({ analysis_type, alert_triggered }, { rejectWithValue }) => {
     try {
       const response = await api.get("/analysis-results", {
-        params: { page, limit, analysis_type, alert_triggered }
+        params: { analysis_type, alert_triggered }
       });
       return response.data.data;
     } catch (error) {
@@ -32,27 +32,10 @@ export const fetchAnalysisResultById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.get(`/analysis-results/${id}`);
-      return response.data.data.result;
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch analysis result"
-      );
-    }
-  }
-);
-
-// Get results by subscription
-export const fetchResultsBySubscription = createAsyncThunk(
-  "analysis/fetchResultsBySubscription",
-  async ({ subscriptionId, page = 1, limit = 10 }, { rejectWithValue }) => {
-    try {
-      const response = await api.get(`/analysis-results/subscription/${subscriptionId}`, {
-        params: { page, limit }
-      });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch subscription results"
+        error.response?.data?.message || "Failed to fetch analysis result"
       );
     }
   }
@@ -80,13 +63,7 @@ const analysisSlice = createSlice({
     currentResult: null,
     alertSummary: null,
     loading: false,
-    error: null,
-    pagination: {
-      currentPage: 1,
-      totalPages: 1,
-      totalCount: 0,
-      limit: 10
-    }
+    error: null
   },
   reducers: {
     clearCurrentResult: (state) => {
@@ -105,13 +82,7 @@ const analysisSlice = createSlice({
       })
       .addCase(fetchUserAnalysisResults.fulfilled, (state, action) => {
         state.loading = false;
-        state.results = action.payload.results;
-        state.pagination = {
-          currentPage: action.payload.currentPage,
-          totalPages: action.payload.totalPages,
-          totalCount: action.payload.totalCount,
-          limit: action.payload.limit
-        };
+        state.results = action.payload;
       })
       .addCase(fetchUserAnalysisResults.rejected, (state, action) => {
         state.loading = false;
@@ -127,25 +98,6 @@ const analysisSlice = createSlice({
         state.currentResult = action.payload;
       })
       .addCase(fetchAnalysisResultById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Fetch Results By Subscription
-      .addCase(fetchResultsBySubscription.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchResultsBySubscription.fulfilled, (state, action) => {
-        state.loading = false;
-        state.results = action.payload.results;
-        state.pagination = {
-          currentPage: action.payload.currentPage,
-          totalPages: action.payload.totalPages,
-          totalCount: action.payload.totalCount,
-          limit: action.payload.limit
-        };
-      })
-      .addCase(fetchResultsBySubscription.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

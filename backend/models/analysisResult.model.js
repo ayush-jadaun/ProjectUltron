@@ -1,34 +1,31 @@
-
 import sequelize from "../db/db.js"; 
 import { DataTypes } from "sequelize";
 import User from "./user.model.js";
 import UserSubscription from "./userSubscription.model.js";
+
 const AnalysisResult = sequelize.define(
-  "AnalysisResult",
+  "analysis_result",
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-
-    subscriptionId: {
+    user_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: UserSubscription,
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: User,
         key: "id",
       },
-      onDelete: "SET NULL",
+    },
+    subscription_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: UserSubscription,
+        key: "id",
+      },
     },
     analysis_type: {
       type: DataTypes.TEXT,
@@ -55,7 +52,6 @@ const AnalysisResult = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-
     recent_period_start: {
       type: DataTypes.DATE,
       allowNull: true,
@@ -84,9 +80,10 @@ const AnalysisResult = sequelize.define(
   {
     timestamps: true,
     tableName: "analysis_results",
+    underscored: true,
     indexes: [
-      { fields: ["subscriptionId"] },
-      { fields: ["userId"] },
+      { fields: ["subscription_id"] },
+      { fields: ["user_id"] },
       { fields: ["analysis_type"] },
       { fields: ["status"] },
       { fields: ["alert_triggered"] },
@@ -94,12 +91,10 @@ const AnalysisResult = sequelize.define(
   }
 );
 
+AnalysisResult.belongsTo(UserSubscription, { foreignKey: "subscription_id" });
+AnalysisResult.belongsTo(User, { foreignKey: "user_id" });
 
-AnalysisResult.belongsTo(UserSubscription, { foreignKey: "subscriptionId" });
-AnalysisResult.belongsTo(User, { foreignKey: "userId" });
-
-
-UserSubscription.hasMany(AnalysisResult, { foreignKey: 'subscriptionId' });
-User.hasMany(AnalysisResult, { foreignKey: 'userId' });
+UserSubscription.hasMany(AnalysisResult, { foreignKey: 'subscription_id' });
+User.hasMany(AnalysisResult, { foreignKey: 'user_id' });
 
 export default AnalysisResult;
