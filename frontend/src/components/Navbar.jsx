@@ -54,7 +54,7 @@ const getPageColors = (pathname) => {
 		case "/history":
 			return {
 				gradient:
-					"bg-gradient-to-r from-purple-700 via-purple-600 to-purple-500",
+					"bg-gradient-to-r from-purple-800 via-purple-500 to-purple-800",
 				text: "text-white",
 				hover: "hover:bg-purple-700",
 				activeGlow: "shadow-[0_0_15px_rgba(147,51,234,0.5)]",

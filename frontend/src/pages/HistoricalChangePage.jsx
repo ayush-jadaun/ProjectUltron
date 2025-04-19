@@ -210,7 +210,7 @@ const HistoricalChangePage = () => {
         maxWidth: 1020,
         margin: "0 auto",
         padding: 32,
-        background: "#f8fbfd",
+        background: "beige",
         borderRadius: 14,
         boxShadow: "0 4px 32px 0 rgba(30,80,180,0.09)",
       }}
@@ -515,7 +515,7 @@ const HistoricalChangePage = () => {
             <div
               style={{
                 marginBottom: 36,
-                background: "#fff",
+                background: "beige",
                 borderRadius: 10,
                 boxShadow: "0 2px 16px 0 rgba(30,80,180,0.06)",
                 padding: 18,
