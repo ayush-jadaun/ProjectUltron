@@ -20,7 +20,7 @@ const HomePage = () => {
 
 	// Navigation handlers
 	const handleGetStarted = () => {
-		navigate(isAuthenticated ? "/preferences" : "/signup");
+		navigate(isAuthenticated ? "/map" : "/signup");
 	};
 
 	const handleLogin = () => {
@@ -97,7 +97,7 @@ const HomePage = () => {
 									className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-md transition-all duration-300 flex items-center justify-center gap-2 group"
 								>
 									<MapPinIcon size={20} />
-									Get Started
+									Get Notifications
 									<ArrowRightIcon
 										size={20}
 										className="group-hover:translate-x-1 transition-transform"
