@@ -199,11 +199,12 @@ async function saveAnalysisResult(resultData) {
 async function processSubscription(subscription, credentialsPath) {
   const {
     id: subscriptionId,
-    userId,
+    user_id,
     region_geometry: regionGeoJson,
     alert_categories = [],
     is_active,
   } = subscription;
+  
   if (!is_active) {
     console.log(`Subscription ${subscriptionId} inactive.`);
     return;
@@ -214,7 +215,7 @@ async function processSubscription(subscription, credentialsPath) {
   }
 
   console.log(
-    `\n--- Processing Active Subscription ID: ${subscriptionId} for User: ${userId} ---`
+    `\n--- Processing Active Subscription ID: ${subscriptionId} for User: ${user_id} ---`
   );
   console.log(`   Categories: ${alert_categories.join(", ")}`);
 
@@ -248,8 +249,8 @@ async function processSubscription(subscription, credentialsPath) {
       console.log(JSON.stringify(result, null, 2));
 
       analysisResultData = {
-        subscriptionId: subscriptionId,
-        userId: userId,
+        subscription_id: subscriptionId,
+        user_id: user_id,
         analysis_type: category.toUpperCase(),
         status: result.status,
         alert_triggered: result.alert_triggered || false,
@@ -278,8 +279,8 @@ async function processSubscription(subscription, credentialsPath) {
       console.error(`   --- Error Running ${category} Check (JS Level) ---`);
       console.error(error.message);
       analysisResultData = {
-        subscriptionId: subscriptionId,
-        userId: userId,
+        subscription_id: subscriptionId,
+        user_id: user_id,
         analysis_type: category.toUpperCase(),
         status: "error",
         alert_triggered: false,
@@ -323,7 +324,7 @@ export async function runAllChecks() {
       where: { is_active: true },
       attributes: [
         "id",
-        "userId",
+        "user_id",
         "region_geometry",
         "alert_categories",
         "is_active",

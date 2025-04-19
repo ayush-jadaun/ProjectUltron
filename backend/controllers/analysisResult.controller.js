@@ -13,12 +13,10 @@ import sequelize from "../db/db.js";
 */
 export const getUserAnalysisResults = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
-  const { page = 1, limit = 10, analysis_type, alert_triggered } = req.query;
+  const { analysis_type, alert_triggered } = req.query;
 
   console.log("Fetching analysis results for user:", userId);
-  console.log("Query parameters:", { page, limit, analysis_type, alert_triggered });
-
-  const offset = (page - 1) * limit;
+  console.log("Query parameters:", { analysis_type, alert_triggered });
 
   // Build query conditions
   const whereConditions = { userId };
@@ -33,30 +31,25 @@ export const getUserAnalysisResults = asyncHandler(async (req, res, next) => {
 
   console.log("Where conditions:", whereConditions);
 
-  // Find results with pagination
-  const results = await AnalysisResult.findAndCountAll({
+  // Find results
+  const results = await AnalysisResult.findAll({
     where: whereConditions,
-    limit: parseInt(limit),
-    offset: parseInt(offset),
     order: [["createdAt", "DESC"]],
     include: [
       {
         model: UserSubscription,
-        attributes: ["id", "subscription_name", "region_geometry"],
+        attributes: ["id", "name", "region_geometry"],
       },
     ],
   });
 
-  console.log("Found results:", results.count);
+  console.log("Found results:", results.length);
 
   res.status(200).json(
     new ApiResponse(
       200,
       {
-        results: results.rows,
-        totalCount: results.count,
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(results.count / limit),
+        results,
       },
       "Analysis results retrieved successfully"
     )
@@ -77,7 +70,7 @@ export const getAnalysisResultById = asyncHandler(async (req, res, next) => {
     include: [
       {
         model: UserSubscription,
-        attributes: ["id", "subscription_name", "region_geometry"],
+        attributes: ["id", "name", "region_geometry"],
       },
     ],
   });
@@ -176,7 +169,7 @@ export const getAlertSummary = asyncHandler(async (req, res, next) => {
     include: [
       {
         model: UserSubscription,
-        attributes: ["id", "subscription_name"],
+        attributes: ["id", "name"],
       },
     ],
   });

@@ -1,9 +1,8 @@
-import sequelize from "../db/db.js";
 import { DataTypes } from "sequelize";
+import sequelize from "../db/db.js";
 
 const User = sequelize.define(
-
-  "users",
+  "user",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -28,14 +27,14 @@ const User = sequelize.define(
     },
     email: {
       type: DataTypes.STRING,
-      unique: true,
       allowNull: false,
+      unique: true,
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    isVerified: {
+    is_verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
@@ -44,11 +43,16 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
   },
   {
     timestamps: true,
-
-    tableName: 'users'
+    tableName: "users",
+    underscored: true,
   }
 );
 

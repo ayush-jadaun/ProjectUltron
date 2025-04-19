@@ -1,10 +1,9 @@
-
 import sequelize from "../db/db.js"; 
 import { DataTypes } from "sequelize";
 import User from "./user.model.js";
 
 const UserSubscription = sequelize.define(
-  "UserSubscription", 
+  "user_subscription", 
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,7 +11,7 @@ const UserSubscription = sequelize.define(
       primaryKey: true,
     },
 
-    userId: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -33,7 +32,6 @@ const UserSubscription = sequelize.define(
         "GeoJSON representation of the subscribed region (e.g., Point, Polygon)",
     },
 
-
     alert_categories: {
       type: DataTypes.ARRAY(DataTypes.TEXT), 
       allowNull: false,
@@ -51,29 +49,21 @@ const UserSubscription = sequelize.define(
   {
     timestamps: true, 
     tableName: "user_subscriptions", 
+    underscored: true,
     indexes: [
-   
-      {
-        fields: ["userId"],
-      },
- 
-      {
-        fields: ["is_active"],
-      },
+      { fields: ["user_id"] },
+      { fields: ["is_active"] },
     ],
   }
 );
 
-
-
 UserSubscription.belongsTo(User, {
-  foreignKey: "userId", 
+  foreignKey: "user_id", 
   onDelete: "CASCADE",
-
 });
 
 User.hasMany(UserSubscription, {
-  foreignKey: "userId",
+  foreignKey: "user_id",
 });
 
 export default UserSubscription;
