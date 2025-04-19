@@ -7,12 +7,10 @@ import time
 import traceback
 from pathlib import Path
 
-DEFAULT_SHORELINE_RETREAT_THRESHOLD = 5.0  # meters (example threshold)
+DEFAULT_SHORELINE_RETREAT_THRESHOLD = 5.0  # meters
 
-# --- UPDATE TO 6-DAY WINDOWS FOR BOTH PERIODS ---
-RECENT_PERIOD_DAYS = 6     # Last 6 days
-BASELINE_PERIOD_DAYS = 6   # 6 days before recent period
-# ------------------------------------------------
+RECENT_PERIOD_DAYS = 6
+BASELINE_PERIOD_DAYS = 6
 
 S2_COLLECTION = 'COPERNICUS/S2_SR_HARMONIZED'
 REDUCTION_SCALE = 10
@@ -56,6 +54,20 @@ def get_median_ndwi_image(s2_collection, start, end, region_geometry):
     print("DEBUG: Bands of median NDWI image:", ndwi_median_img.bandNames().getInfo(), file=sys.stderr)
     return ndwi_median_img
 
+def get_ndwi_image_url(image, region_geometry, vis_params, label):
+    try:
+        url = image.getThumbURL({
+            'min': vis_params.get('min', -1),
+            'max': vis_params.get('max', 1),
+            'dimensions': vis_params.get('dimensions', 512),
+            'palette': vis_params.get('palette', ['#0d0887', '#43ea80', '#f7fcb9']),
+            'region': region_geometry
+        })
+        return url
+    except Exception as e:
+        print(f"WARNING: Could not get {label} NDWI image URL: {e}", file=sys.stderr)
+        return None
+
 def extract_shoreline(image, ndwi_threshold=0.0):
     return image.select('NDWI').gt(ndwi_threshold).rename('water')
 
@@ -94,6 +106,15 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
         baseline_ndwi_img = get_median_ndwi_image(s2_collection, start_date_baseline, end_date_baseline, region_geometry)
         recent_ndwi_img = get_median_ndwi_image(s2_collection, start_date_recent, end_date_recent, region_geometry)
 
+        vis_params = {
+            'min': -1,
+            'max': 1,
+            'palette': ['#0d0887', '#43ea80', '#f7fcb9'],
+            'dimensions': 512
+        }
+        start_image_url = get_ndwi_image_url(baseline_ndwi_img, region_geometry, vis_params, "before")
+        end_image_url = get_ndwi_image_url(recent_ndwi_img, region_geometry, vis_params, "after")
+
         baseline_bands = baseline_ndwi_img.bandNames().getInfo()
         recent_bands = recent_ndwi_img.bandNames().getInfo()
         print("DEBUG: Bands of baseline_ndwi_img:", baseline_bands, file=sys.stderr)
@@ -110,7 +131,10 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
                 "recent_shoreline": None,
                 "shoreline_retreat_meters": None,
                 "threshold": threshold,
-                "buffer_radius_meters": buffer_radius_meters
+                "buffer_radius_meters": buffer_radius_meters,
+                "start_image_url": start_image_url,
+                "end_image_url": end_image_url,
+                "mean_ndwi_change": None
             }
         if not recent_bands or 'NDWI' not in recent_bands:
             error_message = "No NDWI band found in recent composite. No cloud-free data available in this period/region."
@@ -123,8 +147,36 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
                 "recent_shoreline": None,
                 "shoreline_retreat_meters": None,
                 "threshold": threshold,
-                "buffer_radius_meters": buffer_radius_meters
+                "buffer_radius_meters": buffer_radius_meters,
+                "start_image_url": start_image_url,
+                "end_image_url": end_image_url,
+                "mean_ndwi_change": None
             }
+
+        # Calculate mean NDWI change in the region
+        try:
+            mean_ndwi_before = baseline_ndwi_img.reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=region_geometry,
+                scale=REDUCTION_SCALE,
+                maxPixels=1e9,
+                bestEffort=True
+            ).get('NDWI').getInfo()
+            mean_ndwi_after = recent_ndwi_img.reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=region_geometry,
+                scale=REDUCTION_SCALE,
+                maxPixels=1e9,
+                bestEffort=True
+            ).get('NDWI').getInfo()
+            mean_ndwi_change = (
+                mean_ndwi_after - mean_ndwi_before
+                if mean_ndwi_before is not None and mean_ndwi_after is not None
+                else None
+            )
+        except Exception as e:
+            print(f"WARNING: Failed to compute mean NDWI change: {e}", file=sys.stderr)
+            mean_ndwi_change = None
 
         baseline_water_mask = extract_shoreline(baseline_ndwi_img)
         recent_water_mask = extract_shoreline(recent_ndwi_img)
@@ -168,7 +220,10 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
             "shoreline_retreat_meters": shoreline_retreat_meters,
             "threshold": threshold,
             **response_dates,
-            "buffer_radius_meters": buffer_radius_meters
+            "buffer_radius_meters": buffer_radius_meters,
+            "start_image_url": start_image_url,
+            "end_image_url": end_image_url,
+            "mean_ndwi_change": mean_ndwi_change
         }
 
     except ee.EEException as gee_error:
@@ -181,7 +236,10 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
             "alert_triggered": False,
             "shoreline_retreat_meters": None,
             "threshold": threshold,
-            "buffer_radius_meters": buffer_radius_meters
+            "buffer_radius_meters": buffer_radius_meters,
+            "start_image_url": None,
+            "end_image_url": None,
+            "mean_ndwi_change": None
         }
     except Exception as e:
         print(f"ERROR: Unexpected Python error during GEE processing: {e}", file=sys.stderr)
@@ -192,7 +250,10 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
             "alert_triggered": False,
             "shoreline_retreat_meters": None,
             "threshold": threshold,
-            "buffer_radius_meters": buffer_radius_meters
+            "buffer_radius_meters": buffer_radius_meters,
+            "start_image_url": None,
+            "end_image_url": None,
+            "mean_ndwi_change": None
         }
 
 if __name__ == "__main__":

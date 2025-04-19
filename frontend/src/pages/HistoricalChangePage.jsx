@@ -39,7 +39,38 @@ ChartJS.register(
   Legend
 );
 
-// Custom Image Comparison Component to replace ReactCompareImage
+// Helper to get appropriate index name and comparison label
+function getComparisonLabel(analysisType) {
+  switch (analysisType) {
+    case "DEFORESTATION":
+      return "NDVI";
+    case "FLOODING":
+      return "NDWI";
+    case "COASTAL_EROSION":
+      return "NDWI";
+    case "GLACIER":
+      return "NDSI";
+    default:
+      return "Change";
+  }
+}
+
+function getChartLabel(analysisType) {
+  switch (analysisType) {
+    case "DEFORESTATION":
+      return "NDVI Change";
+    case "FLOODING":
+      return "NDWI Change";
+    case "COASTAL_EROSION":
+      return "NDWI Change";
+    case "GLACIER":
+      return "NDSI Change";
+    default:
+      return "Change";
+  }
+}
+
+// Custom Image Comparison Component
 const ImageComparison = ({
   leftImage,
   rightImage,
@@ -52,25 +83,18 @@ const ImageComparison = ({
 
   const handleMove = (e) => {
     if (!isDragging || !containerRef.current) return;
-
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const newPosition = Math.max(0, Math.min(100, (x / rect.width) * 100));
     setSliderPosition(newPosition);
   };
 
-  const handleMouseDown = () => {
-    setIsDragging(true);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const handleMouseDown = () => setIsDragging(true);
+  const handleMouseUp = () => setIsDragging(false);
 
   useEffect(() => {
     document.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("mousemove", handleMove);
-
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("mousemove", handleMove);
@@ -219,7 +243,7 @@ const ImageComparison = ({
 // ---- Custom HeatmapLayer using leaflet.heat ----
 function HeatmapLayer({ points, options }) {
   const map = useMap();
-  React.useEffect(() => {
+  useEffect(() => {
     if (!window.L.heatLayer) return;
     const heatLayer = window.L.heatLayer(points, options).addTo(map);
     return () => {
@@ -334,10 +358,16 @@ const HistoricalChangePage = () => {
   };
 
   // Prepare chart data if available
-  let ndviData = null;
+  let indexData = null;
   let heatmapPoints = [];
   if (reportResult && reportResult.status === "success") {
-    ndviData = {
+    // Pick the correct index: NDVI, NDWI, or NDSI based on analysisType
+    const value =
+      reportResult.mean_ndvi_change ??
+      reportResult.mean_ndwi_change ??
+      reportResult.mean_ndsi_change ??
+      0;
+    indexData = {
       labels: [
         reportResult.previous_period_start,
         reportResult.recent_period_start,
@@ -345,8 +375,8 @@ const HistoricalChangePage = () => {
       ].filter(Boolean),
       datasets: [
         {
-          label: "NDVI Change",
-          data: [0, 0, reportResult.mean_ndvi_change ?? 0],
+          label: getChartLabel(analysisType),
+          data: [0, 0, value],
           fill: false,
           backgroundColor: "#1976d2",
           borderColor: "#1976d2",
@@ -354,7 +384,7 @@ const HistoricalChangePage = () => {
       ],
     };
     heatmapPoints = reportResult.heatmap_points || [
-      [20.7, 78.8, Math.abs(reportResult.mean_ndvi_change ?? 0)],
+      [20.7, 78.8, Math.abs(value)],
     ];
   }
 
@@ -588,7 +618,6 @@ const HistoricalChangePage = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="© OpenStreetMap contributors"
               />
-              {/* Show overlays from results */}
               {resultPolygon}
               {resultMarkers}
               {reportResult && reportResult.heatmap_points && (
@@ -620,7 +649,7 @@ const HistoricalChangePage = () => {
       <div id="report-content">
         {reportResult && (
           <>
-            {/* IMAGE COMPARISON SLIDER - Using our custom component */}
+            {/* IMAGE COMPARISON SLIDER - Dynamic label */}
             {showCompare && (
               <div
                 style={{
@@ -633,7 +662,8 @@ const HistoricalChangePage = () => {
                 }}
               >
                 <h4 style={{ marginBottom: 18 }}>
-                  NDVI Map Comparison ({fromDate} vs {toDate})
+                  {getComparisonLabel(analysisType)} Map Comparison ({fromDate}{" "}
+                  vs {toDate})
                 </h4>
                 <div style={{ maxWidth: 700, margin: "0 auto" }}>
                   <ImageComparison
@@ -661,6 +691,26 @@ const HistoricalChangePage = () => {
                   <span>
                     {typeof reportResult.mean_ndvi_change === "number"
                       ? reportResult.mean_ndvi_change.toFixed(4)
+                      : "N/A"}
+                  </span>
+                </h4>
+              )}
+              {"mean_ndwi_change" in reportResult && (
+                <h4>
+                  Mean NDWI Change:{" "}
+                  <span>
+                    {typeof reportResult.mean_ndwi_change === "number"
+                      ? reportResult.mean_ndwi_change.toFixed(4)
+                      : "N/A"}
+                  </span>
+                </h4>
+              )}
+              {"mean_ndsi_change" in reportResult && (
+                <h4>
+                  Mean NDSI Change:{" "}
+                  <span>
+                    {typeof reportResult.mean_ndsi_change === "number"
+                      ? reportResult.mean_ndsi_change.toFixed(4)
                       : "N/A"}
                   </span>
                 </h4>
@@ -699,19 +749,9 @@ const HistoricalChangePage = () => {
                   minWidth: 300,
                 }}
               >
-                <h4>
-                  {analysisType === "DEFORESTATION"
-                    ? "NDVI Change"
-                    : analysisType === "FLOODING"
-                    ? "Flood Analysis"
-                    : analysisType === "GLACIER"
-                    ? "Glacier Melting"
-                    : analysisType === "COASTAL_EROSION"
-                    ? "Coastal Erosion"
-                    : "Analysis"}
-                </h4>
-                {ndviData ? (
-                  <Line data={ndviData} options={{ responsive: true }} />
+                <h4>{getChartLabel(analysisType)}</h4>
+                {indexData ? (
+                  <Line data={indexData} options={{ responsive: true }} />
                 ) : (
                   <div>No chart data.</div>
                 )}
@@ -737,7 +777,6 @@ const HistoricalChangePage = () => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution="© OpenStreetMap contributors"
                 />
-                {/* Show overlays from results */}
                 {resultPolygon}
                 {resultMarkers}
                 {reportResult && reportResult.heatmap_points && (
@@ -763,6 +802,22 @@ const HistoricalChangePage = () => {
                     <b>NDVI Change Detected:</b>{" "}
                     {typeof reportResult.mean_ndvi_change === "number"
                       ? reportResult.mean_ndvi_change.toFixed(4)
+                      : "N/A"}
+                  </li>
+                )}
+                {reportResult.mean_ndwi_change !== undefined && (
+                  <li>
+                    <b>NDWI Change Detected:</b>{" "}
+                    {typeof reportResult.mean_ndwi_change === "number"
+                      ? reportResult.mean_ndwi_change.toFixed(4)
+                      : "N/A"}
+                  </li>
+                )}
+                {reportResult.mean_ndsi_change !== undefined && (
+                  <li>
+                    <b>NDSI Change Detected:</b>{" "}
+                    {typeof reportResult.mean_ndsi_change === "number"
+                      ? reportResult.mean_ndsi_change.toFixed(4)
                       : "N/A"}
                   </li>
                 )}

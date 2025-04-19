@@ -7,8 +7,7 @@ import time
 import traceback
 
 DEFAULT_DAYS_BACK = 5  # How many days back to check for fires
-
-MODIS_FIRE_COLLECTION = 'MODIS/006/MCD14DL'  # NASA MODIS Fire/Hotspot Thermal Anomalies
+MODIS_FIRE_COLLECTION = 'MODIS/006/MCD14DL'
 gcp_project_id = 'project-ultron-457221'
 
 def initialize_gee(credentials_path_arg):
@@ -31,6 +30,20 @@ def initialize_gee(credentials_path_arg):
         print(traceback.format_exc(), file=sys.stderr)
         return False
 
+def get_fire_image_url(image, region_geometry, vis_params, label):
+    try:
+        url = image.getThumbURL({
+            'min': vis_params.get('min', 0),
+            'max': vis_params.get('max', 1),
+            'dimensions': vis_params.get('dimensions', 512),
+            'palette': vis_params.get('palette', ['black', 'red', 'yellow']),
+            'region': region_geometry
+        })
+        return url
+    except Exception as e:
+        print(f"WARNING: Could not get {label} fire image URL: {e}", file=sys.stderr)
+        return None
+
 def detect_active_fires(region_geometry, days_back):
     try:
         now = datetime.datetime.now(datetime.timezone.utc)
@@ -43,6 +56,24 @@ def detect_active_fires(region_geometry, days_back):
 
         fire_count = fire_collection.size().getInfo()
         print(f"Detected {fire_count} active fire pixels in region (last {days_back} days)", file=sys.stderr)
+
+        # --- Add fire mask images for before & after comparison ---
+        vis_params = {
+            "min": 0,
+            "max": 1,
+            "palette": ["black", "red", "yellow"],
+            "dimensions": 512
+        }
+
+        # Before: fires from previous period (days_back*2 to days_back ago)
+        pre_start_date = end_date.advance(-days_back*2, 'day')
+        pre_end_date = end_date.advance(-days_back, 'day')
+        fire_img_before = ee.Image(fire_collection.filterDate(pre_start_date, pre_end_date)
+                                   .reduceToImage(['confidence'], ee.Reducer.first()).gt(0)).clip(region_geometry)
+        fire_img_after = ee.Image(fire_collection.reduceToImage(['confidence'], ee.Reducer.first()).gt(0)).clip(region_geometry)
+
+        before_image_url = get_fire_image_url(fire_img_before, region_geometry, vis_params, "before")
+        after_image_url = get_fire_image_url(fire_img_after, region_geometry, vis_params, "after")
 
         fires_list = []
         if fire_count > 0:
@@ -63,7 +94,9 @@ def detect_active_fires(region_geometry, days_back):
             "status": "success",
             "active_fire_count": fire_count,
             "fires": fires_list,
-            "days_back": days_back
+            "days_back": days_back,
+            "start_image_url": before_image_url,
+            "end_image_url": after_image_url
         }
     except ee.EEException as gee_error:
         error_str = str(gee_error)

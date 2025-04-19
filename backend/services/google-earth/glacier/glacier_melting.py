@@ -10,12 +10,10 @@ from pathlib import Path
 # --- Configuration Constants ---
 DEFAULT_GLACIER_ALERT_THRESHOLD_PERCENT = 2.0  # Alert if > 2% glacier area loss
 
-# --- UPDATE THESE FOR RECENT/BACKGROUND ANALYSIS WINDOW ---
-RECENT_PERIOD_DAYS = 90  # Analyze the last 6 days
-BASELINE_PERIOD_YEARS_AGO = 90
-BASELINE_PERIOD_DURATION_DAYS = 6  # Baseline is a 6-day window as well
-BASELINE_FALLBACK_YEARS = [8, 9, 11, 12]  # Fallback years to try if primary baseline has no data
-# ----------------------------------------------------------
+RECENT_PERIOD_DAYS = 90
+BASELINE_PERIOD_YEARS_AGO = 1
+BASELINE_PERIOD_DURATION_DAYS = 6
+BASELINE_FALLBACK_YEARS = [8, 9, 11, 12]
 
 S2_COLLECTION = 'COPERNICUS/S2_SR_HARMONIZED'
 NDSI_GREEN_BAND = 'B3'
@@ -46,7 +44,6 @@ def initialize_gee(credentials_path_arg):
         return False
 
 def mask_s2_clouds(image):
-    """Mask clouds in Sentinel-2 imagery using the SCL band."""
     scl = image.select('SCL')
     mask = scl.neq(3).And(scl.neq(8)).And(scl.neq(9)).And(scl.neq(10)).And(scl.neq(11))
     return image.updateMask(mask)
@@ -80,6 +77,20 @@ def get_median_ndsi_image(s2_collection, start, end, region_geometry):
 def glacier_area_mask(image, ndsi_threshold=0.4):
     glacier = image.select('NDSI').gt(ndsi_threshold).rename('glacier')
     return glacier
+
+def get_ndsi_image_url(image, region_geometry, vis_params, label):
+    try:
+        url = image.getThumbURL({
+            'min': vis_params.get('min', -1),
+            'max': vis_params.get('max', 1),
+            'dimensions': vis_params.get('dimensions', 512),
+            'palette': vis_params.get('palette', ['black', 'white', 'lightblue']),
+            'region': region_geometry
+        })
+        return url
+    except Exception as e:
+        print(f"WARNING: Could not get {label} glacier image URL: {e}", file=sys.stderr)
+        return None
 
 def try_alternative_baseline(s2_collection, region_geometry, end_date_recent):
     print("Attempting to find alternative baseline period with sufficient data...", file=sys.stderr)
@@ -129,7 +140,9 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
                 "recent_area_sqkm": None,
                 "loss_percent": None,
                 "threshold_percent": threshold_percent,
-                "buffer_radius_meters": buffer_radius_meters
+                "buffer_radius_meters": buffer_radius_meters,
+                "start_image_url": None,
+                "end_image_url": None
             }
         baseline_ndsi_img = get_median_ndsi_image(s2_collection, start_date_baseline, end_date_baseline, region_geometry)
         if baseline_ndsi_img is None:
@@ -148,7 +161,9 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
                     "recent_area_sqkm": None,
                     "loss_percent": None,
                     "threshold_percent": threshold_percent,
-                    "buffer_radius_meters": buffer_radius_meters
+                    "buffer_radius_meters": buffer_radius_meters,
+                    "start_image_url": None,
+                    "end_image_url": None
                 }
 
         baseline_bands = baseline_ndsi_img.bandNames().getInfo()
@@ -167,7 +182,9 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
                 "recent_area_sqkm": None,
                 "loss_percent": None,
                 "threshold_percent": threshold_percent,
-                "buffer_radius_meters": buffer_radius_meters
+                "buffer_radius_meters": buffer_radius_meters,
+                "start_image_url": None,
+                "end_image_url": None
             }
         if not recent_bands or 'NDSI' not in recent_bands:
             error_message = "No NDSI band found in recent composite. No cloud-free data available in this period/region."
@@ -180,7 +197,9 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
                 "recent_area_sqkm": None,
                 "loss_percent": None,
                 "threshold_percent": threshold_percent,
-                "buffer_radius_meters": buffer_radius_meters
+                "buffer_radius_meters": buffer_radius_meters,
+                "start_image_url": None,
+                "end_image_url": None
             }
 
         baseline_glacier_mask = glacier_area_mask(baseline_ndsi_img)
@@ -250,8 +269,19 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
                 "recent_area_sqkm": None,
                 "loss_percent": None,
                 "threshold_percent": threshold_percent,
-                "buffer_radius_meters": buffer_radius_meters
+                "buffer_radius_meters": buffer_radius_meters,
+                "start_image_url": None,
+                "end_image_url": None
             }
+
+        vis_params = {
+            'min': -1,
+            'max': 1,
+            'palette': ['black', 'white', 'lightblue'],
+            'dimensions': 512
+        }
+        start_image_url = get_ndsi_image_url(baseline_ndsi_img, region_geometry, vis_params, "before")
+        end_image_url = get_ndsi_image_url(recent_ndsi_img, region_geometry, vis_params, "after")
 
         try:
             response_dates = {
@@ -273,7 +303,9 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
                 "loss_percent": loss_percent,
                 "threshold_percent": threshold_percent,
                 **response_dates,
-                "buffer_radius_meters": buffer_radius_meters
+                "buffer_radius_meters": buffer_radius_meters,
+                "start_image_url": start_image_url,
+                "end_image_url": end_image_url
             }
 
         return {
@@ -284,7 +316,9 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
             "loss_percent": loss_percent,
             "threshold_percent": threshold_percent,
             **response_dates,
-            "buffer_radius_meters": buffer_radius_meters
+            "buffer_radius_meters": buffer_radius_meters,
+            "start_image_url": start_image_url,
+            "end_image_url": end_image_url
         }
 
     except ee.EEException as gee_error:
@@ -299,7 +333,9 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
             "recent_area_sqkm": None,
             "loss_percent": None,
             "threshold_percent": threshold_percent,
-            "buffer_radius_meters": buffer_radius_meters
+            "buffer_radius_meters": buffer_radius_meters,
+            "start_image_url": None,
+            "end_image_url": None
         }
     except Exception as e:
         print(f"ERROR: Unexpected Python error during GEE processing: {e}", file=sys.stderr)
@@ -312,7 +348,9 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
             "recent_area_sqkm": None,
             "loss_percent": None,
             "threshold_percent": threshold_percent,
-            "buffer_radius_meters": buffer_radius_meters
+            "buffer_radius_meters": buffer_radius_meters,
+            "start_image_url": None,
+            "end_image_url": None
         }
 
 if __name__ == "__main__":
