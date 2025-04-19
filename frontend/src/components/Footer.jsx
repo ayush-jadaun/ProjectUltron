@@ -40,7 +40,7 @@ const getPageGradients = (pathname) => {
 			};
 		case "/history":
 			return {
-				bg: "bg-gradient-to-r from-purple-700 to-purple-500",
+				bg: "bg-gradient-to-r from-purple-800 via-purple-500 to-purple-800",
 				border: "border-purple-400",
 				text: "text-white",
 				hover: "hover:text-purple-200",

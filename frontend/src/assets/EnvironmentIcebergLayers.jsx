@@ -1,139 +1,190 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 const EnvironmentIcebergLayers = ({ children }) => {
 	return (
 		<div className="relative min-h-screen w-full overflow-hidden">
-			{/* Deep blue sky background */}
-			<div className="absolute inset-0 z-[-5] bg-gradient-to-b from-blue-600 via-blue-500 to-blue-400"></div>
+			{/* Sky gradient background */}
+			<div className="absolute inset-0 z-[-5] bg-gradient-to-b from-sky-100 via-sky-200 to-sky-300"></div>
 
-			{/* Distant snow clouds */}
+			{/* Animated clouds */}
 			<div className="absolute inset-0 z-[-4] pointer-events-none">
-				{/* Large fluffy snow cloud */}
-				<div className="absolute top-[8%] left-[20%]">
-					<div className="w-20 h-10 sm:w-28 sm:h-14 bg-white rounded-full opacity-95 relative">
-						<div className="absolute -top-4 left-4 w-14 h-14 sm:w-18 sm:h-18 bg-white rounded-full"></div>
-						<div className="absolute -top-2 -right-1 w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full"></div>
-						<div className="absolute top-0 left-10 w-10 h-10 sm:w-14 sm:h-14 bg-white rounded-full"></div>
+				{/* Large cloud 1 */}
+				<motion.div 
+					className="absolute top-[5%] left-[10%]"
+					animate={{
+						x: [0, 15, 0],
+						y: [0, -5, 0],
+						opacity: [0.9, 0.7, 0.9]
+					}}
+					transition={{
+						duration: 12,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-32 h-16 sm:w-40 sm:h-20 bg-white/90 rounded-full opacity-90 relative shadow-lg">
+						<div className="absolute -top-6 left-6 w-20 h-20 sm:w-24 sm:h-24 bg-white/90 rounded-full shadow-md"></div>
+						<div className="absolute -top-4 -right-4 w-16 h-16 sm:w-20 sm:h-20 bg-white/90 rounded-full shadow-md"></div>
+						<div className="absolute top-2 right-8 w-12 h-12 sm:w-16 sm:h-16 bg-white/90 rounded-full shadow-md"></div>
 					</div>
-				</div>
-				{/* Medium snow cloud */}
-				<div className="absolute top-[15%] left-[65%] scale-90">
-					<div className="w-20 h-10 sm:w-24 sm:h-12 bg-white rounded-full opacity-90 relative">
-						<div className="absolute -top-3 left-3 w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full"></div>
-						<div className="absolute -top-1 right-2 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full"></div>
+				</motion.div>
+
+				{/* Large cloud 2 */}
+				<motion.div 
+					className="absolute top-[15%] left-[60%] scale-90"
+					animate={{
+						x: [0, -20, 0],
+						y: [0, 5, 0],
+						opacity: [0.85, 0.65, 0.85]
+					}}
+					transition={{
+						duration: 15,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-36 h-18 sm:w-44 sm:h-22 bg-white/85 rounded-full opacity-85 relative shadow-lg">
+						<div className="absolute -top-7 left-7 w-22 h-22 sm:w-26 sm:h-26 bg-white/85 rounded-full shadow-md"></div>
+						<div className="absolute -top-5 -right-5 w-18 h-18 sm:w-22 sm:h-22 bg-white/85 rounded-full shadow-md"></div>
+						<div className="absolute top-3 right-10 w-14 h-14 sm:w-18 sm:h-18 bg-white/85 rounded-full shadow-md"></div>
 					</div>
-				</div>
-				{/* Small snow cloud */}
-				<div className="absolute top-[5%] left-[40%] scale-60">
-					<div className="w-16 h-8 bg-white rounded-full opacity-85 relative">
-						<div className="absolute -top-3 left-3 w-10 h-10 bg-white rounded-full"></div>
-						<div className="absolute top-0 left-8 w-8 h-8 bg-white rounded-full"></div>
+				</motion.div>
+
+				{/* Medium cloud 1 */}
+				<motion.div 
+					className="absolute top-[8%] left-[35%] scale-75"
+					animate={{
+						x: [0, 10, 0],
+						y: [0, -3, 0],
+						opacity: [0.8, 0.6, 0.8]
+					}}
+					transition={{
+						duration: 10,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-24 h-12 sm:w-32 sm:h-16 bg-white/80 rounded-full opacity-80 relative shadow-lg">
+						<div className="absolute -top-4 left-4 w-16 h-16 sm:w-20 sm:h-20 bg-white/80 rounded-full shadow-md"></div>
+						<div className="absolute -top-2 -right-2 w-12 h-12 sm:w-16 sm:h-16 bg-white/80 rounded-full shadow-md"></div>
 					</div>
-				</div>
+				</motion.div>
+
+				{/* Medium cloud 2 */}
+				<motion.div 
+					className="absolute top-[25%] left-[20%] scale-80"
+					animate={{
+						x: [0, -15, 0],
+						y: [0, 4, 0],
+						opacity: [0.75, 0.55, 0.75]
+					}}
+					transition={{
+						duration: 13,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-28 h-14 sm:w-36 sm:h-18 bg-white/75 rounded-full opacity-75 relative shadow-lg">
+						<div className="absolute -top-5 left-5 w-18 h-18 sm:w-22 sm:h-22 bg-white/75 rounded-full shadow-md"></div>
+						<div className="absolute -top-3 -right-3 w-14 h-14 sm:w-18 sm:h-18 bg-white/75 rounded-full shadow-md"></div>
+					</div>
+				</motion.div>
+
+				{/* Small cloud 1 */}
+				<motion.div 
+					className="absolute top-[12%] left-[80%] scale-50"
+					animate={{
+						x: [0, 8, 0],
+						y: [0, -2, 0],
+						opacity: [0.7, 0.5, 0.7]
+					}}
+					transition={{
+						duration: 8,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-16 h-8 sm:w-20 sm:h-10 bg-white/70 rounded-full opacity-70 relative shadow-lg">
+						<div className="absolute -top-3 left-3 w-10 h-10 sm:w-12 sm:h-12 bg-white/70 rounded-full shadow-md"></div>
+						<div className="absolute -top-1 -right-1 w-8 h-8 sm:w-10 sm:h-10 bg-white/70 rounded-full shadow-md"></div>
+					</div>
+				</motion.div>
+
+				{/* Small cloud 2 */}
+				<motion.div 
+					className="absolute top-[30%] left-[45%] scale-60"
+					animate={{
+						x: [0, -10, 0],
+						y: [0, 3, 0],
+						opacity: [0.65, 0.45, 0.65]
+					}}
+					transition={{
+						duration: 11,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-20 h-10 sm:w-24 sm:h-12 bg-white/65 rounded-full opacity-65 relative shadow-lg">
+						<div className="absolute -top-4 left-4 w-12 h-12 sm:w-14 sm:h-14 bg-white/65 rounded-full shadow-md"></div>
+						<div className="absolute -top-2 -right-2 w-10 h-10 sm:w-12 sm:h-12 bg-white/65 rounded-full shadow-md"></div>
+					</div>
+				</motion.div>
+
+				{/* Tiny cloud 1 */}
+				<motion.div 
+					className="absolute top-[18%] left-[70%] scale-40"
+					animate={{
+						x: [0, 5, 0],
+						y: [0, -1, 0],
+						opacity: [0.6, 0.4, 0.6]
+					}}
+					transition={{
+						duration: 7,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-12 h-6 sm:w-16 sm:h-8 bg-white/60 rounded-full opacity-60 relative shadow-lg">
+						<div className="absolute -top-2 left-2 w-8 h-8 sm:w-10 sm:h-10 bg-white/60 rounded-full shadow-md"></div>
+					</div>
+				</motion.div>
+
+				{/* Tiny cloud 2 */}
+				<motion.div 
+					className="absolute top-[22%] left-[15%] scale-45"
+					animate={{
+						x: [0, -7, 0],
+						y: [0, 2, 0],
+						opacity: [0.55, 0.35, 0.55]
+					}}
+					transition={{
+						duration: 9,
+						repeat: Infinity,
+						ease: "easeInOut"
+					}}
+				>
+					<div className="w-14 h-7 sm:w-18 sm:h-9 bg-white/55 rounded-full opacity-55 relative shadow-lg">
+						<div className="absolute -top-3 left-3 w-9 h-9 sm:w-11 sm:h-11 bg-white/55 rounded-full shadow-md"></div>
+					</div>
+				</motion.div>
 			</div>
 
-			{/* Background icebergs - furthest back */}
-			<div
-				className="absolute bottom-0 left-0 right-0 h-[50%] z-[-3] bg-gradient-to-t from-cyan-100 via-blue-50 to-transparent opacity-80"
+			{/* Iceberg layers */}
+			<div className="absolute bottom-0 left-0 right-0 h-[60%] z-[-3] bg-gradient-to-t from-blue-100 via-blue-50 to-transparent opacity-90 shadow-inner"
 				style={{
-					clipPath:
-						"polygon(0 40%, 8% 35%, 15% 42%, 22% 30%, 30% 45%, 38% 25%, 46% 38%, 54% 28%, 62% 40%, 70% 30%, 80% 45%, 88% 30%, 95% 40%, 100% 35%, 100% 100%, 0% 100%)",
+					clipPath: "polygon(0 25%, 15% 15%, 30% 22%, 50% 12%, 70% 20%, 85% 10%, 100% 18%, 100% 100%, 0% 100%)",
 				}}
 			></div>
-
-			{/* Mid-ground icebergs */}
-			<div
-				className="absolute bottom-0 left-0 right-0 h-[40%] z-[-2] bg-gradient-to-t from-cyan-200 to-blue-100"
+			<div className="absolute bottom-0 left-0 right-0 h-2/5 z-[-2] bg-gradient-to-t from-blue-200 to-blue-100 shadow-lg"
 				style={{
-					clipPath:
-						"polygon(0 50%, 5% 42%, 12% 55%, 18% 38%, 25% 60%, 32% 45%, 40% 58%, 48% 40%, 55% 52%, 62% 38%, 70% 55%, 78% 42%, 85% 58%, 92% 45%, 100% 52%, 100% 100%, 0% 100%)",
+					clipPath: "polygon(0 45%, 20% 30%, 45% 40%, 65% 25%, 80% 35%, 100% 30%, 100% 100%, 0% 100%)",
 				}}
 			></div>
-
-			{/* Foreground icebergs - closest to viewer */}
-			<div
-				className="absolute bottom-0 left-0 right-0 h-[30%] z-[-1] bg-gradient-to-t from-cyan-300 to-cyan-200"
-				style={{
-					clipPath:
-						"polygon(0 60%, 6% 50%, 13% 65%, 20% 48%, 27% 70%, 34% 55%, 42% 68%, 50% 50%, 58% 62%, 65% 48%, 73% 65%, 80% 52%, 88% 68%, 95% 55%, 100% 62%, 100% 100%, 0% 100%)",
-				}}
-			></div>
-
-			{/* Water base */}
-			<div className="absolute bottom-0 left-0 right-0 h-1/5 z-0 bg-gradient-to-t from-blue-700 to-blue-500"></div>
-
-			{/* Mario theme elements */}
-			<div className="absolute bottom-0 left-0 right-0 h-2/3 z-10 pointer-events-none">
-				{/* Ice block with question mark */}
-				<div className="absolute bottom-[20%] left-[25%]">
-					<div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-300 rounded-md border-2 border-yellow-600 shadow-md flex items-center justify-center">
-						<span className="text-xl sm:text-2xl font-bold text-yellow-600">
-							?
-						</span>
-					</div>
-				</div>
-
-				{/* Ice platform with blocks */}
-				<div className="absolute bottom-[35%] left-[40%]">
-					<div className="flex">
-						<div className="w-10 h-10 bg-cyan-100 border-2 border-cyan-300 rounded-sm"></div>
-						<div className="w-10 h-10 bg-cyan-100 border-2 border-cyan-300 rounded-sm"></div>
-						<div className="w-10 h-10 bg-cyan-100 border-2 border-cyan-300 rounded-sm"></div>
-					</div>
-				</div>
-
-				{/* Penguin (simplified) */}
-				<div className="absolute bottom-[22%] left-[65%]">
-					<div className="relative">
-						<div className="w-12 h-14 bg-blue-900 rounded-t-full rounded-b-lg relative">
-							<div className="absolute top-2 left-3 w-6 h-8 bg-white rounded-t-full rounded-b-lg"></div>
-							<div className="absolute top-4 left-5 w-1 h-1 bg-black rounded-full"></div>
-							<div className="absolute top-4 left-7 w-1 h-1 bg-black rounded-full"></div>
-							<div className="absolute bottom-2 left-3 w-6 h-2 bg-yellow-400 rounded-md"></div>
-						</div>
-					</div>
-				</div>
-
-				{/* Coins */}
-				<div className="absolute bottom-[45%] left-[15%] flex space-x-4">
-					<div className="w-6 h-8 bg-yellow-400 rounded-full border-2 border-yellow-600"></div>
-					<div className="w-6 h-8 bg-yellow-400 rounded-full border-2 border-yellow-600"></div>
-					<div className="w-6 h-8 bg-yellow-400 rounded-full border-2 border-yellow-600"></div>
-				</div>
-
-				{/* Ice Flowers (power-up) */}
-				<div className="absolute bottom-[30%] left-[80%]">
-					<div className="relative">
-						<div className="w-8 h-3 bg-green-600"></div>
-						<div className="w-6 h-6 bg-cyan-400 rounded-full absolute -top-6 left-1"></div>
-						<div className="w-4 h-4 bg-white rounded-full absolute -top-5 left-2"></div>
-					</div>
-				</div>
-
-				{/* Hanging icicles */}
-				<div className="absolute top-[45%] left-[30%] flex space-x-4">
-					<div
-						className="w-3 h-12 bg-blue-100 opacity-80"
-						style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
-					></div>
-					<div
-						className="w-2 h-8 bg-blue-100 opacity-80"
-						style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
-					></div>
-					<div
-						className="w-4 h-10 bg-blue-100 opacity-80"
-						style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
-					></div>
-				</div>
-
-				{/* Floating ice platform */}
-				<div className="absolute bottom-[15%] left-[50%]">
-					<div className="w-16 h-4 bg-cyan-200 rounded-md border-2 border-cyan-300 shadow-md"></div>
-				</div>
-			</div>
+			<div className="absolute bottom-0 left-0 right-0 h-1/4 z-[-1] bg-blue-300 shadow-xl"></div>
 
 			{/* Content container */}
-			<div className="relative z-20 min-h-screen">{children}</div>
+			<div className="relative z-10 min-h-screen">{children}</div>
 		</div>
 	);
 };

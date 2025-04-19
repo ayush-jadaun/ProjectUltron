@@ -54,7 +54,7 @@ const getPageColors = (pathname) => {
 		case "/history":
 			return {
 				gradient:
-					"bg-gradient-to-r from-purple-700 via-purple-600 to-purple-500",
+					"bg-gradient-to-r from-purple-800 via-purple-500 to-purple-800",
 				text: "text-white",
 				hover: "hover:bg-purple-700",
 				activeGlow: "shadow-[0_0_15px_rgba(147,51,234,0.5)]",
@@ -192,7 +192,7 @@ const Navbar = () => {
 
 	return (
 		<nav
-			className={`${colors.gradient} ${colors.text} shadow-xl w-full sticky top-0 z-50 backdrop-blur-sm bg-opacity-95`}
+			className={`${colors.gradient} ${colors.text} shadow-xl w-full sticky top-0 z-7777 backdrop-blur-sm bg-opacity-95`}
 		>
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex items-center justify-between h-20">
