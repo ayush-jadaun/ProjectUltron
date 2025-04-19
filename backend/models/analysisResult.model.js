@@ -85,10 +85,16 @@ const AnalysisResult = sequelize.define(
   }
 );
 
-AnalysisResult.belongsTo(UserSubscription, { foreignKey: "subscription_id" });
-AnalysisResult.belongsTo(User, { foreignKey: "user_id" });
+AnalysisResult.belongsTo(UserSubscription, {
+  foreignKey: "subscription_id",
+  onDelete: "CASCADE", // Automatically delete associated analysis results
+});
 
-UserSubscription.hasMany(AnalysisResult, { foreignKey: 'subscription_id' });
+AnalysisResult.belongsTo(User, { foreignKey: "user_id" });
+UserSubscription.hasMany(AnalysisResult, {
+  foreignKey: "subscription_id",
+  onDelete: "CASCADE", // Automatically delete analysis results when subscription is deleted
+});
 User.hasMany(AnalysisResult, { foreignKey: 'user_id' });
 
 export default AnalysisResult;
