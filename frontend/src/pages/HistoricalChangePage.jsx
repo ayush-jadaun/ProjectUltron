@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -38,6 +38,183 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
+// Custom Image Comparison Component to replace ReactCompareImage
+const ImageComparison = ({
+  leftImage,
+  rightImage,
+  leftImageLabel,
+  rightImageLabel,
+}) => {
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const containerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMove = (e) => {
+    if (!isDragging || !containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const newPosition = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setSliderPosition(newPosition);
+  };
+
+  const handleMouseDown = () => {
+    setIsDragging(true);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handleMove);
+
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mousemove", handleMove);
+    };
+  }, [isDragging]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "400px",
+        overflow: "hidden",
+        userSelect: "none",
+      }}
+    >
+      {/* Left Image (Full Width) */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <img
+          src={leftImage}
+          alt="Before"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+        {leftImageLabel && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 10,
+              left: 10,
+              background: "rgba(0,0,0,0.5)",
+              color: "white",
+              padding: "4px 8px",
+              borderRadius: 4,
+              fontSize: 14,
+            }}
+          >
+            {leftImageLabel}
+          </div>
+        )}
+      </div>
+
+      {/* Right Image (Partial Width based on slider) */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: `${sliderPosition}%`,
+          height: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <img
+          src={rightImage}
+          alt="After"
+          style={{
+            width: `${100 * (100 / sliderPosition)}%`,
+            height: "100%",
+            objectFit: "cover",
+            transform:
+              sliderPosition === 0
+                ? "none"
+                : `translateX(${
+                    -100 * ((100 - sliderPosition) / sliderPosition)
+                  }%)`,
+          }}
+        />
+        {rightImageLabel && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 10,
+              right: 10,
+              background: "rgba(0,0,0,0.5)",
+              color: "white",
+              padding: "4px 8px",
+              borderRadius: 4,
+              fontSize: 14,
+            }}
+          >
+            {rightImageLabel}
+          </div>
+        )}
+      </div>
+
+      {/* Slider */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: `${sliderPosition}%`,
+          width: "3px",
+          height: "100%",
+          background: "#fff",
+          transform: "translateX(-50%)",
+          cursor: "ew-resize",
+          boxShadow: "0 0 5px rgba(0,0,0,0.5)",
+        }}
+        onMouseDown={handleMouseDown}
+      />
+
+      {/* Slider Handle */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: `${sliderPosition}%`,
+          width: "40px",
+          height: "40px",
+          borderRadius: "50%",
+          background: "white",
+          transform: "translate(-50%, -50%)",
+          cursor: "ew-resize",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 0 5px rgba(0,0,0,0.5)",
+        }}
+        onMouseDown={handleMouseDown}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            transform: "rotate(90deg)",
+          }}
+        >
+          <span>⟵</span>
+          <span>⟶</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // ---- Custom HeatmapLayer using leaflet.heat ----
 function HeatmapLayer({ points, options }) {
@@ -203,6 +380,10 @@ const HistoricalChangePage = () => {
       ));
     }
   }
+
+  // --- IMAGE COMPARISON SECTION ---
+  const showCompare =
+    reportResult && reportResult.start_image_url && reportResult.end_image_url;
 
   return (
     <div
@@ -439,6 +620,31 @@ const HistoricalChangePage = () => {
       <div id="report-content">
         {reportResult && (
           <>
+            {/* IMAGE COMPARISON SLIDER - Using our custom component */}
+            {showCompare && (
+              <div
+                style={{
+                  marginBottom: 36,
+                  background: "#fff",
+                  borderRadius: 10,
+                  boxShadow: "0 1px 8px 0 rgba(30,80,180,0.05)",
+                  padding: 18,
+                  textAlign: "center",
+                }}
+              >
+                <h4 style={{ marginBottom: 18 }}>
+                  NDVI Map Comparison ({fromDate} vs {toDate})
+                </h4>
+                <div style={{ maxWidth: 700, margin: "0 auto" }}>
+                  <ImageComparison
+                    leftImage={reportResult.start_image_url}
+                    rightImage={reportResult.end_image_url}
+                    leftImageLabel={fromDate}
+                    rightImageLabel={toDate}
+                  />
+                </div>
+              </div>
+            )}
             <div style={{ marginBottom: 36 }}>
               <h4>Status: {reportResult.status}</h4>
               <h4>
