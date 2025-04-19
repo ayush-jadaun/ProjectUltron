@@ -26,6 +26,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
 
 // Chart.js registration
 ChartJS.register(
@@ -104,42 +105,17 @@ const ImageComparison = ({
   return (
     <div
       ref={containerRef}
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "400px",
-        overflow: "hidden",
-        userSelect: "none",
-      }}
+      className="relative w-full h-96 overflow-hidden select-none"
     >
       {/* Left Image (Full Width) */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-        }}
-      >
+      <div className="absolute top-0 left-0 w-full h-full">
         <img
           src={leftImage}
           alt="Before"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          className="w-full h-full object-cover"
         />
         {leftImageLabel && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: 10,
-              left: 10,
-              background: "rgba(0,0,0,0.5)",
-              color: "white",
-              padding: "4px 8px",
-              borderRadius: 4,
-              fontSize: 14,
-            }}
-          >
+          <div className="absolute bottom-2.5 left-2.5 bg-black/50 text-white px-2 py-1 rounded text-sm">
             {leftImageLabel}
           </div>
         )}
@@ -147,22 +123,15 @@ const ImageComparison = ({
 
       {/* Right Image (Partial Width based on slider) */}
       <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: `${sliderPosition}%`,
-          height: "100%",
-          overflow: "hidden",
-        }}
+        className="absolute top-0 left-0 h-full overflow-hidden"
+        style={{ width: `${sliderPosition}%` }}
       >
         <img
           src={rightImage}
           alt="After"
+          className="h-full object-cover"
           style={{
             width: `${100 * (100 / sliderPosition)}%`,
-            height: "100%",
-            objectFit: "cover",
             transform:
               sliderPosition === 0
                 ? "none"
@@ -172,18 +141,7 @@ const ImageComparison = ({
           }}
         />
         {rightImageLabel && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: 10,
-              right: 10,
-              background: "rgba(0,0,0,0.5)",
-              color: "white",
-              padding: "4px 8px",
-              borderRadius: 4,
-              fontSize: 14,
-            }}
-          >
+          <div className="absolute bottom-2.5 right-2.5 bg-black/50 text-white px-2 py-1 rounded text-sm">
             {rightImageLabel}
           </div>
         )}
@@ -191,47 +149,18 @@ const ImageComparison = ({
 
       {/* Slider */}
       <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: `${sliderPosition}%`,
-          width: "3px",
-          height: "100%",
-          background: "#fff",
-          transform: "translateX(-50%)",
-          cursor: "ew-resize",
-          boxShadow: "0 0 5px rgba(0,0,0,0.5)",
-        }}
+        className="absolute top-0 h-full w-0.5 bg-white transform -translate-x-1/2 cursor-ew-resize shadow-md"
+        style={{ left: `${sliderPosition}%` }}
         onMouseDown={handleMouseDown}
       />
 
       {/* Slider Handle */}
       <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: `${sliderPosition}%`,
-          width: "40px",
-          height: "40px",
-          borderRadius: "50%",
-          background: "white",
-          transform: "translate(-50%, -50%)",
-          cursor: "ew-resize",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 0 5px rgba(0,0,0,0.5)",
-        }}
+        className="absolute top-1/2 w-10 h-10 rounded-full bg-white transform -translate-x-1/2 -translate-y-1/2 cursor-ew-resize flex items-center justify-center shadow-md"
+        style={{ left: `${sliderPosition}%` }}
         onMouseDown={handleMouseDown}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            transform: "rotate(90deg)",
-          }}
-        >
+        <div className="flex flex-col items-center transform rotate-90">
           <span>⟵</span>
           <span>⟶</span>
         </div>
@@ -416,446 +345,337 @@ const HistoricalChangePage = () => {
     reportResult && reportResult.start_image_url && reportResult.end_image_url;
 
   return (
-    <div
-      style={{
-        maxWidth: 1020,
-        margin: "0 auto",
-        padding: 32,
-        background: "beige",
-        borderRadius: 14,
-        boxShadow: "0 4px 32px 0 rgba(30,80,180,0.09)",
-      }}
-    >
-      <h2 style={{ textAlign: "center", color: "#194185", marginBottom: 10 }}>
-        Historical Change Visualization & Progress Report
-      </h2>
-      <div
-        style={{
-          display: "flex",
-          gap: 18,
-          justifyContent: "center",
-          marginBottom: 28,
-        }}
-      >
-        <label>
-          <b>From:</b>{" "}
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            style={{
-              border: "1px solid #b4b4b4",
-              borderRadius: 4,
-              padding: 5,
-              marginLeft: 4,
-            }}
-          />
-        </label>
-        <label>
-          <b>To:</b>{" "}
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            style={{
-              border: "1px solid #b4b4b4",
-              borderRadius: 4,
-              padding: 5,
-              marginLeft: 4,
-            }}
-          />
-        </label>
-        <label>
-          <b>Analysis:</b>{" "}
-          <select
-            value={analysisType}
-            onChange={(e) => setAnalysisType(e.target.value)}
-            style={{
-              border: "1px solid #b4b4b4",
-              borderRadius: 4,
-              padding: 5,
-              marginLeft: 4,
-            }}
-          >
-            {ANALYSIS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        {(analysisType === "DEFORESTATION" ||
-          analysisType === "COASTAL_EROSION") && (
-          <label>
-            <b>Threshold:</b>{" "}
-            <input
-              type="number"
-              step="any"
-              value={threshold}
-              onChange={(e) => setThreshold(e.target.value)}
-              style={{
-                border: "1px solid #b4b4b4",
-                borderRadius: 4,
-                padding: 5,
-                marginLeft: 4,
-                width: 80,
-              }}
-            />
-          </label>
-        )}
-        {(analysisType === "FLOODING" || analysisType === "GLACIER") && (
-          <>
-            <label>
-              <b>Threshold (%):</b>{" "}
+    <div className="min-h-screen">
+      <EnvironmentBackgroundLayers>
+        <div className="max-w-4xl mx-auto mt-12 p-8 bg-amber-50 rounded-xl shadow-lg">
+          <h2 className="text-center text-blue-800 mb-2.5 text-2xl font-bold">
+            Historical Change Visualization & Progress Report
+          </h2>
+          
+          <div className="flex flex-wrap gap-4 justify-center mb-7">
+            <label className="flex items-center">
+              <span className="font-bold mr-1">From:</span>
               <input
-                type="number"
-                step="any"
-                value={thresholdPercent}
-                onChange={(e) => setThresholdPercent(e.target.value)}
-                style={{
-                  border: "1px solid #b4b4b4",
-                  borderRadius: 4,
-                  padding: 5,
-                  marginLeft: 4,
-                  width: 80,
-                }}
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="border border-gray-400 rounded p-1.5 ml-1"
               />
             </label>
-            <label>
-              <b>Buffer (m):</b>{" "}
+            <label className="flex items-center">
+              <span className="font-bold mr-1">To:</span>
               <input
-                type="number"
-                step="any"
-                value={bufferMeters}
-                onChange={(e) => setBufferMeters(e.target.value)}
-                style={{
-                  border: "1px solid #b4b4b4",
-                  borderRadius: 4,
-                  padding: 5,
-                  marginLeft: 4,
-                  width: 80,
-                }}
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="border border-gray-400 rounded p-1.5 ml-1"
               />
             </label>
-          </>
-        )}
-        <button
-          onClick={handleGenerateReport}
-          style={{
-            background: "#1976d2",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            padding: "7px 18px",
-            fontWeight: 600,
-            fontSize: 15,
-            cursor: loading ? "not-allowed" : "pointer",
-            marginLeft: 32,
-            boxShadow: "0 2px 8px 0 rgba(40,60,130,0.09)",
-          }}
-          disabled={loading}
-        >
-          {loading ? "Generating..." : "Generate Report"}
-        </button>
-        <button
-          onClick={handleDownload}
-          style={{
-            background: "#13b37b",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            padding: "7px 18px",
-            fontWeight: 600,
-            fontSize: 15,
-            cursor: !reportResult ? "not-allowed" : "pointer",
-            marginLeft: 10,
-            opacity: !reportResult ? 0.5 : 1,
-            boxShadow: "0 2px 8px 0 rgba(40,60,130,0.09)",
-          }}
-          disabled={!reportResult}
-        >
-          Download PDF
-        </button>
-      </div>
-
-      {/* Region selection map */}
-      <div style={{ marginBottom: 24 }}>
-        <label>
-          <b>Select Region on Map:</b>
-          <div
-            style={{
-              height: 350,
-              marginTop: 8,
-              marginBottom: 8,
-              borderRadius: 7,
-              overflow: "hidden",
-              boxShadow: "0 2px 16px 0 rgba(30,80,180,0.10)",
-            }}
-          >
-            <MapContainer
-              center={[20.7, 78.8]}
-              zoom={6}
-              style={{ height: "100%", width: "100%" }}
-              scrollWheelZoom={true}
-            >
-              <FeatureGroup ref={featureGroupRef}>
-                <EditControl
-                  position="topright"
-                  onCreated={handleCreated}
-                  onEdited={handleEdited}
-                  onDeleted={handleDeleted}
-                  draw={{
-                    polygon: true,
-                    rectangle: true,
-                    circle: false,
-                    marker: false,
-                    polyline: false,
-                    circlemarker: false,
-                  }}
-                />
-              </FeatureGroup>
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="© OpenStreetMap contributors"
-              />
-              {resultPolygon}
-              {resultMarkers}
-              {reportResult && reportResult.heatmap_points && (
-                <HeatmapLayer
-                  points={heatmapPoints}
-                  options={{ radius: 25, blur: 30, max: 1 }}
-                />
-              )}
-            </MapContainer>
-          </div>
-          {regionGeoJson ? (
-            <div style={{ color: "#148404", fontSize: 15, marginTop: 3 }}>
-              <b>✓ Region selected!</b>
-            </div>
-          ) : (
-            <div style={{ color: "#d32f2f", fontSize: 14, marginTop: 3 }}>
-              Please select a region on the map.
-            </div>
-          )}
-        </label>
-      </div>
-
-      {error && (
-        <div style={{ color: "red", fontWeight: 600, marginBottom: 20 }}>
-          {error}
-        </div>
-      )}
-
-      <div id="report-content">
-        {reportResult && (
-          <>
-            {/* IMAGE COMPARISON SLIDER - Dynamic label */}
-            {showCompare && (
-              <div
-                style={{
-                  marginBottom: 36,
-                  background: "#fff",
-                  borderRadius: 10,
-                  boxShadow: "0 1px 8px 0 rgba(30,80,180,0.05)",
-                  padding: 18,
-                  textAlign: "center",
-                }}
+            <label className="flex items-center">
+              <span className="font-bold mr-1">Analysis:</span>
+              <select
+                value={analysisType}
+                onChange={(e) => setAnalysisType(e.target.value)}
+                className="border border-gray-400 rounded p-1.5 ml-1"
               >
-                <h4 style={{ marginBottom: 18 }}>
-                  {getComparisonLabel(analysisType)} Map Comparison ({fromDate}{" "}
-                  vs {toDate})
-                </h4>
-                <div style={{ maxWidth: 700, margin: "0 auto" }}>
-                  <ImageComparison
-                    leftImage={reportResult.start_image_url}
-                    rightImage={reportResult.end_image_url}
-                    leftImageLabel={fromDate}
-                    rightImageLabel={toDate}
-                  />
-                </div>
-              </div>
+                {ANALYSIS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {(analysisType === "DEFORESTATION" ||
+              analysisType === "COASTAL_EROSION") && (
+              <label className="flex items-center">
+                <span className="font-bold mr-1">Threshold:</span>
+                <input
+                  type="number"
+                  step="any"
+                  value={threshold}
+                  onChange={(e) => setThreshold(e.target.value)}
+                  className="border border-gray-400 rounded p-1.5 ml-1 w-20"
+                />
+              </label>
             )}
-            <div style={{ marginBottom: 36 }}>
-              <h4>Status: {reportResult.status}</h4>
-              <h4>
-                Alert Triggered:{" "}
-                {reportResult.alert_triggered ? (
-                  <span style={{ color: "#d32f2f" }}>Yes 🚨</span>
-                ) : (
-                  <span style={{ color: "#148404" }}>No</span>
-                )}
-              </h4>
-              {"mean_ndvi_change" in reportResult && (
-                <h4>
-                  Mean NDVI Change:{" "}
-                  <span>
-                    {typeof reportResult.mean_ndvi_change === "number"
-                      ? reportResult.mean_ndvi_change.toFixed(4)
-                      : "N/A"}
-                  </span>
-                </h4>
-              )}
-              {"mean_ndwi_change" in reportResult && (
-                <h4>
-                  Mean NDWI Change:{" "}
-                  <span>
-                    {typeof reportResult.mean_ndwi_change === "number"
-                      ? reportResult.mean_ndwi_change.toFixed(4)
-                      : "N/A"}
-                  </span>
-                </h4>
-              )}
-              {"mean_ndsi_change" in reportResult && (
-                <h4>
-                  Mean NDSI Change:{" "}
-                  <span>
-                    {typeof reportResult.mean_ndsi_change === "number"
-                      ? reportResult.mean_ndsi_change.toFixed(4)
-                      : "N/A"}
-                  </span>
-                </h4>
-              )}
-              {"threshold" in reportResult && (
-                <h4>Threshold: {reportResult.threshold}</h4>
-              )}
-              {"threshold_percent" in reportResult && (
-                <h4>Threshold (%): {reportResult.threshold_percent}</h4>
-              )}
-              {"buffer_radius_meters" in reportResult && (
-                <h4>Buffer (m): {reportResult.buffer_radius_meters}</h4>
-              )}
-              {reportResult.message && (
-                <div style={{ color: "#555", fontSize: 15, marginTop: 8 }}>
-                  {reportResult.message}
+            {(analysisType === "FLOODING" || analysisType === "GLACIER") && (
+              <>
+                <label className="flex items-center">
+                  <span className="font-bold mr-1">Threshold (%):</span>
+                  <input
+                    type="number"
+                    step="any"
+                    value={thresholdPercent}
+                    onChange={(e) => setThresholdPercent(e.target.value)}
+                    className="border border-gray-400 rounded p-1.5 ml-1 w-20"
+                  />
+                </label>
+                <label className="flex items-center">
+                  <span className="font-bold mr-1">Buffer (m):</span>
+                  <input
+                    type="number"
+                    step="any"
+                    value={bufferMeters}
+                    onChange={(e) => setBufferMeters(e.target.value)}
+                    className="border border-gray-400 rounded p-1.5 ml-1 w-20"
+                  />
+                </label>
+              </>
+            )}
+            <button
+              onClick={handleGenerateReport}
+              disabled={loading}
+              className={`bg-blue-600 text-white border-none rounded-lg py-1.5 px-4 font-semibold text-base ml-8 shadow-md ${
+                loading ? "cursor-not-allowed opacity-70" : "cursor-pointer hover:bg-blue-700"
+              }`}
+            >
+              {loading ? "Generating..." : "Generate Report"}
+            </button>
+            <button
+              onClick={handleDownload}
+              disabled={!reportResult}
+              className={`bg-green-600 text-white border-none rounded-lg py-1.5 px-4 font-semibold text-base ml-2 shadow-md ${
+                !reportResult ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-green-700"
+              }`}
+            >
+              Download PDF
+            </button>
+          </div>
+
+          {/* Region selection map */}
+          <div className="mb-6">
+            <label>
+              <span className="font-bold block">Select Region on Map:</span>
+              <div className="h-[350px] mt-2 mb-2 rounded-lg overflow-hidden shadow-md">
+                <MapContainer
+                  center={[20.7, 78.8]}
+                  zoom={6}
+                  className="h-full w-full"
+                  scrollWheelZoom={true}
+                >
+                  <FeatureGroup ref={featureGroupRef}>
+                    <EditControl
+                      position="topright"
+                      onCreated={handleCreated}
+                      onEdited={handleEdited}
+                      onDeleted={handleDeleted}
+                      draw={{
+                        polygon: true,
+                        rectangle: true,
+                        circle: false,
+                        marker: false,
+                        polyline: false,
+                        circlemarker: false,
+                      }}
+                    />
+                  </FeatureGroup>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution="© OpenStreetMap contributors"
+                  />
+                  {resultPolygon}
+                  {resultMarkers}
+                  {reportResult && reportResult.heatmap_points && (
+                    <HeatmapLayer
+                      points={heatmapPoints}
+                      options={{ radius: 25, blur: 30, max: 1 }}
+                    />
+                  )}
+                </MapContainer>
+              </div>
+              {regionGeoJson ? (
+                <div className="text-green-700 text-sm mt-0.5 font-semibold">
+                  ✓ Region selected!
+                </div>
+              ) : (
+                <div className="text-red-600 text-sm mt-0.5">
+                  Please select a region on the map.
                 </div>
               )}
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 32,
-                justifyContent: "space-between",
-                marginBottom: 36,
-              }}
-            >
-              <div
-                style={{
-                  flex: "1 1 300px",
-                  background: "#fff",
-                  borderRadius: 10,
-                  boxShadow: "0 1px 8px 0 rgba(30,80,180,0.05)",
-                  padding: 18,
-                  minWidth: 300,
-                }}
-              >
-                <h4>{getChartLabel(analysisType)}</h4>
-                {indexData ? (
-                  <Line data={indexData} options={{ responsive: true }} />
-                ) : (
-                  <div>No chart data.</div>
+            </label>
+          </div>
+
+          {error && (
+            <div className="text-red-600 font-semibold mb-5">{error}</div>
+          )}
+
+          <div id="report-content">
+            {reportResult && (
+              <>
+                {/* IMAGE COMPARISON SLIDER - Dynamic label */}
+                {showCompare && (
+                  <div className="mb-9 bg-white rounded-xl shadow-sm p-4 text-center">
+                    <h4 className="mb-4 text-lg font-semibold">
+                      {getComparisonLabel(analysisType)} Map Comparison ({fromDate}{" "}
+                      vs {toDate})
+                    </h4>
+                    <div className="max-w-lg mx-auto">
+                      <ImageComparison
+                        leftImage={reportResult.start_image_url}
+                        rightImage={reportResult.end_image_url}
+                        leftImageLabel={fromDate}
+                        rightImageLabel={toDate}
+                      />
+                    </div>
+                  </div>
                 )}
-              </div>
-              {/* Add additional charts if backend provides */}
-            </div>
-            <div
-              style={{
-                marginBottom: 36,
-                background: "beige",
-                borderRadius: 10,
-                boxShadow: "0 2px 16px 0 rgba(30,80,180,0.06)",
-                padding: 18,
-              }}
-            >
-              <h4>Change Heatmap</h4>
-              <MapContainer
-                center={[20.7, 78.8]}
-                zoom={6}
-                style={{ height: 350, width: "100%", borderRadius: 10 }}
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution="© OpenStreetMap contributors"
-                />
-                {resultPolygon}
-                {resultMarkers}
-                {reportResult && reportResult.heatmap_points && (
-                  <HeatmapLayer
-                    points={heatmapPoints}
-                    options={{ radius: 25, blur: 30, max: 1 }}
-                  />
-                )}
-              </MapContainer>
-            </div>
-            <div
-              style={{
-                background: "#f1f6fb",
-                borderRadius: 8,
-                padding: 18,
-                marginTop: 10,
-              }}
-            >
-              <h4>Progress Summary</h4>
-              <ul style={{ fontSize: 16, color: "#223" }}>
-                {reportResult.mean_ndvi_change !== undefined && (
-                  <li>
-                    <b>NDVI Change Detected:</b>{" "}
-                    {typeof reportResult.mean_ndvi_change === "number"
-                      ? reportResult.mean_ndvi_change.toFixed(4)
-                      : "N/A"}
-                  </li>
-                )}
-                {reportResult.mean_ndwi_change !== undefined && (
-                  <li>
-                    <b>NDWI Change Detected:</b>{" "}
-                    {typeof reportResult.mean_ndwi_change === "number"
-                      ? reportResult.mean_ndwi_change.toFixed(4)
-                      : "N/A"}
-                  </li>
-                )}
-                {reportResult.mean_ndsi_change !== undefined && (
-                  <li>
-                    <b>NDSI Change Detected:</b>{" "}
-                    {typeof reportResult.mean_ndsi_change === "number"
-                      ? reportResult.mean_ndsi_change.toFixed(4)
-                      : "N/A"}
-                  </li>
-                )}
-                <li>
-                  <b>Alert Triggered:</b>{" "}
-                  {reportResult.alert_triggered ? "Yes" : "No"}
-                </li>
-                {reportResult.previous_period_start &&
-                  reportResult.recent_period_end && (
-                    <li>
-                      <b>Dates Analyzed:</b>{" "}
-                      {reportResult.previous_period_start} to{" "}
-                      {reportResult.recent_period_end}
-                    </li>
+                
+                <div className="mb-9">
+                  <h4 className="text-lg font-semibold">Status: {reportResult.status}</h4>
+                  <h4 className="text-lg font-semibold">
+                    Alert Triggered:{" "}
+                    {reportResult.alert_triggered ? (
+                      <span className="text-red-600">Yes 🚨</span>
+                    ) : (
+                      <span className="text-green-700">No</span>
+                    )}
+                  </h4>
+                  {"mean_ndvi_change" in reportResult && (
+                    <h4 className="text-lg font-semibold">
+                      Mean NDVI Change:{" "}
+                      <span>
+                        {typeof reportResult.mean_ndvi_change === "number"
+                          ? reportResult.mean_ndvi_change.toFixed(4)
+                          : "N/A"}
+                      </span>
+                    </h4>
                   )}
-                <li>
-                  <b>Region ID:</b> {reportResult.region_id}
-                </li>
-                {reportResult.threshold !== undefined && (
-                  <li>
-                    <b>Threshold Used:</b> {reportResult.threshold}
-                  </li>
-                )}
-                {reportResult.threshold_percent !== undefined && (
-                  <li>
-                    <b>Threshold Used (%):</b> {reportResult.threshold_percent}
-                  </li>
-                )}
-                {reportResult.buffer_radius_meters !== undefined && (
-                  <li>
-                    <b>Buffer Used (m):</b> {reportResult.buffer_radius_meters}
-                  </li>
-                )}
-              </ul>
-            </div>
-          </>
-        )}
-      </div>
+                  {"mean_ndwi_change" in reportResult && (
+                    <h4 className="text-lg font-semibold">
+                      Mean NDWI Change:{" "}
+                      <span>
+                        {typeof reportResult.mean_ndwi_change === "number"
+                          ? reportResult.mean_ndwi_change.toFixed(4)
+                          : "N/A"}
+                      </span>
+                    </h4>
+                  )}
+                  {"mean_ndsi_change" in reportResult && (
+                    <h4 className="text-lg font-semibold">
+                      Mean NDSI Change:{" "}
+                      <span>
+                        {typeof reportResult.mean_ndsi_change === "number"
+                          ? reportResult.mean_ndsi_change.toFixed(4)
+                          : "N/A"}
+                      </span>
+                    </h4>
+                  )}
+                  {"threshold" in reportResult && (
+                    <h4 className="text-lg font-semibold">Threshold: {reportResult.threshold}</h4>
+                  )}
+                  {"threshold_percent" in reportResult && (
+                    <h4 className="text-lg font-semibold">Threshold (%): {reportResult.threshold_percent}</h4>
+                  )}
+                  {"buffer_radius_meters" in reportResult && (
+                    <h4 className="text-lg font-semibold">Buffer (m): {reportResult.buffer_radius_meters}</h4>
+                  )}
+                  {reportResult.message && (
+                    <div className="text-gray-600 text-sm mt-2">
+                      {reportResult.message}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex flex-wrap gap-8 justify-between mb-9">
+                  <div className="flex-1 min-w-[300px] bg-white rounded-xl shadow-sm p-4">
+                    <h4 className="text-lg font-semibold mb-2">{getChartLabel(analysisType)}</h4>
+                    {indexData ? (
+                      <Line data={indexData} options={{ responsive: true }} />
+                    ) : (
+                      <div>No chart data.</div>
+                    )}
+                  </div>
+                  {/* Add additional charts if backend provides */}
+                </div>
+                
+                <div className="mb-9 bg-amber-50 rounded-xl shadow-md p-4">
+                  <h4 className="text-lg font-semibold mb-2">Change Heatmap</h4>
+                  <div className="h-[350px] w-full rounded-xl overflow-hidden">
+                    <MapContainer
+                      center={[20.7, 78.8]}
+                      zoom={6}
+                      className="h-full w-full"
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution="© OpenStreetMap contributors"
+                      />
+                      {resultPolygon}
+                      {resultMarkers}
+                      {reportResult && reportResult.heatmap_points && (
+                        <HeatmapLayer
+                          points={heatmapPoints}
+                          options={{ radius: 25, blur: 30, max: 1 }}
+                        />
+                      )}
+                    </MapContainer>
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 rounded-lg p-4 mt-2.5">
+                  <h4 className="text-lg font-semibold mb-2">Progress Summary</h4>
+                  <ul className="text-base text-gray-800">
+                    {reportResult.mean_ndvi_change !== undefined && (
+                      <li className="mb-1">
+                        <span className="font-semibold">NDVI Change Detected:</span>{" "}
+                        {typeof reportResult.mean_ndvi_change === "number"
+                          ? reportResult.mean_ndvi_change.toFixed(4)
+                          : "N/A"}
+                      </li>
+                    )}
+                    {reportResult.mean_ndwi_change !== undefined && (
+                      <li className="mb-1">
+                        <span className="font-semibold">NDWI Change Detected:</span>{" "}
+                        {typeof reportResult.mean_ndwi_change === "number"
+                          ? reportResult.mean_ndwi_change.toFixed(4)
+                          : "N/A"}
+                      </li>
+                    )}
+                    {reportResult.mean_ndsi_change !== undefined && (
+                      <li className="mb-1">
+                        <span className="font-semibold">NDSI Change Detected:</span>{" "}
+                        {typeof reportResult.mean_ndsi_change === "number"
+                          ? reportResult.mean_ndsi_change.toFixed(4)
+                          : "N/A"}
+                      </li>
+                    )}
+                    <li className="mb-1">
+                      <span className="font-semibold">Alert Triggered:</span>{" "}
+                      {reportResult.alert_triggered ? "Yes" : "No"}
+                    </li>
+                    {reportResult.previous_period_start &&
+                      reportResult.recent_period_end && (
+                        <li className="mb-1">
+                          <span className="font-semibold">Dates Analyzed:</span>{" "}
+                          {reportResult.previous_period_start} to{" "}
+                          {reportResult.recent_period_end}
+                        </li>
+                      )}
+                    <li className="mb-1">
+                      <span className="font-semibold">Region ID:</span> {reportResult.region_id}
+                    </li>
+                    {reportResult.threshold !== undefined && (
+                      <li className="mb-1">
+                        <span className="font-semibold">Threshold Used:</span> {reportResult.threshold}
+                      </li>
+                    )}
+                    {reportResult.threshold_percent !== undefined && (
+                      <li className="mb-1">
+                        <span className="font-semibold">Threshold Used (%):</span> {reportResult.threshold_percent}
+                      </li>
+                    )}
+                    {reportResult.buffer_radius_meters !== undefined && (
+                      <li className="mb-1">
+                        <span className="font-semibold">Buffer Used (m):</span> {reportResult.buffer_radius_meters}
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </EnvironmentBackgroundLayers>
     </div>
   );
 };

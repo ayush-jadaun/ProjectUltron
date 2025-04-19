@@ -38,13 +38,6 @@ const getPageGradients = (pathname) => {
 				text: "text-white",
 				hover: "hover:text-teal-200",
 			};
-		case "/history":
-			return {
-				bg: "bg-gradient-to-r from-purple-800 via-purple-500 to-purple-800",
-				border: "border-purple-400",
-				text: "text-white",
-				hover: "hover:text-purple-200",
-			};
 		case "/profile":
 		case "/analysis":
 			return {
