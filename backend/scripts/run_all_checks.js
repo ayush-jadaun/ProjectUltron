@@ -8,11 +8,14 @@ import User from "../models/user.model.js";
 import UserSubscription from "../models/userSubscription.model.js";
 import AnalysisResult from "../models/analysisResult.model.js";
 import { sendAlertNotification } from "../utils/alertNotifier.js";
+
 // --- Import flooding and glacier melting runners ---
 import { runFloodCheck } from "../services/google-earth/flooding/flooding.js";
 import { runGlacierMeltingCheck } from "../services/google-earth/glacier/glacier_melting.js";
 // --- Import coastal erosion runner ---
 import { runCoastalErosionCheck } from "../services/google-earth/coastal_erosion/coastal_erosion.js";
+// --- Import fire protection runner ---
+import { runFireProtectionCheck } from "../services/google-earth/fire/fireProtection.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -206,6 +209,22 @@ function runCoastalErosionCheckWrapper(
   );
 }
 
+// --- Fire Protection Runner ---
+function runFireProtectionCheckWrapper(
+  regionGeoJson,
+  regionId,
+  credentialsPath,
+  days_back
+) {
+  // days_back is how many days to look back for active fires (default: 1)
+  return runFireProtectionCheck(
+    regionGeoJson,
+    regionId,
+    credentialsPath,
+    days_back ?? 1
+  );
+}
+
 // --- Normalize category for robust mapping ---
 function normalizeCategory(category) {
   // glacierMelting -> GLACIER_MELTING, "Glacier Melting" -> GLACIER_MELTING, etc.
@@ -214,10 +233,6 @@ function normalizeCategory(category) {
     .replace(/[\s\-]+/g, "_")
     .toUpperCase();
 }
-
-
-
-// ...rest of your file...
 
 async function saveAnalysisResult(resultData) {
   if (!resultData) {
@@ -291,6 +306,8 @@ async function processSubscription(subscription, credentialsPath) {
     threshold_glacier,
     buffer_glacier,
     threshold_coastal_erosion,
+    threshold_fire_protection, // Add if you want to allow fire alert threshold
+    days_back_fire_protection, // Add if you want to allow window customization
     // Add more as needed
   } = subscription;
 
@@ -314,6 +331,7 @@ async function processSubscription(subscription, credentialsPath) {
     FLOODING: "FLOODING",
     GLACIER_MELTING: "GLACIER",
     COASTAL_EROSION: "COASTAL_EROSION",
+    FIRE_PROTECTION: "FIRE_PROTECTION",
   };
 
   // --- Analysis Task Map ---
@@ -354,6 +372,15 @@ async function processSubscription(subscription, credentialsPath) {
         subscriptionId.toString(),
         credentialsPath,
         threshold_coastal_erosion || 5.0,
+      ],
+    },
+    FIRE_PROTECTION: {
+      runner: runFireProtectionCheckWrapper,
+      args: [
+        regionGeoJson,
+        subscriptionId.toString(),
+        credentialsPath,
+        days_back_fire_protection || 1, // Default to last 1 day
       ],
     },
   };
@@ -467,6 +494,24 @@ async function processSubscription(subscription, credentialsPath) {
           delete analysisResultData.baseline_period_start;
           delete analysisResultData.baseline_period_end;
         }
+      } else if (canonical === "FIRE_PROTECTION") {
+        analysisResultData = {
+          subscription_id: subscriptionId,
+          user_id: user_id,
+          analysis_type: canonical,
+          status: result.status,
+          alert_triggered: (result.active_fire_count ?? 0) > 0,
+          calculated_value: result.active_fire_count ?? null,
+          threshold_value: null, // you may add a threshold field if you want to trigger alerts only above a certain count
+          details: result.fires
+            ? JSON.stringify(result.fires)
+            : result.message || null,
+          recent_period_start: null,
+          recent_period_end: null,
+          baseline_period_start: null,
+          baseline_period_end: null,
+          buffer_radius_meters: null,
+        };
       }
     } catch (error) {
       console.error(`   --- Error Running ${category} Check (JS Level) ---`);
@@ -485,7 +530,9 @@ async function processSubscription(subscription, credentialsPath) {
             ? threshold_flooding
             : canonical === "GLACIER"
             ? threshold_glacier
-            : threshold_coastal_erosion ?? null,
+            : canonical === "COASTAL_EROSION"
+            ? threshold_coastal_erosion
+            : null,
       };
     }
 
@@ -533,7 +580,9 @@ export async function runAllChecks() {
         "buffer_flooding",
         "threshold_glacier",
         "buffer_glacier",
-        "threshold_coastal_erosion", // Add this if using coastal erosion
+        "threshold_coastal_erosion",
+        "threshold_fire_protection", // Add if using fire protection
+        "days_back_fire_protection", // Add if using fire protection
       ],
     });
   } catch (fetchError) {
