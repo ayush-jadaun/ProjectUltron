@@ -28,10 +28,11 @@ import Glaciers from "./pages/infoPages/Glaciers";
 import Beach from "./pages/infoPages/Beach";
 import Fire from "./pages/infoPages/Fire";
 import HistoricalChangePage from "./pages/HistoricalChangePage";
-import { Contact, Satellite } from "lucide-react";
+import { Satellite } from "lucide-react";
 import RealtimeSatelliteMap from "./pages/satellite";
 import AboutUs from "./pages/AboutUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Contact from "./pages/Contact";
 
 function App() {
 	// const dispatch = useDispatch(); // No longer needed here
