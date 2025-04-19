@@ -1,15 +1,39 @@
-import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import React, { useState, useRef } from "react";
+import { MapContainer, TileLayer, FeatureGroup, useMap } from "react-leaflet";
+import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet.heat";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Line, Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 // ---- Custom HeatmapLayer using leaflet.heat ----
 function HeatmapLayer({ points, options }) {
   const map = useMap();
-  useEffect(() => {
+  React.useEffect(() => {
     if (!window.L.heatLayer) return;
     const heatLayer = window.L.heatLayer(points, options).addTo(map);
     return () => {
@@ -19,9 +43,7 @@ function HeatmapLayer({ points, options }) {
   return null;
 }
 
-// ---- Main Component ----
-
-const API_URL = "/api/gee-reports/generate"; // Adjust if your backend route is different
+const API_URL = "http://localhost:5000/api/gee-reports/generate";
 
 const DEFAULT_REGION = {
   type: "Polygon",
@@ -41,15 +63,20 @@ const DEFAULT_ANALYSIS_TYPE = "DEFORESTATION";
 const HistoricalChangePage = () => {
   const [fromDate, setFromDate] = useState("2024-01-01");
   const [toDate, setToDate] = useState("2024-05-01");
-  const [regionGeoJson, setRegionGeoJson] = useState(DEFAULT_REGION);
+  const [regionGeoJson, setRegionGeoJson] = useState(null); // Initially no region
   const [analysisType, setAnalysisType] = useState(DEFAULT_ANALYSIS_TYPE);
   const [threshold, setThreshold] = useState(-0.1);
   const [loading, setLoading] = useState(false);
   const [reportResult, setReportResult] = useState(null);
   const [error, setError] = useState("");
+  const featureGroupRef = useRef(null);
 
   // Handler to call backend API
   const handleGenerateReport = async () => {
+    if (!regionGeoJson) {
+      setError("Please select a region on the map before generating a report.");
+      return;
+    }
     setLoading(true);
     setError("");
     setReportResult(null);
@@ -89,6 +116,18 @@ const HistoricalChangePage = () => {
     pdf.save(`progress_report_${fromDate}_to_${toDate}.pdf`);
   };
 
+  // Draw handlers for region selection
+  const handleCreated = (e) => {
+    setRegionGeoJson(e.layer.toGeoJSON().geometry);
+  };
+  const handleEdited = (e) => {
+    const layer = Object.values(e.layers._layers)[0];
+    if (layer) setRegionGeoJson(layer.toGeoJSON().geometry);
+  };
+  const handleDeleted = () => {
+    setRegionGeoJson(null);
+  };
+
   // Prepare chart data if available
   let ndviData = null;
   let heatmapPoints = [];
@@ -110,7 +149,6 @@ const HistoricalChangePage = () => {
         },
       ],
     };
-    // If your backend returns real heatmap points, use them; else, mock one point for demo.
     heatmapPoints = reportResult.heatmap_points || [
       [20.7, 78.8, Math.abs(reportResult.mean_ndvi_change ?? 0)],
     ];
@@ -179,7 +217,6 @@ const HistoricalChangePage = () => {
             }}
           >
             <option value="DEFORESTATION">Deforestation</option>
-            {/* Add more options as your backend supports */}
           </select>
         </label>
         <label>
@@ -235,6 +272,60 @@ const HistoricalChangePage = () => {
         >
           Download PDF
         </button>
+      </div>
+
+      {/* Region selection map */}
+      <div style={{ marginBottom: 24 }}>
+        <label>
+          <b>Select Region on Map:</b>
+          <div
+            style={{
+              height: 350,
+              marginTop: 8,
+              marginBottom: 8,
+              borderRadius: 7,
+              overflow: "hidden",
+              boxShadow: "0 2px 16px 0 rgba(30,80,180,0.10)",
+            }}
+          >
+            <MapContainer
+              center={[20.7, 78.8]}
+              zoom={6}
+              style={{ height: "100%", width: "100%" }}
+              scrollWheelZoom={true}
+            >
+              <FeatureGroup ref={featureGroupRef}>
+                <EditControl
+                  position="topright"
+                  onCreated={handleCreated}
+                  onEdited={handleEdited}
+                  onDeleted={handleDeleted}
+                  draw={{
+                    polygon: true,
+                    rectangle: true,
+                    circle: false,
+                    marker: false,
+                    polyline: false,
+                    circlemarker: false,
+                  }}
+                />
+              </FeatureGroup>
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="© OpenStreetMap contributors"
+              />
+            </MapContainer>
+          </div>
+          {regionGeoJson ? (
+            <div style={{ color: "#148404", fontSize: 15, marginTop: 3 }}>
+              <b>✓ Region selected!</b>
+            </div>
+          ) : (
+            <div style={{ color: "#d32f2f", fontSize: 14, marginTop: 3 }}>
+              Please select a region on the map.
+            </div>
+          )}
+        </label>
       </div>
 
       {error && (
@@ -297,7 +388,7 @@ const HistoricalChangePage = () => {
                   <div>No NDVI data.</div>
                 )}
               </div>
-              {/* Add additional charts (waterData, fireData) if backend provides */}
+              {/* Add additional charts if backend provides */}
             </div>
             <div
               style={{
