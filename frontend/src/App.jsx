@@ -29,7 +29,6 @@ import Beach from "./pages/infoPages/Beach";
 
 import HistoricalChangePage from "./pages/HistoricalChangePage";
 
-import SubscribeLocationPage from "./pages/SubscribeLocationPage"; // Corrected import if needed
 
 
 function App() {
