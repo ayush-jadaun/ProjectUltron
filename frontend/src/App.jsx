@@ -15,7 +15,7 @@ import LoginSignup from "./pages/auth/LoginSignup";
 import HomePage from "./pages/homePage";
 
 import UserProfile from "./pages/user/UserProfile";
-import AnalysisPage from "./pages/analysisPage";
+import AnalysisPage from "./pages/user/analysisPage";
 
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
