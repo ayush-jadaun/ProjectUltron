@@ -1,5 +1,3 @@
-// backend/scripts/run_all_checks.js (Using Sequelize)
-
 import path from "path";
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
@@ -9,6 +7,12 @@ import sequelize from "../db/db.js";
 import User from "../models/user.model.js";
 import UserSubscription from "../models/userSubscription.model.js";
 import AnalysisResult from "../models/analysisResult.model.js";
+
+// --- Import flooding and glacier melting runners ---
+import { runFloodCheck } from "../services/google-earth/flooding/flooding.js";
+import { runGlacierMeltingCheck } from "../services/google-earth/glacier/glacier_melting.js";
+// --- Import coastal erosion runner ---
+import { runCoastalErosionCheck } from "../services/google-earth/coastal_erosion/coastal_erosion.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -156,6 +160,61 @@ function runDeforestationCheck(
   );
 }
 
+function runFloodingCheck(
+  regionGeoJson,
+  regionId,
+  credentialsPath,
+  threshold_percent,
+  buffer_meters
+) {
+  return runFloodCheck(
+    regionGeoJson,
+    regionId,
+    credentialsPath,
+    threshold_percent,
+    buffer_meters
+  );
+}
+
+function runGlacierCheck(
+  regionGeoJson,
+  regionId,
+  credentialsPath,
+  threshold_percent,
+  buffer_meters
+) {
+  return runGlacierMeltingCheck(
+    regionGeoJson,
+    regionId,
+    credentialsPath,
+    threshold_percent,
+    buffer_meters
+  );
+}
+
+function runCoastalErosionCheckWrapper(
+  regionGeoJson,
+  regionId,
+  credentialsPath,
+  threshold
+) {
+  return runCoastalErosionCheck(
+    regionGeoJson,
+    regionId,
+    credentialsPath,
+    threshold
+  );
+}
+
+// --- Normalize category for robust mapping ---
+function normalizeCategory(category) {
+  // glacierMelting -> GLACIER_MELTING, "Glacier Melting" -> GLACIER_MELTING, etc.
+  return category
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
+    .replace(/[\s\-]+/g, "_")
+    .toUpperCase();
+}
+
 async function saveAnalysisResult(resultData) {
   if (!resultData) {
     console.error("No analysis data provided to save.");
@@ -170,6 +229,8 @@ async function saveAnalysisResult(resultData) {
     "recent_period_end",
     "previous_period_start",
     "previous_period_end",
+    "baseline_period_start",
+    "baseline_period_end",
   ];
   dateFields.forEach((field) => {
     if (resultData[field]) {
@@ -203,8 +264,15 @@ async function processSubscription(subscription, credentialsPath) {
     region_geometry: regionGeoJson,
     alert_categories = [],
     is_active,
+    threshold_deforestation,
+    threshold_flooding,
+    buffer_flooding,
+    threshold_glacier,
+    buffer_glacier,
+    threshold_coastal_erosion,
+    // Add more as needed
   } = subscription;
-  
+
   if (!is_active) {
     console.log(`Subscription ${subscriptionId} inactive.`);
     return;
@@ -219,16 +287,61 @@ async function processSubscription(subscription, credentialsPath) {
   );
   console.log(`   Categories: ${alert_categories.join(", ")}`);
 
+  // --- Category display name to internal key mapping ---
+  const categoryKeyMap = {
+    DEFORESTATION: "DEFORESTATION",
+    FLOODING: "FLOODING",
+    GLACIER_MELTING: "GLACIER",
+    COASTAL_EROSION: "COASTAL_EROSION",
+  };
+
+  // --- Analysis Task Map ---
   const analysisTasks = {
     DEFORESTATION: {
       runner: runDeforestationCheck,
-      threshold: subscription.threshold_deforestation || -0.1,
+      args: [
+        regionGeoJson,
+        subscriptionId.toString(),
+        credentialsPath,
+        threshold_deforestation || -0.1,
+      ],
+    },
+    FLOODING: {
+      runner: runFloodingCheck,
+      args: [
+        regionGeoJson,
+        subscriptionId.toString(),
+        credentialsPath,
+        threshold_flooding || 5.0,
+        buffer_flooding || undefined,
+      ],
+    },
+    GLACIER: {
+      runner: runGlacierCheck,
+      args: [
+        regionGeoJson,
+        subscriptionId.toString(),
+        credentialsPath,
+        threshold_glacier || 2.0,
+        buffer_glacier || undefined,
+      ],
+    },
+    COASTAL_EROSION: {
+      runner: runCoastalErosionCheckWrapper,
+      args: [
+        regionGeoJson,
+        subscriptionId.toString(),
+        credentialsPath,
+        threshold_coastal_erosion || 5.0,
+      ],
     },
   };
 
   for (const category of alert_categories) {
+    const normCat = normalizeCategory(category);
+    const canonical = categoryKeyMap[normCat] || normCat;
+    const task = analysisTasks[canonical];
     console.log(`\n   Checking category: ${category}...`);
-    const task = analysisTasks[category.toUpperCase()];
     if (!task || !task.runner) {
       console.warn(
         `   -> Task/Runner not found/implemented for ${category}. Skipping.`
@@ -239,41 +352,100 @@ async function processSubscription(subscription, credentialsPath) {
     let analysisResultData = null;
     try {
       console.log(`   -> Running analysis for ${category}...`);
-      const result = await task.runner(
-        regionGeoJson,
-        subscriptionId.toString(),
-        credentialsPath,
-        task.threshold
-      );
+      const result = await task.runner(...task.args);
       console.log(`   --- GEE Check Result (${category}) ---`);
       console.log(JSON.stringify(result, null, 2));
 
-      analysisResultData = {
-        subscription_id: subscriptionId,
-        user_id: user_id,
-        analysis_type: category.toUpperCase(),
-        status: result.status,
-        alert_triggered: result.alert_triggered || false,
-        calculated_value:
-          result.mean_ndvi_change ??
-          result.mean_ndbi_change ??
-          result.mean_ndwi_change ??
-          result.calculated_value ??
-          null,
-        threshold_value: result.threshold || task.threshold,
-        details: result.message || null,
-        recent_period_start: result.recent_period_start || null,
-        recent_period_end: result.recent_period_end || null,
-        previous_period_start: result.previous_period_start || null,
-        previous_period_end: result.previous_period_end || null,
-        buffer_radius_meters: result.buffer_radius_meters || null,
-      };
-
-      if (result.status !== "success") {
-        delete analysisResultData.recent_period_start;
-        delete analysisResultData.recent_period_end;
-        delete analysisResultData.previous_period_start;
-        delete analysisResultData.previous_period_end;
+      if (canonical === "DEFORESTATION") {
+        analysisResultData = {
+          subscription_id: subscriptionId,
+          user_id: user_id,
+          analysis_type: canonical,
+          status: result.status,
+          alert_triggered: result.alert_triggered || false,
+          calculated_value:
+            result.mean_ndvi_change ?? result.calculated_value ?? null,
+          threshold_value: result.threshold ?? threshold_deforestation ?? -0.1,
+          details: result.message || null,
+          recent_period_start: result.recent_period_start || null,
+          recent_period_end: result.recent_period_end || null,
+          previous_period_start: result.previous_period_start || null,
+          previous_period_end: result.previous_period_end || null,
+          buffer_radius_meters: result.buffer_radius_meters || null,
+        };
+        if (result.status !== "success") {
+          delete analysisResultData.recent_period_start;
+          delete analysisResultData.recent_period_end;
+          delete analysisResultData.previous_period_start;
+          delete analysisResultData.previous_period_end;
+        }
+      } else if (canonical === "FLOODING") {
+        analysisResultData = {
+          subscription_id: subscriptionId,
+          user_id: user_id,
+          analysis_type: canonical,
+          status: result.status,
+          alert_triggered: result.alert_triggered || false,
+          calculated_value: result.flooded_percentage ?? null,
+          threshold_value:
+            result.threshold_percent ?? threshold_flooding ?? 5.0,
+          details: result.message || null,
+          recent_period_start: result.recent_period_start || null,
+          recent_period_end: result.recent_period_end || null,
+          baseline_period_start: result.baseline_period_start || null,
+          baseline_period_end: result.baseline_period_end || null,
+          buffer_radius_meters: result.buffer_radius_meters || null,
+        };
+        if (result.status !== "success") {
+          delete analysisResultData.recent_period_start;
+          delete analysisResultData.recent_period_end;
+          delete analysisResultData.baseline_period_start;
+          delete analysisResultData.baseline_period_end;
+        }
+      } else if (canonical === "GLACIER") {
+        analysisResultData = {
+          subscription_id: subscriptionId,
+          user_id: user_id,
+          analysis_type: canonical,
+          status: result.status,
+          alert_triggered: result.alert_triggered || false,
+          calculated_value: result.loss_percent ?? null,
+          threshold_value: result.threshold_percent ?? threshold_glacier ?? 2.0,
+          details: result.message || null,
+          recent_period_start: result.recent_period_start || null,
+          recent_period_end: result.recent_period_end || null,
+          baseline_period_start: result.baseline_period_start || null,
+          baseline_period_end: result.baseline_period_end || null,
+          buffer_radius_meters: result.buffer_radius_meters || null,
+        };
+        if (result.status !== "success") {
+          delete analysisResultData.recent_period_start;
+          delete analysisResultData.recent_period_end;
+          delete analysisResultData.baseline_period_start;
+          delete analysisResultData.baseline_period_end;
+        }
+      } else if (canonical === "COASTAL_EROSION") {
+        analysisResultData = {
+          subscription_id: subscriptionId,
+          user_id: user_id,
+          analysis_type: canonical,
+          status: result.status,
+          alert_triggered: result.alert_triggered || false,
+          calculated_value: result.shoreline_retreat_meters ?? null,
+          threshold_value: result.threshold ?? threshold_coastal_erosion ?? 5.0,
+          details: result.message || null,
+          recent_period_start: result.recent_period_start || null,
+          recent_period_end: result.recent_period_end || null,
+          baseline_period_start: result.baseline_period_start || null,
+          baseline_period_end: result.baseline_period_end || null,
+          buffer_radius_meters: result.buffer_radius_meters || null,
+        };
+        if (result.status !== "success") {
+          delete analysisResultData.recent_period_start;
+          delete analysisResultData.recent_period_end;
+          delete analysisResultData.baseline_period_start;
+          delete analysisResultData.baseline_period_end;
+        }
       }
     } catch (error) {
       console.error(`   --- Error Running ${category} Check (JS Level) ---`);
@@ -281,11 +453,18 @@ async function processSubscription(subscription, credentialsPath) {
       analysisResultData = {
         subscription_id: subscriptionId,
         user_id: user_id,
-        analysis_type: category.toUpperCase(),
+        analysis_type: canonical,
         status: "error",
         alert_triggered: false,
         details: `Node.js Orchestration/Runner Error: ${error.message}`,
-        threshold_value: task.threshold,
+        threshold_value:
+          canonical === "DEFORESTATION"
+            ? threshold_deforestation
+            : canonical === "FLOODING"
+            ? threshold_flooding
+            : canonical === "GLACIER"
+            ? threshold_glacier
+            : threshold_coastal_erosion ?? null,
       };
     }
 
@@ -328,6 +507,12 @@ export async function runAllChecks() {
         "region_geometry",
         "alert_categories",
         "is_active",
+        "threshold_deforestation",
+        "threshold_flooding",
+        "buffer_flooding",
+        "threshold_glacier",
+        "buffer_glacier",
+        "threshold_coastal_erosion", // Add this if using coastal erosion
       ],
     });
   } catch (fetchError) {
