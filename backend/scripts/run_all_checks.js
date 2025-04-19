@@ -1,5 +1,3 @@
-// backend/scripts/run_all_checks.js (Using Sequelize)
-
 import path from "path";
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
@@ -9,6 +7,9 @@ import sequelize from "../db/db.js";
 import User from "../models/user.model.js";
 import UserSubscription from "../models/userSubscription.model.js";
 import AnalysisResult from "../models/analysisResult.model.js";
+
+// --- Import flooding runner ---
+import {runFloodCheck} from "../services/google-earth/flooding/flooding.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -156,6 +157,24 @@ function runDeforestationCheck(
   );
 }
 
+// --- New: Flooding runner using flooding.js's runFloodCheck ---
+function runFloodingCheck(
+  regionGeoJson,
+  regionId,
+  credentialsPath,
+  threshold_percent,
+  buffer_meters
+) {
+  // runFloodCheck(regionGeoJson, regionId, credentialsPath, thresholdPercent, bufferMeters)
+  return runFloodCheck(
+    regionGeoJson,
+    regionId,
+    credentialsPath,
+    threshold_percent,
+    buffer_meters
+  );
+}
+
 async function saveAnalysisResult(resultData) {
   if (!resultData) {
     console.error("No analysis data provided to save.");
@@ -170,6 +189,8 @@ async function saveAnalysisResult(resultData) {
     "recent_period_end",
     "previous_period_start",
     "previous_period_end",
+    "baseline_period_start",
+    "baseline_period_end",
   ];
   dateFields.forEach((field) => {
     if (resultData[field]) {
@@ -203,8 +224,11 @@ async function processSubscription(subscription, credentialsPath) {
     region_geometry: regionGeoJson,
     alert_categories = [],
     is_active,
+    threshold_deforestation,
+    threshold_flooding,
+    buffer_flooding,
   } = subscription;
-  
+
   if (!is_active) {
     console.log(`Subscription ${subscriptionId} inactive.`);
     return;
@@ -219,10 +243,28 @@ async function processSubscription(subscription, credentialsPath) {
   );
   console.log(`   Categories: ${alert_categories.join(", ")}`);
 
+  // --- Analysis Task Map ---
   const analysisTasks = {
     DEFORESTATION: {
       runner: runDeforestationCheck,
-      threshold: subscription.threshold_deforestation || -0.1,
+      args: [
+        // (regionGeoJson, regionId, credentialsPath, threshold)
+        regionGeoJson,
+        subscriptionId.toString(),
+        credentialsPath,
+        threshold_deforestation || -0.1,
+      ],
+    },
+    FLOODING: {
+      runner: runFloodingCheck,
+      args: [
+        // (regionGeoJson, regionId, credentialsPath, threshold_percent, buffer_meters)
+        regionGeoJson,
+        subscriptionId.toString(),
+        credentialsPath,
+        threshold_flooding || 5.0,
+        buffer_flooding || undefined,
+      ],
     },
   };
 
@@ -239,41 +281,57 @@ async function processSubscription(subscription, credentialsPath) {
     let analysisResultData = null;
     try {
       console.log(`   -> Running analysis for ${category}...`);
-      const result = await task.runner(
-        regionGeoJson,
-        subscriptionId.toString(),
-        credentialsPath,
-        task.threshold
-      );
+      const result = await task.runner(...task.args);
       console.log(`   --- GEE Check Result (${category}) ---`);
       console.log(JSON.stringify(result, null, 2));
 
-      analysisResultData = {
-        subscription_id: subscriptionId,
-        user_id: user_id,
-        analysis_type: category.toUpperCase(),
-        status: result.status,
-        alert_triggered: result.alert_triggered || false,
-        calculated_value:
-          result.mean_ndvi_change ??
-          result.mean_ndbi_change ??
-          result.mean_ndwi_change ??
-          result.calculated_value ??
-          null,
-        threshold_value: result.threshold || task.threshold,
-        details: result.message || null,
-        recent_period_start: result.recent_period_start || null,
-        recent_period_end: result.recent_period_end || null,
-        previous_period_start: result.previous_period_start || null,
-        previous_period_end: result.previous_period_end || null,
-        buffer_radius_meters: result.buffer_radius_meters || null,
-      };
-
-      if (result.status !== "success") {
-        delete analysisResultData.recent_period_start;
-        delete analysisResultData.recent_period_end;
-        delete analysisResultData.previous_period_start;
-        delete analysisResultData.previous_period_end;
+      // --- Compose analysis result for DB insert depending on type ---
+      if (category.toUpperCase() === "DEFORESTATION") {
+        analysisResultData = {
+          subscription_id: subscriptionId,
+          user_id: user_id,
+          analysis_type: category.toUpperCase(),
+          status: result.status,
+          alert_triggered: result.alert_triggered || false,
+          calculated_value:
+            result.mean_ndvi_change ?? result.calculated_value ?? null,
+          threshold_value: result.threshold ?? threshold_deforestation ?? -0.1,
+          details: result.message || null,
+          recent_period_start: result.recent_period_start || null,
+          recent_period_end: result.recent_period_end || null,
+          previous_period_start: result.previous_period_start || null,
+          previous_period_end: result.previous_period_end || null,
+          buffer_radius_meters: result.buffer_radius_meters || null,
+        };
+        if (result.status !== "success") {
+          delete analysisResultData.recent_period_start;
+          delete analysisResultData.recent_period_end;
+          delete analysisResultData.previous_period_start;
+          delete analysisResultData.previous_period_end;
+        }
+      } else if (category.toUpperCase() === "FLOODING") {
+        analysisResultData = {
+          subscription_id: subscriptionId,
+          user_id: user_id,
+          analysis_type: category.toUpperCase(),
+          status: result.status,
+          alert_triggered: result.alert_triggered || false,
+          calculated_value: result.flooded_percentage ?? null,
+          threshold_value:
+            result.threshold_percent ?? threshold_flooding ?? 5.0,
+          details: result.message || null,
+          recent_period_start: result.recent_period_start || null,
+          recent_period_end: result.recent_period_end || null,
+          baseline_period_start: result.baseline_period_start || null,
+          baseline_period_end: result.baseline_period_end || null,
+          buffer_radius_meters: result.buffer_radius_meters || null,
+        };
+        if (result.status !== "success") {
+          delete analysisResultData.recent_period_start;
+          delete analysisResultData.recent_period_end;
+          delete analysisResultData.baseline_period_start;
+          delete analysisResultData.baseline_period_end;
+        }
       }
     } catch (error) {
       console.error(`   --- Error Running ${category} Check (JS Level) ---`);
@@ -285,7 +343,10 @@ async function processSubscription(subscription, credentialsPath) {
         status: "error",
         alert_triggered: false,
         details: `Node.js Orchestration/Runner Error: ${error.message}`,
-        threshold_value: task.threshold,
+        threshold_value:
+          (category.toUpperCase() === "DEFORESTATION"
+            ? threshold_deforestation
+            : threshold_flooding) ?? null,
       };
     }
 
@@ -328,6 +389,9 @@ export async function runAllChecks() {
         "region_geometry",
         "alert_categories",
         "is_active",
+        "threshold_deforestation",
+        "threshold_flooding",
+        "buffer_flooding",
       ],
     });
   } catch (fetchError) {

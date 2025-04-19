@@ -1,6 +1,3 @@
-# backend/services/google-earth/flooding.py
-# NO CHANGES NEEDED - Retaining the code provided in the prompt.
-
 import sys
 import json
 import os
@@ -120,8 +117,8 @@ def check_flooding(region_geometry, threshold_percent, buffer_radius_meters):
         flood_water_mask = recent_water_composite.subtract(baseline_water_composite).gt(0).rename('flood_water')
 
         # --- Calculate Areas ---
-        # Calculate pixel area in sq meters
-        pixel_area = ee.Image.pixelArea().divide(1000000) # Convert to sq km
+        # Calculate pixel area in sq meters, then rename to 'area'
+        pixel_area = ee.Image.pixelArea().divide(1000000).rename('area')  # Convert to sq km and rename
 
         # Calculate flooded area
         flood_area_image = flood_water_mask.multiply(pixel_area) # Area only where flood_water_mask is 1
@@ -164,7 +161,7 @@ def check_flooding(region_geometry, threshold_percent, buffer_radius_meters):
                  flooded_area_sqkm = 0.0
 
             # Extract total area
-            total_area_result = total_area_stats.get('constant') # Pixel area image has band name 'constant'
+            total_area_result = total_area_stats.get('area') # <-- use 'area'!
             if total_area_result is not None:
                  total_area_sqkm = total_area_result.getInfo()
                  if total_area_sqkm is None or total_area_sqkm == 0:
@@ -176,10 +173,9 @@ def check_flooding(region_geometry, threshold_percent, buffer_radius_meters):
                      alert_triggered = flooded_percentage > threshold_percent
 
             else:
-                 print("ERROR: 'constant' key not found in total_area_stats. Cannot calculate percentage.", file=sys.stderr)
+                 print("ERROR: 'area' key not found in total_area_stats. Cannot calculate percentage.", file=sys.stderr)
                  error_message = "Could not calculate total area of the region."
                  total_area_sqkm = 0 # Avoid division by zero
-
 
             print(f"Flooded Area: {flooded_area_sqkm:.4f} sqkm", file=sys.stderr)
             print(f"Total Region Area: {total_area_sqkm:.4f} sqkm", file=sys.stderr)
@@ -306,7 +302,6 @@ if __name__ == "__main__":
          print(json.dumps({"status": "error", "message": f"Unexpected error processing input: {e}", "region_id": region_id}))
          sys.exit(1)
 
-
     if not initialize_gee(credentials_path_from_arg):
         print(json.dumps({"status": "error", "message": "GEE initialization failed.", "region_id": region_id}))
         sys.exit(1)
@@ -331,10 +326,7 @@ if __name__ == "__main__":
         else:
             raise ValueError(f"Unsupported geometry type: {geom_type}")
 
-        # Basic validation of the geometry (optional but good practice)
-        validation_info = ee_geometry.isValid(1).getInfo() # Check validity with details
-        if not validation_info.get('valid', False):
-             raise ValueError(f"Geometry is invalid. Reason: {validation_info.get('reason', 'Unknown')}")
+        # Geometry validation block removed (no .isValid in Python API)
 
     except ValueError as e:
         print(f"ERROR: Invalid GeoJSON geometry: {e}", file=sys.stderr)

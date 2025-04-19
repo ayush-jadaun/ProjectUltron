@@ -4,7 +4,7 @@ import User from "./user.model.js";
 // Import User model if you have associations defined here
 
 const UserSubscription = sequelize.define(
-  "UserSubscription", 
+  "UserSubscription",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -29,7 +29,18 @@ const UserSubscription = sequelize.define(
       type: DataTypes.JSONB, // Or DataTypes.GEOMETRY for PostGIS
       allowNull: false,
     },
-
+    threshold_deforestation: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    threshold_flooding: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    buffer_flooding: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
 
     alert_categories: {
       type: DataTypes.ARRAY(DataTypes.STRING), // e.g., ['DEFORESTATION', 'FLOODING']
@@ -41,12 +52,10 @@ const UserSubscription = sequelize.define(
       allowNull: false,
       defaultValue: true,
     },
-
   },
   {
-    timestamps: true, 
-    tableName: "user_subscriptions", 
-
+    timestamps: true,
+    tableName: "user_subscriptions",
   }
 );
 
