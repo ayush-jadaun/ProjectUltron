@@ -60,7 +60,7 @@ connectDb();
 
 //cron functions
 scheduleUnverifiedUserCleanup();
-cronService.startCronJobs(); // Start the environmental check cron jobs
+// cronService.startCronJobs(); // Start the environmental check cron jobs
 
 // Routes
 app.use("/api/users", userRoutes);

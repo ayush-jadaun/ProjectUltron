@@ -1,9 +1,11 @@
 import sequelize from "../db/db.js"; 
 import { DataTypes } from "sequelize";
+import sequelize from "../db/db.js"; // Adjust path as needed
 import User from "./user.model.js";
+// Import User model if you have associations defined here
 
 const UserSubscription = sequelize.define(
-  "user_subscription", 
+  "UserSubscription", 
   {
     id: {
       type: DataTypes.INTEGER,
@@ -11,59 +13,63 @@ const UserSubscription = sequelize.define(
       primaryKey: true,
     },
 
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: User, 
-        key: "id", 
+        model: "users", // Make sure this matches your users table name
+        key: "id",
       },
     },
-
-    subscription_name: {
+    region_name: {
+      // Assuming you have a name field
       type: DataTypes.STRING,
-      allowNull: true, 
+      allowNull: true,
+    },
+    region_geometry: {
+      type: DataTypes.JSONB, // Or DataTypes.GEOMETRY for PostGIS
+      allowNull: false,
     },
 
-    region_geometry: {
-      type: DataTypes.JSONB, 
-      allowNull: false,
-      comment:
-        "GeoJSON representation of the subscribed region (e.g., Point, Polygon)",
-    },
 
     alert_categories: {
-      type: DataTypes.ARRAY(DataTypes.TEXT), 
+      type: DataTypes.ARRAY(DataTypes.STRING), // e.g., ['DEFORESTATION', 'FLOODING']
       allowNull: false,
-      defaultValue: [], 
-      comment: "List of environmental categories monitored for this region",
+      defaultValue: [],
     },
- 
     is_active: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true, 
+      defaultValue: true,
     },
 
   },
   {
     timestamps: true, 
     tableName: "user_subscriptions", 
-    underscored: true,
     indexes: [
-      { fields: ["user_id"] },
-      { fields: ["is_active"] },
+   
+      {
+        fields: ["userId"],
+      },
+ 
+      {
+        fields: ["is_active"],
+      },
     ],
   }
 );
 
+
+
 UserSubscription.belongsTo(User, {
-  foreignKey: "user_id", 
+  foreignKey: "userId", 
   onDelete: "CASCADE",
+
 });
 
 User.hasMany(UserSubscription, {
-  foreignKey: "user_id",
+  foreignKey: "userId",
 });
 
 export default UserSubscription;

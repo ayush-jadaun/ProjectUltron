@@ -15,9 +15,9 @@ export const fetchUserAnalysisResults = createAsyncThunk(
   async ({ analysis_type, alert_triggered }, { rejectWithValue }) => {
     try {
       const response = await api.get("/analysis-results", {
-        params: { analysis_type, alert_triggered }
+        params: { page, limit, analysis_type, alert_triggered }
       });
-      return response.data.data;
+      return response.data.data.results; // assuming data shape includes .results
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch analysis results"
@@ -36,6 +36,23 @@ export const fetchAnalysisResultById = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch analysis result"
+      );
+    }
+  }
+);
+
+// Get results by subscription
+export const fetchResultsBySubscription = createAsyncThunk(
+  "analysis/fetchResultsBySubscription",
+  async ({ subscriptionId, page = 1, limit = 10 }, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/analysis-results/subscription/${subscriptionId}`, {
+        params: { page, limit }
+      });
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch subscription results"
       );
     }
   }
@@ -63,7 +80,13 @@ const analysisSlice = createSlice({
     currentResult: null,
     alertSummary: null,
     loading: false,
-    error: null
+    error: null,
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalCount: 0,
+      limit: 10
+    }
   },
   reducers: {
     clearCurrentResult: (state) => {
@@ -71,7 +94,7 @@ const analysisSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -101,6 +124,25 @@ const analysisSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      // Fetch Results By Subscription
+      .addCase(fetchResultsBySubscription.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchResultsBySubscription.fulfilled, (state, action) => {
+        state.loading = false;
+        state.results = action.payload.results;
+        state.pagination = {
+          currentPage: action.payload.currentPage,
+          totalPages: action.payload.totalPages,
+          totalCount: action.payload.totalCount,
+          limit: action.payload.limit
+        };
+      })
+      .addCase(fetchResultsBySubscription.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       // Fetch Alert Summary
       .addCase(fetchAlertSummary.pending, (state) => {
         state.loading = true;
@@ -114,8 +156,8 @@ const analysisSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-  }
+  },
 });
 
 export const { clearCurrentResult, clearError } = analysisSlice.actions;
-export default analysisSlice.reducer; 
+export default analysisSlice.reducer;
