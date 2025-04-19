@@ -3,6 +3,8 @@ import { handleLogout } from "../store/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { BellIcon, LogIn, LogOut, User } from "lucide-react";
 import { useAsyncError, useNavigate } from "react-router-dom";
+import GreenIndex from "../pages/GreenIndex";
+
 const Navbar = () => {
 	const [selectedRegions, setSelectedRegions] = useState([]);
 	const [topics, setTopics] = useState({
@@ -97,27 +99,31 @@ const Navbar = () => {
 		}
 	}, [isAuthenticated, user, notifyMethod]);
 	return (
-		<header className="bg-green-700 text-white p-4 shadow-md sticky top-0 z-20">
-			{" "}
-			{/* Increased z-index */}
+		<header className="bg-green-700 text-white p-4 shadow-md sticky top-0 z-100">
 			<div className="container mx-auto flex items-center justify-between">
 				<div className="flex items-center">
 					<BellIcon className="mr-2 hidden sm:block" size={24} />
 					<h1 className="text-xl font-bold">Ultron Alert</h1>
 				</div>
-				<div>
+
+				<div className="flex items-center space-x-3">
+					<button
+						onClick={() => navigate("/green")}
+						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+					>
+						Deforestation
+					</button>
+
 					{isAuthenticated ? (
-						<div className="flex items-center space-x-3 sm:space-x-4">
+						<>
 							<button
 								className="flex items-center px-3 py-1.5 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
 								onClick={onProfileClick}
-								title="View Profile" // Added title for clarity
+								title="View Profile"
 							>
-								<User size={16} className="mr-1.5" /> {/* Added User icon */}
+								<User size={16} className="mr-1.5" />
 								<span className="hidden md:inline">
-									{/* Show name only on medium screens and up */}
-									{user?.name?.split(" ")[0] || user?.email}{" "}
-									{/* Show first name or email */}
+									{user?.name?.split(" ")[0] || user?.email}
 								</span>
 							</button>
 							<button
@@ -132,7 +138,7 @@ const Navbar = () => {
 								<LogOut size={16} className="mr-1" />
 								Logout
 							</button>
-						</div>
+						</>
 					) : (
 						<button
 							onClick={onLoginClick}

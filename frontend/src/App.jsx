@@ -20,6 +20,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import GreenIndex from "./pages/GreenIndex";
 
 function App() {
   // const dispatch = useDispatch(); // No longer needed here
@@ -47,6 +48,7 @@ function AppContent() {
           {/* --- Now essentially all Public Routes --- */}
           <Route path="/" element={<HomePage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/green" element={<GreenIndex />} />
           <Route
             path="/reset-password/:resetToken"
             element={<ResetPassword />}
