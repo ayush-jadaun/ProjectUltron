@@ -22,6 +22,7 @@ import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import GreenIndex from "./pages/GreenIndex";
 import Flood from "./pages/Flood";
+import SubscribeLocationPage from "./pages/SubscribeLocationPage";
 
 function App() {
   // const dispatch = useDispatch(); // No longer needed here
@@ -60,6 +61,7 @@ function AppContent() {
           <Route path="/profile" element={<UserProfile />} />
           {/* --- Analysis Page (now public) --- */}
           <Route path="/analysis" element={<AnalysisPage />} />
+          <Route path="/map" element={<SubscribeLocationPage />} />
           {/* --- Public-only route (not for logged-in users) --- */}
           <Route
             path="/login"
