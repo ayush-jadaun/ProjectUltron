@@ -1,6 +1,6 @@
 # Project Ultron - Advanced Environmental Monitoring System
 
-# Build at Hack36 8.0
+# Built at Hack36 8.0
 
 ## Overview
 Project Ultron is a sophisticated environmental monitoring system designed to track and analyze various environmental phenomena. The platform provides real-time data visualization, historical analysis, and predictive insights for environmental changes.
