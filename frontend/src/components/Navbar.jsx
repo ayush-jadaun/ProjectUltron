@@ -113,7 +113,12 @@ const Navbar = () => {
 					>
 						Deforestation
 					</button>
-
+					<button
+						onClick={() => navigate("/flood")}
+						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+					>
+						Floods
+					</button>
 					{isAuthenticated ? (
 						<>
 							<button
