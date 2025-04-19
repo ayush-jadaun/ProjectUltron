@@ -1,11 +1,22 @@
-# Project Ultron - Advanced Environmental Monitoring System
+<a href="https://hack36.com"> <img src="https://i.postimg.cc/FFwvfkGk/built-at-hack36.png" height=24px> </a>
 
 # Built at Hack36 8.0
 
 ## Overview
 Project Ultron is a sophisticated environmental monitoring system designed to track and analyze various environmental phenomena. The platform provides real-time data visualization, historical analysis, and predictive insights for environmental changes.
 
-## Features
+
+## Introduction:
+  Project Ultron is a sophisticated environmental monitoring system designed to track and analyze various environmental phenomena. The platform provides real-time data visualization, historical analysis, and predictive insights for environmental changes.
+  
+## Demo Video Link:
+  <a href="https://youtu.be/dQw4w9WgXcQ">https://youtu.be/dQw4w9WgXcQ</a>
+  
+## Presentation Link:
+  <a href="https://bit.ly/hack36_24_ppt"> PPT link here </a>
+  
+  
+## Table of Contents:
 
 ### Core Functionality
 - Real-time environmental monitoring
@@ -31,56 +42,25 @@ Project Ultron is a sophisticated environmental monitoring system designed to tr
 - Data analysis tools
 - Historical change visualization
 
-## Technical Stack
+## Technology Stack:
+  1) React Js
+  2) Node JS
+  3) TailwaindCss
+  4) Google Earth Engine
+  
 
-### Frontend
-- React.js with Vite
-- React Router for navigation
-- Framer Motion for animations
-- Tailwind CSS for styling
-- Lucide React for icons
-- Redux for state management
+## Contributors:
 
-### Key Components
-- **Navigation**: Responsive navbar with dynamic routing
-- **Footer**: Themed footer with social links and navigation
-- **Pages**:
-  - Homepage with environmental overview
-  - About Us with company information
-  - Contact page with form and information
-  - Privacy Policy page
-  - User Profile and Analysis pages
-  - Environmental monitoring pages (Green, Flood, Ice, Fire, Coast)
-  - Historical Change visualization
-  - Satellite imagery integration
+Team Name: BrainWashingtonEC
 
-### Environment Visualization
-- Dynamic background layers
-- Animated environmental elements
-- Interactive maps
-- Real-time data visualization
-- Historical data comparison
+* [Ayush Jadaun](https://github.com/ayush-jadaun)
+* [Ayush Agarwal](https://github.com/ayushagr101)
 
-## Project Structure
 
-```
-frontend/
-├── src/
-│   ├── assets/           # Environmental assets and visualizations
-│   ├── components/       # Reusable UI components
-│   │   ├── user/        # User-specific components
-│   │   ├── Navbar.jsx   # Navigation component
-│   │   └── Footer.jsx   # Footer component
-│   ├── pages/           # Application pages
-│   │   ├── auth/        # Authentication pages
-│   │   ├── infoPages/   # Environmental information pages
-│   │   ├── user/        # User-related pages
-│   │   └── *.jsx        # Main application pages
-│   ├── store/           # Redux store configuration
-│   ├── utils/           # Utility functions and helpers
-│   ├── App.jsx          # Main application component
-│   └── main.jsx         # Application entry point
-```
+
+
+### Made at:
+<a href="https://hack36.com"> <img src="https://i.postimg.cc/FFwvfkGk/built-at-hack36.png" height=24px> </a>
 
 ## Getting Started
 
@@ -122,4 +102,5 @@ frontend/
 - Real-time satellite imagery
 - Historical change comparison
 - Environmental condition indicators
+
 
