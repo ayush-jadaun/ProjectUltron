@@ -40,19 +40,21 @@ const HomePage = () => {
 							issues before irreversible damage occurs.
 						</p>
 						<div className="flex flex-wrap gap-3">
-							<button
-								onClick={handleGetStarted}
-								className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-sm transition-all duration-150 flex items-center"
-							>
-								<BellIcon className="mr-2" size={18} />
-								Get Started
-							</button>
 							{!isAuthenticated && (
 								<button
 									onClick={handleLogin}
 									className="px-6 py-2 bg-white hover:bg-gray-50 text-green-600 font-medium rounded-md shadow-sm transition-all duration-150 border border-green-500"
 								>
 									Already a member? Sign in
+								</button>
+							)}
+							{isAuthenticated && (
+								<button
+									onClick={navigate("/map")}
+									className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-sm transition-all duration-150 flex items-center"
+								>
+									<BellIcon className="mr-2" size={18} />
+									Get Started
 								</button>
 							)}
 						</div>
@@ -134,12 +136,12 @@ const HomePage = () => {
 									<AlertTriangleIcon size={24} className="text-gray-500" />
 								</div>
 								<h3 className="text-lg font-semibold text-gray-600 mb-2">
-									Air Quality Control
+									Coastal Erosion
 								</h3>
 								<p className="text-gray-600 text-sm">
-									Monitor dangerous levels of air pollution to protect public
-									health and identify pollution sources requiring immediate
-									intervention.
+									Monitor dangerous levels of coastal erosion for public safety
+									and identify sources requiring immediate intervention by the
+									authorities.
 								</p>
 							</div>
 
