@@ -14,9 +14,9 @@ import {
 	User, // Added User icon for profile button consistency
 } from "lucide-react";
 import { handleLogout } from "../store/slices/authSlice";
+import { createSubscription } from "../store/slices/subscriptionSlice";
 // Corrected import path assumption - place it in components or assets folder
 import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
-import Footer from "../components/Footer";
 
 const HomePage = () => {
 	// --- Existing State ---
@@ -40,6 +40,8 @@ const HomePage = () => {
 		user,
 		loading: authLoading,
 	} = useSelector((state) => state.auth);
+	const { creating: subscriptionCreating, error: subscriptionError } =
+		useSelector((state) => state.subscription);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -72,26 +74,50 @@ const HomePage = () => {
 			navigate("/login");
 			return;
 		}
+
+		// Validate required fields
+		if (selectedRegions.length === 0) {
+			alert("Please select at least one region to monitor.");
+			return;
+		}
+
+		const selectedTopics = Object.keys(topics).filter((key) => topics[key]);
+		if (selectedTopics.length === 0) {
+			alert("Please select at least one environmental topic to monitor.");
+			return;
+		}
+
 		setIsSaving(true);
-		const preferenceData = {
-			regions: selectedRegions.map((r) => r.name),
-			topics: Object.keys(topics).filter((key) => topics[key]),
-			notifyMethod: notifyMethod,
-			contactInfo: contactInfo,
-			userId: user?.id,
+		const subscriptionData = {
+			subscription_name: "Environmental Alerts",
+			region_geometry: {
+				type: "Point",
+				coordinates: [selectedRegions[0].lng, selectedRegions[0].lat],
+			},
+			alert_categories: selectedTopics,
+			is_active: true,
 		};
-		console.log(
-			"Attempting to save preferences for user:",
-			user?.id,
-			preferenceData
-		);
-		// Simulate API call
-		setTimeout(() => {
-			console.log("Saved preferences:", preferenceData);
-			setIsSaving(false);
+
+		try {
+			await dispatch(createSubscription(subscriptionData)).unwrap();
 			setSaveSuccess(true);
 			setTimeout(() => setSaveSuccess(false), 3000);
-		}, 1500);
+			// Clear form after successful submission
+			setSelectedRegions([]);
+			setTopics({
+				deforestation: false,
+				airPollution: false,
+				flooding: false,
+				glacierMelting: false,
+				urbanExpansion: false,
+				coastalErosion: false,
+			});
+			setNotifyMethod("email");
+		} catch (error) {
+			console.error("Failed to save preferences:", error);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	const onLoginClick = () => navigate("/login");
@@ -155,6 +181,16 @@ const HomePage = () => {
 								</p>
 							</div>
 						)}
+						{subscriptionError && (
+							<div className="mb-6 p-4 bg-red-100/80 border-l-4 border-red-500 text-red-800 rounded-md backdrop-blur-sm">
+								<p className="font-medium">{subscriptionError}</p>
+							</div>
+						)}
+						{saveSuccess && (
+							<div className="mb-6 p-4 bg-green-100/80 border-l-4 border-green-500 text-green-800 rounded-md backdrop-blur-sm">
+								<p className="font-medium">Preferences saved successfully!</p>
+							</div>
+						)}
 						<form onSubmit={handleSubmit} className="space-y-8">
 							{/* Region Selection */}
 							<section>
@@ -164,9 +200,14 @@ const HomePage = () => {
 								</h3>
 								{/* Map Placeholder */}
 								<div className="mb-6 h-64 border rounded-lg overflow-hidden bg-gray-100/50 backdrop-blur-sm flex items-center justify-center shadow-inner">
-									<p className="text-gray-500 italic">
-										Interactive map placeholder
-									</p>
+									<iframe
+										src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15283674.799797209!2d72.09858950579333!3d20.73595779415586!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30635ff06b92b791%3A0xd78c4fa1854213a6!2sIndia!5e0!3m2!1sen!2sin!4v1745021275104!5m2!1sen!2sin"
+										width="100%"
+										height="100%"
+										allowFullScreen=""
+										loading="lazy"
+										referrerPolicy="no-referrer-when-downgrade"
+									></iframe>
 								</div>
 								{/* Region Buttons */}
 								<div className="flex flex-wrap gap-2 mt-4">
@@ -288,32 +329,47 @@ const HomePage = () => {
 							</section>
 
 							{/* Submit Button */}
-							<div className="flex items-center justify-between pt-6 border-t border-gray-200/80">
-								{" "}
-								{/* Adjusted border */}
-								<button
-									type="submit"
-									disabled={isSaving || !isAuthenticated}
-									className={`flex justify-center items-center px-6 py-3 rounded-lg shadow-md text-base font-semibold text-white transition-colors duration-150 ${
-										isSaving
-											? "bg-green-400 cursor-wait"
-											: !isAuthenticated
-											? "bg-gray-400 cursor-not-allowed"
-											: "bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-									}`}
-								>
-									{isSaving ? (
-										<> {/* Spinner */} </>
-									) : (
-										"Save Notification Preferences"
-									)}
-								</button>
-								{saveSuccess && (
-									<div className="text-green-600 flex items-center font-medium animate-pulse">
-										<CheckIcon className="mr-1" size={20} /> Preferences saved!
-									</div>
-								)}
-							</div>
+							{isAuthenticated && (
+								<div className="flex justify-end">
+									<button
+										type="submit"
+										disabled={isSaving || subscriptionCreating}
+										className={`px-6 py-2 rounded-lg font-medium text-white transition-all duration-150 ease-in-out ${
+											isSaving || subscriptionCreating
+												? "bg-gray-400 cursor-not-allowed"
+												: "bg-green-600 hover:bg-green-700"
+										}`}
+									>
+										{isSaving || subscriptionCreating ? (
+											<span className="flex items-center">
+												<svg
+													className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+													xmlns="http://www.w3.org/2000/svg"
+													fill="none"
+													viewBox="0 0 24 24"
+												>
+													<circle
+														className="opacity-25"
+														cx="12"
+														cy="12"
+														r="10"
+														stroke="currentColor"
+														strokeWidth="4"
+													></circle>
+													<path
+														className="opacity-75"
+														fill="currentColor"
+														d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+													></path>
+												</svg>
+												Saving...
+											</span>
+										) : (
+											"Save Preferences"
+										)}
+									</button>
+								</div>
+							)}
 						</form>
 					</div>
 				</main>
