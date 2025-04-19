@@ -1,8 +1,88 @@
 import React, { useState, useEffect } from "react";
 import { handleLogout } from "../store/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { BellIcon, LogIn, LogOut, User } from "lucide-react";
-import { useAsyncError, useNavigate } from "react-router-dom";
+import { BellIcon, LogIn, LogOut, User, Menu, X } from "lucide-react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+
+const getPageColors = (pathname) => {
+	switch (pathname) {
+		case "/green":
+			return {
+				gradient: "bg-gradient-to-r from-green-700 via-green-600 to-green-500",
+				text: "text-white",
+				hover: "hover:bg-green-700",
+				activeGlow: "shadow-[0_0_15px_rgba(34,197,94,0.5)]",
+				button: "bg-green-500 hover:bg-green-600",
+				border: "border-green-400",
+			};
+		case "/flood":
+			return {
+				gradient: "bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500",
+				text: "text-white",
+				hover: "hover:bg-blue-700",
+				activeGlow: "shadow-[0_0_15px_rgba(59,130,246,0.5)]",
+				button: "bg-blue-500 hover:bg-blue-600",
+				border: "border-blue-400",
+			};
+		case "/ice":
+			return {
+				gradient: "bg-gradient-to-r from-cyan-700 via-cyan-600 to-cyan-500",
+				text: "text-white",
+				hover: "hover:bg-cyan-700",
+				activeGlow: "shadow-[0_0_15px_rgba(6,182,212,0.5)]",
+				button: "bg-cyan-500 hover:bg-cyan-600",
+				border: "border-cyan-400",
+			};
+		case "/fire":
+			return {
+				gradient: "bg-gradient-to-r from-red-700 via-red-600 to-red-500",
+				text: "text-white",
+				hover: "hover:bg-red-700",
+				activeGlow: "shadow-[0_0_15px_rgba(239,68,68,0.5)]",
+				button: "bg-red-500 hover:bg-red-600",
+				border: "border-red-400",
+			};
+		case "/coast":
+			return {
+				gradient: "bg-gradient-to-r from-teal-700 via-teal-600 to-teal-500",
+				text: "text-white",
+				hover: "hover:bg-teal-700",
+				activeGlow: "shadow-[0_0_15px_rgba(20,184,166,0.5)]",
+				button: "bg-teal-500 hover:bg-teal-600",
+				border: "border-teal-400",
+			};
+		case "/history":
+			return {
+				gradient:
+					"bg-gradient-to-r from-purple-700 via-purple-600 to-purple-500",
+				text: "text-white",
+				hover: "hover:bg-purple-700",
+				activeGlow: "shadow-[0_0_15px_rgba(147,51,234,0.5)]",
+				button: "bg-purple-500 hover:bg-purple-600",
+				border: "border-purple-400",
+			};
+		case "/profile":
+		case "/analysis":
+			return {
+				gradient:
+					"bg-gradient-to-r from-indigo-700 via-indigo-600 to-indigo-500",
+				text: "text-white",
+				hover: "hover:bg-indigo-700",
+				activeGlow: "shadow-[0_0_15px_rgba(99,102,241,0.5)]",
+				button: "bg-indigo-500 hover:bg-indigo-600",
+				border: "border-indigo-400",
+			};
+		default:
+			return {
+				gradient: "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700",
+				text: "text-white",
+				hover: "hover:bg-gray-700",
+				activeGlow: "shadow-[0_0_15px_rgba(75,85,99,0.5)]",
+				button: "bg-gray-700 hover:bg-gray-600",
+				border: "border-gray-600",
+			};
+	}
+};
 
 const Navbar = () => {
 	const [selectedRegions, setSelectedRegions] = useState([]);
@@ -18,6 +98,7 @@ const Navbar = () => {
 	const [contactInfo, setContactInfo] = useState("");
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveSuccess, setSaveSuccess] = useState(false);
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	// --- Redux State and Hooks ---
 	const {
@@ -27,6 +108,8 @@ const Navbar = () => {
 	} = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+	const location = useLocation();
+	const colors = getPageColors(location.pathname);
 
 	// --- Data ---
 	const regions = [
@@ -80,12 +163,16 @@ const Navbar = () => {
 	};
 
 	const onLoginClick = () => navigate("/login");
-	const onProfileClick = () => navigate("/profile"); // Navigate to profile page
+	const onProfileClick = () => navigate("/profile");
 	const onLogoutClick = () => {
 		dispatch(handleLogout())
 			.unwrap()
 			.then(() => navigate("/"))
 			.catch((err) => console.error("Logout failed:", err));
+	};
+
+	const toggleMobileMenu = () => {
+		setMobileMenuOpen(!mobileMenuOpen);
 	};
 
 	useEffect(() => {
@@ -97,88 +184,254 @@ const Navbar = () => {
 			setContactInfo("");
 		}
 	}, [isAuthenticated, user, notifyMethod]);
+
+	useEffect(() => {
+		// Close mobile menu when navigating
+		setMobileMenuOpen(false);
+	}, [location.pathname]);
+
 	return (
-		<header className="bg-green-700 text-white p-4 shadow-md sticky top-0 z-7777">
-			<div className="container mx-auto flex items-center justify-between">
-				<div className="flex items-center">
-					<BellIcon className="mr-2 hidden sm:block" size={24} />
-					<h1 className="text-xl font-bold pr-2">Ultron Alert</h1>
-					<button
-						onClick={() => navigate("/")}
-						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+		<nav
+			className={`${colors.gradient} ${colors.text} shadow-xl w-full sticky top-0 z-50 backdrop-blur-sm bg-opacity-95`}
+		>
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div className="flex items-center justify-between h-20">
+					<div className="flex items-center space-x-6">
+						<Link
+							to="/"
+							className="flex-shrink-0 flex items-center space-x-2 transition-transform hover:scale-105"
+						>
+							<span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 drop-shadow-lg">
+								Project Ultron
+							</span>
+						</Link>
+					</div>
+
+					{/* Desktop Menu */}
+					<div className="hidden md:flex items-center space-x-1">
+						<Link
+							to="/"
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+								location.pathname === "/"
+									? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+									: `${colors.hover} opacity-80 hover:opacity-100`
+							}`}
+						>
+							Home
+						</Link>
+						<Link
+							to="/green"
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+								location.pathname === "/green"
+									? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+									: `${colors.hover} opacity-80 hover:opacity-100`
+							}`}
+						>
+							Deforestation
+						</Link>
+						<Link
+							to="/flood"
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+								location.pathname === "/flood"
+									? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+									: `${colors.hover} opacity-80 hover:opacity-100`
+							}`}
+						>
+							Flood
+						</Link>
+						<Link
+							to="/ice"
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+								location.pathname === "/ice"
+									? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+									: `${colors.hover} opacity-80 hover:opacity-100`
+							}`}
+						>
+							Glaciers
+						</Link>
+						<Link
+							to="/fire"
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+								location.pathname === "/fire"
+									? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+									: `${colors.hover} opacity-80 hover:opacity-100`
+							}`}
+						>
+							Fire
+						</Link>
+						<Link
+							to="/coast"
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+								location.pathname === "/coast"
+									? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+									: `${colors.hover} opacity-80 hover:opacity-100`
+							}`}
+						>
+							Coast
+						</Link>
+						<Link
+							to="/history"
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+								location.pathname === "/history"
+									? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+									: `${colors.hover} opacity-80 hover:opacity-100`
+							}`}
+						>
+							History
+						</Link>
+					</div>
+
+					{/* User Menu */}
+					<div className="flex items-center space-x-4">
+						{isAuthenticated ? (
+							<div className="flex items-center space-x-2">
+								<Link
+									to="/profile"
+									className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+										location.pathname === "/profile"
+											? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+											: `${colors.hover} opacity-80 hover:opacity-100`
+									}`}
+								>
+									<User size={16} className="inline mr-1" />
+									Profile
+								</Link>
+								<Link
+									to="/analysis"
+									className={`hidden sm:flex px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+										location.pathname === "/analysis"
+											? `bg-white/20 ${colors.activeGlow} backdrop-blur-sm`
+											: `${colors.hover} opacity-80 hover:opacity-100`
+									}`}
+								>
+									Analysis
+								</Link>
+								<button
+									onClick={onLogoutClick}
+									className={`${colors.button} px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${colors.border} shadow-md`}
+								>
+									<LogOut size={16} className="inline mr-1" />
+									Logout
+								</button>
+							</div>
+						) : (
+							<button
+								onClick={onLoginClick}
+								className={`${colors.button} px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${colors.border} shadow-md`}
+							>
+								<LogIn size={16} className="inline mr-1" />
+								Login/SignUp
+							</button>
+						)}
+
+						{/* Mobile menu button */}
+						<button
+							className="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+							onClick={toggleMobileMenu}
+						>
+							{mobileMenuOpen ? (
+								<X size={24} className="text-white" />
+							) : (
+								<Menu size={24} className="text-white" />
+							)}
+						</button>
+					</div>
+				</div>
+			</div>
+
+			{/* Mobile Menu */}
+			<div
+				className={`${
+					mobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+				} md:hidden overflow-hidden transition-all duration-300 ease-in-out`}
+			>
+				<div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-black/20 backdrop-blur-md">
+					<Link
+						to="/"
+						className={`block px-3 py-2 rounded-md text-base font-medium ${
+							location.pathname === "/"
+								? `bg-white/20 ${colors.activeGlow}`
+								: `${colors.hover} opacity-80 hover:opacity-100`
+						}`}
 					>
 						Home
-					</button>
-				</div>
-
-				<div className="flex items-center space-x-3">
-					<button
-						onClick={() => navigate("/green")}
-						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+					</Link>
+					<Link
+						to="/green"
+						className={`block px-3 py-2 rounded-md text-base font-medium ${
+							location.pathname === "/green"
+								? `bg-white/20 ${colors.activeGlow}`
+								: `${colors.hover} opacity-80 hover:opacity-100`
+						}`}
 					>
 						Deforestation
-					</button>
-					<button
-						onClick={() => navigate("/flood")}
-						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+					</Link>
+					<Link
+						to="/flood"
+						className={`block px-3 py-2 rounded-md text-base font-medium ${
+							location.pathname === "/flood"
+								? `bg-white/20 ${colors.activeGlow}`
+								: `${colors.hover} opacity-80 hover:opacity-100`
+						}`}
 					>
-						Floods
-					</button>
-					<button
-						onClick={() => navigate("/ice")}
-						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+						Flood
+					</Link>
+					<Link
+						to="/ice"
+						className={`block px-3 py-2 rounded-md text-base font-medium ${
+							location.pathname === "/ice"
+								? `bg-white/20 ${colors.activeGlow}`
+								: `${colors.hover} opacity-80 hover:opacity-100`
+						}`}
 					>
 						Glaciers
-					</button>
-					<button
-						onClick={() => navigate("/fire")}
-						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+					</Link>
+					<Link
+						to="/fire"
+						className={`block px-3 py-2 rounded-md text-base font-medium ${
+							location.pathname === "/fire"
+								? `bg-white/20 ${colors.activeGlow}`
+								: `${colors.hover} opacity-80 hover:opacity-100`
+						}`}
 					>
-						Wildfire
-					</button>
-					<button
-						onClick={() => navigate("/coast")}
-						className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+						Fire
+					</Link>
+					<Link
+						to="/coast"
+						className={`block px-3 py-2 rounded-md text-base font-medium ${
+							location.pathname === "/coast"
+								? `bg-white/20 ${colors.activeGlow}`
+								: `${colors.hover} opacity-80 hover:opacity-100`
+						}`}
 					>
 						Coast
-					</button>
-					{isAuthenticated ? (
-						<>
-							<button
-								className="flex items-center px-3 py-1.5 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-								onClick={onProfileClick}
-								title="View Profile"
-							>
-								<User size={16} className="mr-1.5" />
-								<span className="hidden md:inline">
-									{user?.name?.split(" ")[0] || user?.email}
-								</span>
-							</button>
-							<button
-								onClick={onLogoutClick}
-								disabled={authLoading}
-								className={`flex items-center px-3 py-1.5 sm:px-4 ${
-									authLoading
-										? "bg-orange-400 cursor-not-allowed"
-										: "bg-orange-600 hover:bg-orange-700"
-								} text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors`}
-							>
-								<LogOut size={16} className="mr-1" />
-								Logout
-							</button>
-						</>
-					) : (
-						<button
-							onClick={onLoginClick}
-							className="flex items-center px-3 py-2 sm:px-4 bg-green-900 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+					</Link>
+					<Link
+						to="/history"
+						className={`block px-3 py-2 rounded-md text-base font-medium ${
+							location.pathname === "/history"
+								? `bg-white/20 ${colors.activeGlow}`
+								: `${colors.hover} opacity-80 hover:opacity-100`
+						}`}
+					>
+						History
+					</Link>
+
+					{isAuthenticated && (
+						<Link
+							to="/analysis"
+							className={`block sm:hidden px-3 py-2 rounded-md text-base font-medium ${
+								location.pathname === "/analysis"
+									? `bg-white/20 ${colors.activeGlow}`
+									: `${colors.hover} opacity-80 hover:opacity-100`
+							}`}
 						>
-							<LogIn size={16} className="mr-1" />
-							Login / Sign Up
-						</button>
+							Analysis
+						</Link>
 					)}
 				</div>
 			</div>
-		</header>
+		</nav>
 	);
 };
 
