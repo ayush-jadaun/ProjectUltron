@@ -26,10 +26,8 @@ import Flood from "./pages/infoPages/Flood";
 import Glaciers from "./pages/infoPages/Glaciers";
 
 import Beach from "./pages/infoPages/Beach";
-
+import Fire from "./pages/infoPages/Fire";
 import HistoricalChangePage from "./pages/HistoricalChangePage";
-
-
 
 function App() {
   // const dispatch = useDispatch(); // No longer needed here
@@ -60,6 +58,7 @@ function AppContent() {
           <Route path="/green" element={<GreenIndex />} />
           <Route path="/flood" element={<Flood />} />
           <Route path="/ice" element={<Glaciers />} />
+          <Route path="/fire" element={<Fire />} />
 
           <Route path="/coast" element={<Beach />} />
 
