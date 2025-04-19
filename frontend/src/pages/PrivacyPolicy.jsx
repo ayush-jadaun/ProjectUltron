@@ -43,7 +43,7 @@ const PrivacyPolicy = () => {
 					{/* Hero Section */}
 					<motion.section
 						variants={itemVariants}
-						className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg p-8 max-w-4xl mx-auto border border-gray-200/50 mb-12 relative overflow-hidden"
+						className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg p-5 max-w-2xl mx-auto border border-gray-200/50 mb-12 relative overflow-hidden"
 					>
 						<div className="relative z-10">
 							<motion.div
@@ -51,13 +51,13 @@ const PrivacyPolicy = () => {
 								transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
 								className="mb-6"
 							>
-								<ShieldIcon size={48} className="text-green-600 mx-auto" />
+								<ShieldIcon size={40} className="text-green-600 mx-auto" />
 							</motion.div>
 							<motion.h1
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6 }}
-								className="text-4xl md:text-5xl font-bold text-green-700 mb-6 text-center bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent"
+								className="text-3xl md:text-4xl font-bold text-green-700 mb-6 text-center bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent"
 							>
 								Privacy Policy
 							</motion.h1>
@@ -65,10 +65,10 @@ const PrivacyPolicy = () => {
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: 0.2 }}
-								className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto text-center leading-relaxed"
+								className="text-xl text-gray-600 mb-6 max-w-xl mx-auto text-center leading-relaxed"
 							>
-								Your privacy is important to us. This policy outlines how we collect,
-								use, and protect your personal information.
+								Your privacy is important to us. This policy outlines how we
+								collect, use, and protect your personal information.
 							</motion.p>
 						</div>
 					</motion.section>
@@ -98,7 +98,8 @@ const PrivacyPolicy = () => {
 								transition={{ duration: 0.6, delay: 0.2 }}
 								className="text-gray-600 leading-relaxed"
 							>
-								We collect information that you provide directly to us, including:
+								We collect information that you provide directly to us,
+								including:
 							</motion.p>
 							<ul className="list-disc list-inside text-gray-600 space-y-2 mt-4 ml-8">
 								<li>Name and contact information</li>
@@ -231,8 +232,8 @@ const PrivacyPolicy = () => {
 								transition={{ duration: 0.6, delay: 0.2 }}
 								className="text-gray-600 leading-relaxed"
 							>
-								If you have any questions about our privacy policy or how we handle
-								your data, please contact us at:
+								If you have any questions about our privacy policy or how we
+								handle your data, please contact us at:
 							</motion.p>
 							<p className="text-green-600 font-medium mt-4">
 								privacy@projectultron.com
@@ -245,4 +246,4 @@ const PrivacyPolicy = () => {
 	);
 };
 
-export default PrivacyPolicy; 
+export default PrivacyPolicy;
