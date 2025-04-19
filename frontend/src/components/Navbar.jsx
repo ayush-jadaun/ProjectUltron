@@ -98,7 +98,7 @@ const Navbar = () => {
 		}
 	}, [isAuthenticated, user, notifyMethod]);
 	return (
-		<header className="bg-green-700 text-white p-4 shadow-md sticky top-0 z-100">
+		<header className="bg-green-700 text-white p-4 shadow-md sticky top-0 z-7777">
 			<div className="container mx-auto flex items-center justify-between">
 				<div className="flex items-center">
 					<BellIcon className="mr-2 hidden sm:block" size={24} />
