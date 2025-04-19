@@ -27,7 +27,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
 
 // Sync Database
 sequelize
-  .sync()
+  .sync({force:true})
   .then(() => {
     console.log("Database & tables have been updated!");
   })

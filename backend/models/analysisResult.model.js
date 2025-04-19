@@ -81,13 +81,7 @@ const AnalysisResult = sequelize.define(
     timestamps: true,
     tableName: "analysis_results",
     underscored: true,
-    indexes: [
-      { fields: ["subscription_id"] },
-      { fields: ["user_id"] },
-      { fields: ["analysis_type"] },
-      { fields: ["status"] },
-      { fields: ["alert_triggered"] },
-    ],
+
   }
 );
 

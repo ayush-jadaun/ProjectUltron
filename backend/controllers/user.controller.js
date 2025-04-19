@@ -71,7 +71,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     email,
     password: hashedPassword,
     location,
-    isVerified: false, // Default is set in model, but explicit is fine
+    is_verified: false, // Default is set in model, but explicit is fine
   });
 
   console.log(`New user registered: ${email} at ${getCurrentUTCDateTime()}`);
@@ -111,7 +111,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ where: { email } });
   if (!user) return next(new ApiError("Invalid email or password", 401)); 
 
-  if (!user.isVerified)
+  if (!user.is_verified)
     return next(
       new ApiError(
         "Please verify your email before logging in. You can request a new verification email if needed.",
@@ -151,7 +151,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
           email: user.email,
           name: user.name,
           user_type: user.user_type,
-          isVerified: user.isVerified,
+          isVerified: user.is_verified,
           location: user.location,
           organization_name: user.organization_name,
           contact_number: user.contact_number,
