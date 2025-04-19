@@ -28,8 +28,10 @@ const formatDate = (dateString) => {
 		return "Invalid Date";
 	}
 };
+console.log(1)
 
 const UserProfilePage = () => {
+	console.log(2);
 	const {
 		user,
 		isAuthenticated,
