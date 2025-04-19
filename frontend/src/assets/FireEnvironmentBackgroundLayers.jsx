@@ -76,13 +76,13 @@ const FireEnvironmentBackgroundLayers = ({ children }) => {
 
 				{/* Fire blocks similar to Mario */}
 				<div className="absolute bottom-[calc(25%-5px)] left-[30%]">
-					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2 border-yellow-400 border-r-2 border-b-2 border-orange-700 flex items-center justify-center">
+					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2  border-r-2 border-b-2 border-orange-700 flex items-center justify-center">
 						<div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-300 rounded-sm"></div>
 					</div>
 				</div>
 
 				<div className="absolute bottom-[calc(25%-5px)] left-[60%] scale-75">
-					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2 border-yellow-400 border-r-2 border-b-2 border-orange-700 flex items-center justify-center opacity-95">
+					<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-lg border-t-2 border-l-2  border-r-2 border-b-2 border-orange-700 flex items-center justify-center opacity-95">
 						<div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-300 rounded-sm"></div>
 					</div>
 				</div>

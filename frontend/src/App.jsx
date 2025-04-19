@@ -28,6 +28,8 @@ import Glaciers from "./pages/infoPages/Glaciers";
 import Beach from "./pages/infoPages/Beach";
 import Fire from "./pages/infoPages/Fire";
 import HistoricalChangePage from "./pages/HistoricalChangePage";
+import { Satellite } from "lucide-react";
+import RealtimeSatelliteMap from "./pages/satellite";
 
 function App() {
   // const dispatch = useDispatch(); // No longer needed here
@@ -61,6 +63,7 @@ function AppContent() {
           <Route path="/fire" element={<Fire />} />
 
           <Route path="/coast" element={<Beach />} />
+          <Route path="/satellite" element={<RealtimeSatelliteMap />} />
 
           <Route path="/history" element={<HistoricalChangePage />} />
 
