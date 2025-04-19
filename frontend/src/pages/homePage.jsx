@@ -51,7 +51,7 @@ const HomePage = () => {
 							)}
 							{isAuthenticated && (
 								<button
-									onClick={navigate("/map")}
+									onClick={() => navigate("/map")}
 									className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-sm transition-all duration-150 flex items-center"
 								>
 									<BellIcon className="mr-2" size={18} />
