@@ -9,11 +9,14 @@ from pathlib import Path
 
 # --- Configuration Constants ---
 DEFAULT_GLACIER_ALERT_THRESHOLD_PERCENT = 2.0  # Alert if > 2% glacier area loss
-RECENT_PERIOD_DAYS = 365    # Recent year
-# Adjust the baseline period to be more flexible and potentially capture more data
+
+# --- UPDATE THESE FOR RECENT/BACKGROUND ANALYSIS WINDOW ---
+RECENT_PERIOD_DAYS = 6    # Analyze the last 6 days
 BASELINE_PERIOD_YEARS_AGO = 10
-BASELINE_PERIOD_DURATION_DAYS = 365  # Expanded from 90 to full year for more data coverage
+BASELINE_PERIOD_DURATION_DAYS = 6  # Baseline is a 6-day window as well
 BASELINE_FALLBACK_YEARS = [8, 9, 11, 12]  # Fallback years to try if primary baseline has no data
+# ----------------------------------------------------------
+
 S2_COLLECTION = 'COPERNICUS/S2_SR_HARMONIZED'
 NDSI_GREEN_BAND = 'B3'
 NDSI_SWIR_BAND = 'B11'
@@ -45,46 +48,29 @@ def initialize_gee(credentials_path_arg):
 def mask_s2_clouds(image):
     """Mask clouds in Sentinel-2 imagery using the SCL band."""
     scl = image.select('SCL')
-    # Keep pixels that are not classified as cloud shadows, medium/high probability clouds, or cirrus
     mask = scl.neq(3).And(scl.neq(8)).And(scl.neq(9)).And(scl.neq(10)).And(scl.neq(11))
     return image.updateMask(mask)
 
 def calculate_ndsi(image):
-    """Calculate Normalized Difference Snow Index."""
     ndsi = image.normalizedDifference([NDSI_GREEN_BAND, NDSI_SWIR_BAND]).rename('NDSI')
     return image.addBands(ndsi).copyProperties(image, ['system:time_start'])
 
 def get_median_ndsi_image(s2_collection, start, end, region_geometry):
-    """Get median NDSI image for the given time period and region."""
     try:
-        # Filter by date and region
         filtered_collection = s2_collection.filterDate(start, end).filterBounds(region_geometry)
-        
-        # Check if we have any images in this collection
         image_count = filtered_collection.size().getInfo()
         print(f"DEBUG: Found {image_count} images for period {start.format('YYYY-MM-dd').getInfo()} to {end.format('YYYY-MM-dd').getInfo()}", file=sys.stderr)
-        
         if image_count == 0:
             print(f"WARNING: No images found for period {start.format('YYYY-MM-dd').getInfo()} to {end.format('YYYY-MM-dd').getInfo()}", file=sys.stderr)
             return None
-        
-        # Apply cloud masking and calculate NDSI
         ndsi_collection = filtered_collection.map(mask_s2_clouds).map(calculate_ndsi)
-        
-        # Keep only the NDSI band
         ndsi_only_collection = ndsi_collection.select(['NDSI'])
-        
-        # Generate median composite
         ndsi_median_img = ndsi_only_collection.median().clip(region_geometry)
-        
-        # Verify we have the NDSI band
         bands = ndsi_median_img.bandNames().getInfo()
         print(f"DEBUG: Bands of median NDSI image: {bands}", file=sys.stderr)
-        
         if not bands or 'NDSI' not in bands:
             print("WARNING: No NDSI band in median composite", file=sys.stderr)
             return None
-            
         return ndsi_median_img
     except Exception as e:
         print(f"ERROR in get_median_ndsi_image: {e}", file=sys.stderr)
@@ -92,31 +78,23 @@ def get_median_ndsi_image(s2_collection, start, end, region_geometry):
         return None
 
 def glacier_area_mask(image, ndsi_threshold=0.4):
-    """Classify glacier/snow/ice by NDSI threshold. Returns ee.Image."""
     glacier = image.select('NDSI').gt(ndsi_threshold).rename('glacier')
     return glacier
 
 def try_alternative_baseline(s2_collection, region_geometry, end_date_recent):
-    """Try alternative baseline periods if the primary one fails."""
     print("Attempting to find alternative baseline period with sufficient data...", file=sys.stderr)
-    
     for year_offset in BASELINE_FALLBACK_YEARS:
         try:
             end_date_alt = end_date_recent.advance(-year_offset, 'year')
             start_date_alt = end_date_alt.advance(-BASELINE_PERIOD_DURATION_DAYS, 'day')
-            
             print(f"Trying alternate baseline: {start_date_alt.format('YYYY-MM-dd').getInfo()} to {end_date_alt.format('YYYY-MM-dd').getInfo()}", file=sys.stderr)
-            
             alt_ndsi_img = get_median_ndsi_image(s2_collection, start_date_alt, end_date_alt, region_geometry)
-            
             if alt_ndsi_img is not None and 'NDSI' in alt_ndsi_img.bandNames().getInfo():
                 print(f"Found valid alternative baseline {year_offset} years ago.", file=sys.stderr)
                 return alt_ndsi_img, start_date_alt, end_date_alt
-                
         except Exception as e:
             print(f"Error trying alternative baseline {year_offset} years ago: {e}", file=sys.stderr)
             continue
-    
     print("All alternative baseline periods failed.", file=sys.stderr)
     return None, None, None
 
@@ -128,7 +106,6 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
         end_date_baseline = end_date_recent.advance(-BASELINE_PERIOD_YEARS_AGO, 'year')
         start_date_baseline = end_date_baseline.advance(-BASELINE_PERIOD_DURATION_DAYS, 'day')
 
-        # For logging
         try:
             start_date_baseline_str = start_date_baseline.format('YYYY-MM-dd').getInfo()
             end_date_baseline_str = end_date_baseline.format('YYYY-MM-dd').getInfo()
@@ -140,8 +117,6 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
             print(f"WARNING: Unable to format date strings for logging: {date_error}", file=sys.stderr)
 
         s2_collection = ee.ImageCollection(S2_COLLECTION).filterBounds(region_geometry)
-
-        # Try to get recent period image
         recent_ndsi_img = get_median_ndsi_image(s2_collection, start_date_recent, end_date_recent, region_geometry)
         if recent_ndsi_img is None:
             error_message = "No cloud-free data available for recent period. Cannot perform analysis."
@@ -156,17 +131,12 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
                 "threshold_percent": threshold_percent,
                 "buffer_radius_meters": buffer_radius_meters
             }
-
-        # Try to get baseline period image
         baseline_ndsi_img = get_median_ndsi_image(s2_collection, start_date_baseline, end_date_baseline, region_geometry)
-        
-        # If primary baseline fails, try alternatives
         if baseline_ndsi_img is None:
             print("Primary baseline period has no data, trying alternatives...", file=sys.stderr)
             baseline_ndsi_img, start_date_baseline, end_date_baseline = try_alternative_baseline(
                 s2_collection, region_geometry, end_date_recent
             )
-            
             if baseline_ndsi_img is None:
                 error_message = "No cloud-free data available for any baseline period. Cannot perform analysis."
                 print(f"ERROR: {error_message}", file=sys.stderr)
@@ -181,7 +151,6 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
                     "buffer_radius_meters": buffer_radius_meters
                 }
 
-        # Check for NDSI band presence
         baseline_bands = baseline_ndsi_img.bandNames().getInfo()
         recent_bands = recent_ndsi_img.bandNames().getInfo()
         print("DEBUG: Bands of baseline_ndsi_img:", baseline_bands, file=sys.stderr)
@@ -243,7 +212,6 @@ def check_glacier_melting(region_geometry, threshold_percent, buffer_radius_mete
         alert_triggered = False
         error_message = None
         try:
-            # Extract glacier area in sq km
             baseline_result = baseline_area_stats.get('glacier')
             if baseline_result is not None:
                 baseline_area = baseline_result.getInfo()

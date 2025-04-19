@@ -15,8 +15,8 @@ export async function sendAlertNotification({
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.SMTP_EMAIL, // Your email address
-      pass: process.env.SMTP_PASS, // Your email password or app password
+      user: process.env.EMAIL_USERNAME, // Your email address
+      pass: process.env.EMAIL_PASSWORD, // Your email password or app password
     },
   });
 
