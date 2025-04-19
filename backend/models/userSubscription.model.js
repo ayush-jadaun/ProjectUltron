@@ -1,62 +1,64 @@
-import sequelize from "../db/db.js"; 
 import { DataTypes } from "sequelize";
+import sequelize from "../db/db.js";
 import User from "./user.model.js";
-// Import User model if you have associations defined here
 
 const UserSubscription = sequelize.define(
-  "UserSubscription",
+  "user_subscription",
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "users", // Make sure this matches your users table name
-        key: "id",
-      },
+      references: { model: User, key: "id" },
+    },
+    subscription_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     region_name: {
-      // Assuming you have a name field
       type: DataTypes.STRING,
       allowNull: true,
     },
     region_geometry: {
-      type: DataTypes.JSONB, // Or DataTypes.GEOMETRY for PostGIS
+      type: DataTypes.JSONB,
       allowNull: false,
     },
     threshold_deforestation: {
       type: DataTypes.FLOAT,
       allowNull: true,
+      defaultValue: null,
     },
     threshold_flooding: {
       type: DataTypes.FLOAT,
       allowNull: true,
+      defaultValue: null,
     },
     buffer_flooding: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: null,
     },
     threshold_glacier: {
       type: DataTypes.FLOAT,
       allowNull: true,
+      defaultValue: null,
     },
     buffer_glacier: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: null,
     },
     threshold_coastal_erosion: {
       type: DataTypes.FLOAT,
       allowNull: true,
       defaultValue: null,
     },
-
     alert_categories: {
-      type: DataTypes.ARRAY(DataTypes.STRING), // e.g., ['DEFORESTATION', 'FLOODING']
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
       defaultValue: [],
     },
@@ -69,19 +71,11 @@ const UserSubscription = sequelize.define(
   {
     timestamps: true,
     tableName: "user_subscriptions",
+    underscored: true,
   }
 );
 
-
-
-UserSubscription.belongsTo(User, {
-  foreignKey: "userId", 
-  onDelete: "CASCADE",
-
-});
-
-User.hasMany(UserSubscription, {
-  foreignKey: "userId",
-});
+UserSubscription.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(UserSubscription, { foreignKey: "userId" });
 
 export default UserSubscription;
