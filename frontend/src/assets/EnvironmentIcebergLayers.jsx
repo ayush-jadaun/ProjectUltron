@@ -136,6 +136,6 @@ const EnvironmentIcebergLayers = ({ children }) => {
 			<div className="relative z-20 min-h-screen">{children}</div>
 		</div>
 	);
-};  
+};
 
 export default EnvironmentIcebergLayers;
