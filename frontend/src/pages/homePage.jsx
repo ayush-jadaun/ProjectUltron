@@ -68,7 +68,9 @@ const HomePage = () => {
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6 }}
+
 								className="text-4xl font-bold mb-6 bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent"
+
 							>
 								Take Action for Our Planet
 							</motion.h1>

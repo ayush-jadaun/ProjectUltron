@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -39,10 +39,211 @@ ChartJS.register(
   Legend
 );
 
+// Helper to get appropriate index name and comparison label
+function getComparisonLabel(analysisType) {
+  switch (analysisType) {
+    case "DEFORESTATION":
+      return "NDVI";
+    case "FLOODING":
+      return "NDWI";
+    case "COASTAL_EROSION":
+      return "NDWI";
+    case "GLACIER":
+      return "NDSI";
+    default:
+      return "Change";
+  }
+}
+
+function getChartLabel(analysisType) {
+  switch (analysisType) {
+    case "DEFORESTATION":
+      return "NDVI Change";
+    case "FLOODING":
+      return "NDWI Change";
+    case "COASTAL_EROSION":
+      return "NDWI Change";
+    case "GLACIER":
+      return "NDSI Change";
+    default:
+      return "Change";
+  }
+}
+
+// Custom Image Comparison Component
+const ImageComparison = ({
+  leftImage,
+  rightImage,
+  leftImageLabel,
+  rightImageLabel,
+}) => {
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const containerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMove = (e) => {
+    if (!isDragging || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const newPosition = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setSliderPosition(newPosition);
+  };
+
+  const handleMouseDown = () => setIsDragging(true);
+  const handleMouseUp = () => setIsDragging(false);
+
+  useEffect(() => {
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handleMove);
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mousemove", handleMove);
+    };
+  }, [isDragging]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "400px",
+        overflow: "hidden",
+        userSelect: "none",
+      }}
+    >
+      {/* Left Image (Full Width) */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <img
+          src={leftImage}
+          alt="Before"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+        {leftImageLabel && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 10,
+              left: 10,
+              background: "rgba(0,0,0,0.5)",
+              color: "white",
+              padding: "4px 8px",
+              borderRadius: 4,
+              fontSize: 14,
+            }}
+          >
+            {leftImageLabel}
+          </div>
+        )}
+      </div>
+
+      {/* Right Image (Partial Width based on slider) */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: `${sliderPosition}%`,
+          height: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <img
+          src={rightImage}
+          alt="After"
+          style={{
+            width: `${100 * (100 / sliderPosition)}%`,
+            height: "100%",
+            objectFit: "cover",
+            transform:
+              sliderPosition === 0
+                ? "none"
+                : `translateX(${
+                    -100 * ((100 - sliderPosition) / sliderPosition)
+                  }%)`,
+          }}
+        />
+        {rightImageLabel && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 10,
+              right: 10,
+              background: "rgba(0,0,0,0.5)",
+              color: "white",
+              padding: "4px 8px",
+              borderRadius: 4,
+              fontSize: 14,
+            }}
+          >
+            {rightImageLabel}
+          </div>
+        )}
+      </div>
+
+      {/* Slider */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: `${sliderPosition}%`,
+          width: "3px",
+          height: "100%",
+          background: "#fff",
+          transform: "translateX(-50%)",
+          cursor: "ew-resize",
+          boxShadow: "0 0 5px rgba(0,0,0,0.5)",
+        }}
+        onMouseDown={handleMouseDown}
+      />
+
+      {/* Slider Handle */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: `${sliderPosition}%`,
+          width: "40px",
+          height: "40px",
+          borderRadius: "50%",
+          background: "white",
+          transform: "translate(-50%, -50%)",
+          cursor: "ew-resize",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 0 5px rgba(0,0,0,0.5)",
+        }}
+        onMouseDown={handleMouseDown}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            transform: "rotate(90deg)",
+          }}
+        >
+          <span>⟵</span>
+          <span>⟶</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ---- Custom HeatmapLayer using leaflet.heat ----
 function HeatmapLayer({ points, options }) {
   const map = useMap();
-  React.useEffect(() => {
+  useEffect(() => {
     if (!window.L.heatLayer) return;
     const heatLayer = window.L.heatLayer(points, options).addTo(map);
     return () => {
@@ -157,10 +358,16 @@ const HistoricalChangePage = () => {
   };
 
   // Prepare chart data if available
-  let ndviData = null;
+  let indexData = null;
   let heatmapPoints = [];
   if (reportResult && reportResult.status === "success") {
-    ndviData = {
+    // Pick the correct index: NDVI, NDWI, or NDSI based on analysisType
+    const value =
+      reportResult.mean_ndvi_change ??
+      reportResult.mean_ndwi_change ??
+      reportResult.mean_ndsi_change ??
+      0;
+    indexData = {
       labels: [
         reportResult.previous_period_start,
         reportResult.recent_period_start,
@@ -168,8 +375,8 @@ const HistoricalChangePage = () => {
       ].filter(Boolean),
       datasets: [
         {
-          label: "NDVI Change",
-          data: [0, 0, reportResult.mean_ndvi_change ?? 0],
+          label: getChartLabel(analysisType),
+          data: [0, 0, value],
           fill: false,
           backgroundColor: "#1976d2",
           borderColor: "#1976d2",
@@ -177,7 +384,7 @@ const HistoricalChangePage = () => {
       ],
     };
     heatmapPoints = reportResult.heatmap_points || [
-      [20.7, 78.8, Math.abs(reportResult.mean_ndvi_change ?? 0)],
+      [20.7, 78.8, Math.abs(value)],
     ];
   }
 
@@ -203,6 +410,10 @@ const HistoricalChangePage = () => {
       ));
     }
   }
+
+  // --- IMAGE COMPARISON SECTION ---
+  const showCompare =
+    reportResult && reportResult.start_image_url && reportResult.end_image_url;
 
   return (
     <div
@@ -407,7 +618,6 @@ const HistoricalChangePage = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="© OpenStreetMap contributors"
               />
-              {/* Show overlays from results */}
               {resultPolygon}
               {resultMarkers}
               {reportResult && reportResult.heatmap_points && (
@@ -439,6 +649,32 @@ const HistoricalChangePage = () => {
       <div id="report-content">
         {reportResult && (
           <>
+            {/* IMAGE COMPARISON SLIDER - Dynamic label */}
+            {showCompare && (
+              <div
+                style={{
+                  marginBottom: 36,
+                  background: "#fff",
+                  borderRadius: 10,
+                  boxShadow: "0 1px 8px 0 rgba(30,80,180,0.05)",
+                  padding: 18,
+                  textAlign: "center",
+                }}
+              >
+                <h4 style={{ marginBottom: 18 }}>
+                  {getComparisonLabel(analysisType)} Map Comparison ({fromDate}{" "}
+                  vs {toDate})
+                </h4>
+                <div style={{ maxWidth: 700, margin: "0 auto" }}>
+                  <ImageComparison
+                    leftImage={reportResult.start_image_url}
+                    rightImage={reportResult.end_image_url}
+                    leftImageLabel={fromDate}
+                    rightImageLabel={toDate}
+                  />
+                </div>
+              </div>
+            )}
             <div style={{ marginBottom: 36 }}>
               <h4>Status: {reportResult.status}</h4>
               <h4>
@@ -455,6 +691,26 @@ const HistoricalChangePage = () => {
                   <span>
                     {typeof reportResult.mean_ndvi_change === "number"
                       ? reportResult.mean_ndvi_change.toFixed(4)
+                      : "N/A"}
+                  </span>
+                </h4>
+              )}
+              {"mean_ndwi_change" in reportResult && (
+                <h4>
+                  Mean NDWI Change:{" "}
+                  <span>
+                    {typeof reportResult.mean_ndwi_change === "number"
+                      ? reportResult.mean_ndwi_change.toFixed(4)
+                      : "N/A"}
+                  </span>
+                </h4>
+              )}
+              {"mean_ndsi_change" in reportResult && (
+                <h4>
+                  Mean NDSI Change:{" "}
+                  <span>
+                    {typeof reportResult.mean_ndsi_change === "number"
+                      ? reportResult.mean_ndsi_change.toFixed(4)
                       : "N/A"}
                   </span>
                 </h4>
@@ -493,19 +749,9 @@ const HistoricalChangePage = () => {
                   minWidth: 300,
                 }}
               >
-                <h4>
-                  {analysisType === "DEFORESTATION"
-                    ? "NDVI Change"
-                    : analysisType === "FLOODING"
-                    ? "Flood Analysis"
-                    : analysisType === "GLACIER"
-                    ? "Glacier Melting"
-                    : analysisType === "COASTAL_EROSION"
-                    ? "Coastal Erosion"
-                    : "Analysis"}
-                </h4>
-                {ndviData ? (
-                  <Line data={ndviData} options={{ responsive: true }} />
+                <h4>{getChartLabel(analysisType)}</h4>
+                {indexData ? (
+                  <Line data={indexData} options={{ responsive: true }} />
                 ) : (
                   <div>No chart data.</div>
                 )}
@@ -531,7 +777,6 @@ const HistoricalChangePage = () => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution="© OpenStreetMap contributors"
                 />
-                {/* Show overlays from results */}
                 {resultPolygon}
                 {resultMarkers}
                 {reportResult && reportResult.heatmap_points && (
@@ -557,6 +802,22 @@ const HistoricalChangePage = () => {
                     <b>NDVI Change Detected:</b>{" "}
                     {typeof reportResult.mean_ndvi_change === "number"
                       ? reportResult.mean_ndvi_change.toFixed(4)
+                      : "N/A"}
+                  </li>
+                )}
+                {reportResult.mean_ndwi_change !== undefined && (
+                  <li>
+                    <b>NDWI Change Detected:</b>{" "}
+                    {typeof reportResult.mean_ndwi_change === "number"
+                      ? reportResult.mean_ndwi_change.toFixed(4)
+                      : "N/A"}
+                  </li>
+                )}
+                {reportResult.mean_ndsi_change !== undefined && (
+                  <li>
+                    <b>NDSI Change Detected:</b>{" "}
+                    {typeof reportResult.mean_ndsi_change === "number"
+                      ? reportResult.mean_ndsi_change.toFixed(4)
                       : "N/A"}
                   </li>
                 )}
