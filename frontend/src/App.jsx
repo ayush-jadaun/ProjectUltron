@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  // useLocation, // No longer needed in this simplified version
+	BrowserRouter,
+	Routes,
+	Route,
+	Navigate,
+	// useLocation, // No longer needed in this simplified version
 } from "react-router-dom";
 // import { useDispatch, useSelector } from "react-redux"; // No longer needed here
 // import { checkAuthStatus } from "./store/slices/authSlice"; // No longer needed here
@@ -20,7 +20,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
-import SubscribeLocationPage from "./pages/SubscribeLocationPage"
+import SubscribeLocationPage from "./pages/SubscribeLocationPage";
 import GreenIndex from "./pages/infoPages/GreenIndex";
 import Flood from "./pages/infoPages/Flood";
 import Glaciers from "./pages/infoPages/Glaciers";
@@ -28,71 +28,66 @@ import Glaciers from "./pages/infoPages/Glaciers";
 import Beach from "./pages/infoPages/Beach";
 import Fire from "./pages/infoPages/Fire";
 import HistoricalChangePage from "./pages/HistoricalChangePage";
-import AboutUs from "./pages/AboutUs";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Contact from "./pages/Contact";
+import { Satellite } from "lucide-react";
+import RealtimeSatelliteMap from "./pages/satellite";
 
 function App() {
-  // const dispatch = useDispatch(); // No longer needed here
+	// const dispatch = useDispatch(); // No longer needed here
 
-  // You might still want to dispatch checkAuthStatus somewhere,
-  // perhaps once when the app loads, independent of routing,
-  // or inside the Navbar component if user   info is displayed there.
-  // useEffect(() => {
-  //   dispatch(checkAuthStatus());
-  // }, [dispatch]);
+	// You might still want to dispatch checkAuthStatus somewhere,
+	// perhaps once when the app loads, independent of routing,
+	// or inside the Navbar component if user   info is displayed there.
+	// useEffect(() => {
+	//   dispatch(checkAuthStatus());
+	// }, [dispatch]);
 
-  return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
-  );
+	return (
+		<BrowserRouter>
+			<AppContent />
+		</BrowserRouter>
+	);
 }
 
 function AppContent() {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-grow">
-        <Routes>
-          {/* --- Now essentially all Public Routes --- */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/green" element={<GreenIndex />} />
-          <Route path="/flood" element={<Flood />} />
-          <Route path="/ice" element={<Glaciers />} />
-          <Route path="/fire" element={<Fire />} />
-
-          <Route path="/coast" element={<Beach />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/history" element={<HistoricalChangePage />} />
-
-          {/* <Route path="/coastal" element={<CoastalErosion />} /> */}
-          <Route
-            path="/reset-password/:resetToken"
-            element={<ResetPassword />}
-          />{" "}
-          {/* Assuming token in URL */}
-          {/* --- User Profile (now public) --- */}
-          <Route path="/profile" element={<UserProfile />} />
-          {/* --- Analysis Page (now public) --- */}
-          <Route path="/analysis" element={<AnalysisPage />} />
-          <Route path="/map" element={<SubscribeLocationPage />} />
-          {/* --- Public-only route (not for logged-in users) --- */}
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                {" "}
-                {/* Keeps redirecting logged-in users away from /login */}
-                <LoginSignup />
-              </PublicRoute>
-            }
-          />
-          {/* --- Example Structure for when Protected Routes are re-enabled --- */}
-          {/*
+	return (
+		<div className="flex flex-col min-h-screen">
+			<Navbar />
+			<main className="flex-grow">
+				<Routes>
+					{/* --- Now essentially all Public Routes --- */}
+					<Route path="/" element={<HomePage />} />
+					<Route path="/forgot-password" element={<ForgotPassword />} />
+					<Route path="/green" element={<GreenIndex />} />
+					<Route path="/flood" element={<Flood />} />
+					<Route path="/ice" element={<Glaciers />} />
+					<Route path="/fire" element={<Fire />} />
+					<Route path="/coast" element={<Beach />} />
+					<Route path="/satellite" element={<RealtimeSatelliteMap />} />
+					<Route path="/history" element={<HistoricalChangePage />} />
+					{/* <Route path="/coastal" element={<CoastalErosion />} /> */}
+					<Route
+						path="/reset-password/:resetToken"
+						element={<ResetPassword />}
+					/>{" "}
+					{/* Assuming token in URL */}
+					{/* --- User Profile (now public) --- */}
+					<Route path="/profile" element={<UserProfile />} />
+					{/* --- Analysis Page (now public) --- */}
+					<Route path="/analysis" element={<AnalysisPage />} />
+					<Route path="/map" element={<SubscribeLocationPage />} />
+					{/* --- Public-only route (not for logged-in users) --- */}
+					<Route
+						path="/login"
+						element={
+							<PublicRoute>
+								{" "}
+								{/* Keeps redirecting logged-in users away from /login */}
+								<LoginSignup />
+							</PublicRoute>
+						}
+					/>
+					{/* --- Example Structure for when Protected Routes are re-enabled --- */}
+					{/*
 					<Route
 						path="/profile"
 						element={
@@ -110,14 +105,14 @@ function AppContent() {
 						}
 					/>
 					 */}
-          {/* --- Catch-All Route --- */}
-          {/* Redirects any unmatched URL back to the homepage */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
-  );
+					{/* --- Catch-All Route --- */}
+					{/* Redirects any unmatched URL back to the homepage */}
+					<Route path="*" element={<Navigate to="/" replace />} />
+				</Routes>
+			</main>
+			<Footer />
+		</div>
+	);
 }
 
 export default App;
