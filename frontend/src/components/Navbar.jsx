@@ -51,16 +51,6 @@ const getPageColors = (pathname) => {
 				button: "bg-teal-500 hover:bg-teal-600",
 				border: "border-teal-400",
 			};
-		case "/history":
-			return {
-				gradient:
-					"bg-gradient-to-r from-purple-800 via-purple-500 to-purple-800",
-				text: "text-white",
-				hover: "hover:bg-purple-700",
-				activeGlow: "shadow-[0_0_15px_rgba(147,51,234,0.5)]",
-				button: "bg-purple-500 hover:bg-purple-600",
-				border: "border-purple-400",
-			};
 		case "/profile":
 		case "/analysis":
 			return {
