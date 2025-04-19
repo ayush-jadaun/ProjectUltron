@@ -161,7 +161,7 @@ const HomePage = () => {
 					</section>
 
 					{/* Call to Action - More compact */}
-					<section className="bg-green-600/90 backdrop-blur-sm text-white rounded-lg shadow-md p-6 text-center">
+					<section className="bg-green-200/1000 backdrop-blur-sm text-white rounded-lg shadow-md p-6 text-center">
 						<h2 className="text-2xl font-bold mb-4">
 							Join Our Environmental Alert Network
 						</h2>
