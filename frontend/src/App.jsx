@@ -15,6 +15,7 @@ import LoginSignup from "./pages/auth/LoginSignup";
 import HomePage from "./pages/homePage";
 
 import UserProfile from "./pages/user/UserProfile";
+import AnalysisPage from "./pages/analysisPage";
 
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
@@ -53,10 +54,25 @@ function AppContent() {
 					/>
 
 					{/* --- Protected Routes --- */}
-					<Route element={<ProtectedRoute />}>
-						<Route path="/profile" element={<UserProfile />} />
-					</Route>
+					<Route
+						path="/profile"
+						element={
+							<ProtectedRoute>
+								<UserProfile />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/analysis"
+						element={
+							<ProtectedRoute>
+								<AnalysisPage />
+							</ProtectedRoute>
+						}
+					/>
+
 					{/* --- Catch-All Route --- */}
+					<Route path="*" element={<Navigate to="/" replace />} />
 				</Routes>
 			</main>
 			<Footer />

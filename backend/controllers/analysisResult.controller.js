@@ -4,6 +4,7 @@ import UserSubscription from "../models/userSubscription.model.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import sequelize from "../db/db.js";
 
 /*
 =============================
@@ -13,6 +14,9 @@ import asyncHandler from "../utils/asyncHandler.js";
 export const getUserAnalysisResults = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
   const { page = 1, limit = 10, analysis_type, alert_triggered } = req.query;
+
+  console.log("Fetching analysis results for user:", userId);
+  console.log("Query parameters:", { page, limit, analysis_type, alert_triggered });
 
   const offset = (page - 1) * limit;
 
@@ -27,6 +31,8 @@ export const getUserAnalysisResults = asyncHandler(async (req, res, next) => {
     whereConditions.alert_triggered = alert_triggered === "true";
   }
 
+  console.log("Where conditions:", whereConditions);
+
   // Find results with pagination
   const results = await AnalysisResult.findAndCountAll({
     where: whereConditions,
@@ -40,6 +46,8 @@ export const getUserAnalysisResults = asyncHandler(async (req, res, next) => {
       },
     ],
   });
+
+  console.log("Found results:", results.count);
 
   res.status(200).json(
     new ApiResponse(

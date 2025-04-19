@@ -11,6 +11,7 @@ import userRoutes from "./routes/user.routes.js";
 import scheduleUnverifiedUserCleanup from "./utils/killUnverifiedUser.js";
 import userSubscriptionRoutes from "./routes/userSubscription.routes.js"
 import analysisResultRoutes from "./routes/analysisResult.routes.js"
+import cronService from "./services/cron.service.js";
 dotenv.config();
 
 const app = express();
@@ -59,6 +60,7 @@ connectDb();
 
 //cron functions
 scheduleUnverifiedUserCleanup();
+cronService.startCronJobs(); // Start the environmental check cron jobs
 
 // Routes
 app.use("/api/users", userRoutes);
