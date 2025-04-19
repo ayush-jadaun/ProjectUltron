@@ -96,7 +96,7 @@ const Footer = () => {
 							Contact
 						</Link>
 						<Link
-							to="/privacy-policy"
+							to="/privacy"
 							className={`${theme.hover} transition-colors duration-300`}
 						>
 							Privacy Policy

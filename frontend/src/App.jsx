@@ -30,6 +30,9 @@ import Fire from "./pages/infoPages/Fire";
 import HistoricalChangePage from "./pages/HistoricalChangePage";
 import { Satellite } from "lucide-react";
 import RealtimeSatelliteMap from "./pages/satellite";
+import AboutUs from "./pages/AboutUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Contact from "./pages/Contact";
 
 function App() {
 	// const dispatch = useDispatch(); // No longer needed here
@@ -62,6 +65,9 @@ function AppContent() {
 					<Route path="/ice" element={<Glaciers />} />
 					<Route path="/fire" element={<Fire />} />
 					<Route path="/coast" element={<Beach />} />
+					<Route path="/about" element={<AboutUs />} />
+					<Route path="/contact" element={<Contact />} />
+					<Route path="/privacy" element={<PrivacyPolicy />} />
 					<Route path="/satellite" element={<RealtimeSatelliteMap />} />
 					<Route path="/history" element={<HistoricalChangePage />} />
 					{/* <Route path="/coastal" element={<CoastalErosion />} /> */}

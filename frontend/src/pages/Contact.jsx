@@ -1,19 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import {
-	MailIcon,
-	PhoneIcon,
-	MapPinIcon,
-	SendIcon,
-	ClockIcon,
-} from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock, ArrowRight } from "lucide-react";
 import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
 
 const Contact = () => {
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",
-		subject: "",
 		message: "",
 	});
 
@@ -27,8 +20,9 @@ const Contact = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		// Handle form submission here
+		// Handle form submission
 		console.log("Form submitted:", formData);
+		// Add form submission logic here
 	};
 
 	const containerVariants = {
@@ -36,21 +30,44 @@ const Contact = () => {
 		visible: {
 			opacity: 1,
 			transition: {
-				staggerChildren: 0.2,
+				staggerChildren: 0.15,
 			},
 		},
 	};
 
 	const itemVariants = {
-		hidden: { y: 20, opacity: 0 },
+		hidden: { y: 15, opacity: 0 },
 		visible: {
 			y: 0,
 			opacity: 1,
 			transition: {
-				duration: 0.5,
+				duration: 0.4,
 			},
 		},
 	};
+
+	const contactInfo = [
+		{
+			icon: <Mail size={20} className="text-green-600" />,
+			title: "Email",
+			details: ["contact@ecoalert.com"],
+		},
+		{
+			icon: <Phone size={20} className="text-green-600" />,
+			title: "Phone",
+			details: ["+1 (555) 123-4567"],
+		},
+		{
+			icon: <MapPin size={20} className="text-green-600" />,
+			title: "Address",
+			details: ["123 Green Street", "Eco City, EC 12345"],
+		},
+		{
+			icon: <Clock size={20} className="text-green-600" />,
+			title: "Business Hours",
+			details: ["Mon-Fri: 9AM - 6PM", "Weekends: Closed"],
+		},
+	];
 
 	return (
 		<motion.div
@@ -60,183 +77,142 @@ const Contact = () => {
 			className="min-h-screen"
 		>
 			<EnvironmentBackgroundLayers>
-				<main className="container mx-auto py-12 px-4">
-					{/* Hero Section */}
-					<motion.section
-						variants={itemVariants}
-						className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg p-8 max-w-4xl mx-auto border border-gray-200/50 mb-12 relative overflow-hidden"
-					>
-						<div className="relative z-10">
-							<motion.div
-								animate={{ rotate: 360 }}
-								transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-								className="mb-6"
-							>
-								<MailIcon size={48} className="text-green-600 mx-auto" />
-							</motion.div>
-							<motion.h1
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.6 }}
-								className="text-4xl md:text-5xl font-bold text-green-700 mb-6 text-center bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent"
-							>
-								Contact Us
-							</motion.h1>
-							<motion.p
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.6, delay: 0.2 }}
-								className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto text-center leading-relaxed"
-							>
-								Have questions or feedback? We'd love to hear from you. Reach out to us
-								through any of the channels below.
-							</motion.p>
+				<main className="container mx-auto py-16 px-4 max-w-4xl">
+					{/* Header */}
+					<motion.div variants={itemVariants} className="text-center mb-12">
+						<div className="inline-block p-3 bg-green-100 rounded-full mb-4">
+							<Mail size={28} className="text-green-600" />
 						</div>
-					</motion.section>
+						<h1 className="text-3xl md:text-4xl font-bold text-green-700 mb-4">
+							Get in Touch
+						</h1>
+						<p className="text-gray-600 max-w-lg mx-auto">
+							Have questions or feedback about our environmental monitoring
+							solutions? We're here to help.
+						</p>
+					</motion.div>
 
-					<div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
-						{/* Contact Form */}
-						<motion.section
-							variants={itemVariants}
-							className="bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-200/50"
-						>
-							<h2 className="text-2xl font-semibold text-green-600 mb-6">
-								Send us a Message
-							</h2>
-							<form onSubmit={handleSubmit} className="space-y-6">
-								<div>
-									<label
-										htmlFor="name"
-										className="block text-sm font-medium text-gray-700 mb-1"
-									>
-										Name
-									</label>
-									<input
-										type="text"
-										id="name"
-										name="name"
-										value={formData.name}
-										onChange={handleChange}
-										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-										required
-									/>
-								</div>
-								<div>
-									<label
-										htmlFor="email"
-										className="block text-sm font-medium text-gray-700 mb-1"
-									>
-										Email
-									</label>
-									<input
-										type="email"
-										id="email"
-										name="email"
-										value={formData.email}
-										onChange={handleChange}
-										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-										required
-									/>
-								</div>
-								<div>
-									<label
-										htmlFor="subject"
-										className="block text-sm font-medium text-gray-700 mb-1"
-									>
-										Subject
-									</label>
-									<input
-										type="text"
-										id="subject"
-										name="subject"
-										value={formData.subject}
-										onChange={handleChange}
-										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-										required
-									/>
-								</div>
-								<div>
-									<label
-										htmlFor="message"
-										className="block text-sm font-medium text-gray-700 mb-1"
-									>
-										Message
-									</label>
-									<textarea
-										id="message"
-										name="message"
-										value={formData.message}
-										onChange={handleChange}
-										rows="4"
-										className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-										required
-									></textarea>
-								</div>
-								<motion.button
-									whileHover={{ scale: 1.02 }}
-									whileTap={{ scale: 0.98 }}
-									type="submit"
-									className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-								>
-									<SendIcon size={20} />
-									Send Message
-								</motion.button>
-							</form>
-						</motion.section>
+					{/* Main Content */}
+					<div className="bg-white/90 backdrop-blur-md rounded-xl shadow-md border border-gray-100 overflow-hidden">
+						<div className="grid md:grid-cols-5 gap-0">
+							{/* Contact Information */}
+							<motion.div
+								variants={itemVariants}
+								className="md:col-span-2 bg-gradient-to-br from-green-600 to-green-700 text-white p-8"
+							>
+								<h2 className="text-xl font-semibold mb-6">
+									Contact Information
+								</h2>
 
-						{/* Contact Information */}
-						<motion.section
-							variants={itemVariants}
-							className="bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-200/50"
-						>
-							<h2 className="text-2xl font-semibold text-green-600 mb-6">
-								Contact Information
-							</h2>
-							<div className="space-y-6">
-								<div className="flex items-start gap-4">
-									<MailIcon size={24} className="text-green-600 mt-1" />
-									<div>
-										<h3 className="font-medium text-gray-900">Email</h3>
-										<p className="text-gray-600">contact@ecoalert.com</p>
-										<p className="text-gray-600">support@ecoalert.com</p>
+								<div className="space-y-6">
+									{contactInfo.map((item, index) => (
+										<div key={index} className="flex items-start gap-3">
+											<div className="mt-1">{item.icon}</div>
+											<div>
+												<h3 className="font-medium text-white/90">
+													{item.title}
+												</h3>
+												{item.details.map((detail, i) => (
+													<p key={i} className="text-white/80 text-sm">
+														{detail}
+													</p>
+												))}
+											</div>
+										</div>
+									))}
+								</div>
+
+								<div className="mt-12">
+									<h3 className="font-medium text-white/90 mb-3">Follow Us</h3>
+									<div className="flex space-x-3">
+										{["Twitter", "LinkedIn", "Facebook"].map((platform, i) => (
+											<button
+												key={i}
+												className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+											>
+												<span className="sr-only">{platform}</span>
+											</button>
+										))}
 									</div>
 								</div>
-								<div className="flex items-start gap-4">
-									<PhoneIcon size={24} className="text-green-600 mt-1" />
-									<div>
-										<h3 className="font-medium text-gray-900">Phone</h3>
-										<p className="text-gray-600">+1 (555) 123-4567</p>
-										<p className="text-gray-600">+1 (555) 987-6543</p>
+							</motion.div>
+
+							{/* Contact Form */}
+							<motion.div variants={itemVariants} className="md:col-span-3 p-8">
+								<h2 className="text-xl font-semibold text-gray-800 mb-6">
+									Send us a Message
+								</h2>
+
+								<form onSubmit={handleSubmit} className="space-y-5">
+									<div className="grid md:grid-cols-2 gap-5">
+										<div>
+											<label
+												htmlFor="name"
+												className="block text-sm font-medium text-gray-700 mb-1"
+											>
+												Name
+											</label>
+											<input
+												type="text"
+												id="name"
+												name="name"
+												value={formData.name}
+												onChange={handleChange}
+												className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+												required
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="email"
+												className="block text-sm font-medium text-gray-700 mb-1"
+											>
+												Email
+											</label>
+											<input
+												type="email"
+												id="email"
+												name="email"
+												value={formData.email}
+												onChange={handleChange}
+												className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+												required
+											/>
+										</div>
 									</div>
-								</div>
-								<div className="flex items-start gap-4">
-									<MapPinIcon size={24} className="text-green-600 mt-1" />
+
 									<div>
-										<h3 className="font-medium text-gray-900">Address</h3>
-										<p className="text-gray-600">
-											123 Green Street
-											<br />
-											Eco City, EC 12345
-											<br />
-											United States
-										</p>
+										<label
+											htmlFor="message"
+											className="block text-sm font-medium text-gray-700 mb-1"
+										>
+											Message
+										</label>
+										<textarea
+											id="message"
+											name="message"
+											value={formData.message}
+											onChange={handleChange}
+											rows="5"
+											className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+											required
+										></textarea>
 									</div>
-								</div>
-								<div className="flex items-start gap-4">
-									<ClockIcon size={24} className="text-green-600 mt-1" />
-									<div>
-										<h3 className="font-medium text-gray-900">Business Hours</h3>
-										<p className="text-gray-600">
-											Monday - Friday: 9:00 AM - 6:00 PM
-											<br />
-											Saturday: 10:00 AM - 4:00 PM
-											<br />
-											Sunday: Closed
-										</p>
+
+									<div className="flex justify-end">
+										<motion.button
+											whileHover={{ scale: 1.02 }}
+											whileTap={{ scale: 0.98 }}
+											type="submit"
+											className="bg-green-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-2"
+										>
+											Send Message
+											<ArrowRight size={16} />
+										</motion.button>
 									</div>
-								</div>
-							</div>
-						</motion.section>
+								</form>
+							</motion.div>
+						</div>
 					</div>
 				</main>
 			</EnvironmentBackgroundLayers>
@@ -244,4 +220,4 @@ const Contact = () => {
 	);
 };
 
-export default Contact; 
+export default Contact;
