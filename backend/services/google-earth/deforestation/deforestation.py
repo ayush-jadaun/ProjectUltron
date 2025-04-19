@@ -1,5 +1,3 @@
-# backend/services/google-earth/deforestation.py
-
 import sys
 import json
 import os
@@ -9,10 +7,13 @@ import time
 import traceback
 from pathlib import Path
 
-
 DEFAULT_NDVI_DROP_THRESHOLD = -0.1
-RECENT_PERIOD_DAYS = 30
-PREVIOUS_PERIOD_DAYS = 30
+
+
+RECENT_PERIOD_DAYS = 6
+PREVIOUS_PERIOD_DAYS = 6
+# -----------------------------------------------
+
 SATELLITE_COLLECTION = 'COPERNICUS/S2_SR_HARMONIZED'
 NIR_BAND = 'B8'
 RED_BAND = 'B4'
@@ -21,7 +22,6 @@ SCL_MASK_VALUES = [3, 8, 9, 10, 11]
 REDUCTION_SCALE = 30
 DEFAULT_POINT_BUFFER = 1000
 gcp_project_id = 'project-ultron-457221' 
-
 
 
 def initialize_gee(credentials_path_arg):
@@ -51,7 +51,6 @@ def mask_s2_clouds(image):
 def calculate_ndvi(image):
     ndvi = image.normalizedDifference([NIR_BAND, RED_BAND]).rename('NDVI')
     return image.addBands(ndvi).copyProperties(image, ['system:time_start'])
-
 
 
 def check_deforestation(region_geometry, threshold, buffer_radius_meters):

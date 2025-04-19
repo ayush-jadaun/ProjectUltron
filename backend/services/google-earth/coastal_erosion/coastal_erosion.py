@@ -8,8 +8,12 @@ import traceback
 from pathlib import Path
 
 DEFAULT_SHORELINE_RETREAT_THRESHOLD = 5.0  # meters (example threshold)
-RECENT_PERIOD_DAYS = 365     # Last 12 months
-BASELINE_PERIOD_DAYS = 365   # 12 months before recent
+
+# --- UPDATE TO 6-DAY WINDOWS FOR BOTH PERIODS ---
+RECENT_PERIOD_DAYS = 6     # Last 6 days
+BASELINE_PERIOD_DAYS = 6   # 6 days before recent period
+# ------------------------------------------------
+
 S2_COLLECTION = 'COPERNICUS/S2_SR_HARMONIZED'
 REDUCTION_SCALE = 10
 DEFAULT_POINT_BUFFER = 1000
@@ -42,7 +46,6 @@ def mask_s2_clouds(image):
     return image.updateMask(mask)
 
 def calculate_ndwi(image):
-    # NDWI = (Green - NIR) / (Green + NIR)
     ndwi = image.normalizedDifference(['B3', 'B8']).rename('NDWI')
     return image.addBands(ndwi).copyProperties(image, ['system:time_start'])
 
@@ -54,11 +57,9 @@ def get_median_ndwi_image(s2_collection, start, end, region_geometry):
     return ndwi_median_img
 
 def extract_shoreline(image, ndwi_threshold=0.0):
-    # Returns an ee.Image with value 1 where NDWI > threshold (water), 0 elsewhere (land)
     return image.select('NDWI').gt(ndwi_threshold).rename('water')
 
 def get_shoreline_edge(image, region_geometry):
-    # Detect the water-land boundary (edge of water mask)
     canny = ee.Algorithms.CannyEdgeDetector(image, threshold=0.1, sigma=1)
     shoreline = canny.mask(canny).clip(region_geometry)
     return shoreline
@@ -73,9 +74,7 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
         end_date_baseline = start_date_recent
         start_date_baseline = end_date_baseline.advance(-BASELINE_PERIOD_DAYS, 'day')
 
-        # Sentinel-2 data starts from June 23, 2015
         SENTINEL2_START = ee.Date('2015-06-23')
-        # Adjust baseline if it falls before coverage
         if start_date_baseline.millis().getInfo() < SENTINEL2_START.millis().getInfo():
             print("Baseline period before Sentinel-2 data. Adjusting to first available date.", file=sys.stderr)
             start_date_baseline = SENTINEL2_START
@@ -95,7 +94,6 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
         baseline_ndwi_img = get_median_ndwi_image(s2_collection, start_date_baseline, end_date_baseline, region_geometry)
         recent_ndwi_img = get_median_ndwi_image(s2_collection, start_date_recent, end_date_recent, region_geometry)
 
-        # Check for NDWI band presence
         baseline_bands = baseline_ndwi_img.bandNames().getInfo()
         recent_bands = recent_ndwi_img.bandNames().getInfo()
         print("DEBUG: Bands of baseline_ndwi_img:", baseline_bands, file=sys.stderr)
@@ -128,21 +126,17 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
                 "buffer_radius_meters": buffer_radius_meters
             }
 
-        # Extract shorelines using NDWI threshold (0 is common)
         baseline_water_mask = extract_shoreline(baseline_ndwi_img)
         recent_water_mask = extract_shoreline(recent_ndwi_img)
 
-        # Find shoreline edges
         baseline_shoreline = get_shoreline_edge(baseline_water_mask, region_geometry)
         recent_shoreline = get_shoreline_edge(recent_water_mask, region_geometry)
 
-        # For demonstration: estimate shoreline retreat as centroid-to-centroid distance
         try:
             baseline_centroid = baseline_shoreline.geometry().centroid().coordinates().getInfo()
             recent_centroid = recent_shoreline.geometry().centroid().coordinates().getInfo()
             print(f"Baseline shoreline centroid: {baseline_centroid}", file=sys.stderr)
             print(f"Recent shoreline centroid: {recent_centroid}", file=sys.stderr)
-            # Haversine distance
             from math import radians, sin, cos, sqrt, atan2
             lat1, lon1 = baseline_centroid[1], baseline_centroid[0]
             lat2, lon2 = recent_centroid[1], recent_centroid[0]
@@ -158,7 +152,6 @@ def check_coastal_erosion(region_geometry, threshold, buffer_radius_meters):
 
         alert_triggered = shoreline_retreat_meters is not None and abs(shoreline_retreat_meters) > threshold
 
-        # Dates for response
         try:
             response_dates = {
                 "recent_period_start": start_date_recent.format('YYYY-MM-dd').getInfo(),
