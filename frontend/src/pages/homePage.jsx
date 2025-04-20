@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -17,6 +17,9 @@ import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
 const HomePage = () => {
 	const { isAuthenticated } = useSelector((state) => state.auth);
 	const navigate = useNavigate();
+	const [coinCount, setCoinCount] = useState(0);
+	const [coinActive, setCoinActive] = useState(false);
+	const audioRef = useRef(null);
 
 	// Navigation handlers
 	const handleGetStarted = () => {
@@ -25,6 +28,27 @@ const HomePage = () => {
 
 	const handleLogin = () => {
 		navigate("/login");
+	};
+
+	// Mario coin handler
+	const handleCoinClick = () => {
+		// Play coin sound
+
+		if (audioRef.current) {
+			audioRef.current.currentTime = 0; // Reset audio to start
+			audioRef.current.play().catch((error) => {
+				console.error("Error playing sound:", error);
+			});
+		} else {
+			console.error("Audio element not found");
+		}
+		// Animate coin
+		setCoinActive(true);
+		setTimeout(() => setCoinActive(false), 500);
+
+		// Increment coin count
+		setCoinCount((prevCount) => prevCount + 1);
+		setTimeout(() => navigate("/satellite"), 1200);
 	};
 
 	// Animation variants
@@ -116,6 +140,41 @@ const HomePage = () => {
 						</div>
 					</motion.div>
 
+					{/* Mario Coin Button */}
+					<div className="flex flex-col items-center mb-8">
+						<motion.div
+							className="relative mb-2"
+							initial={{ y: 0 }}
+							animate={
+								coinActive ? { y: -20, opacity: [1, 0] } : { y: 0, opacity: 1 }
+							}
+							transition={{ duration: 0.5 }}
+						>
+							<motion.button
+								onClick={handleCoinClick}
+								whileHover={{ scale: 1.1, rotate: [0, 5, -5, 0] }}
+								whileTap={{ scale: 0.9 }}
+								className="w-16 h-16 rounded-full bg-yellow-400 border-4 border-yellow-500 shadow-lg flex items-center justify-center relative overflow-hidden"
+							>
+								<div className="absolute inset-0 bg-gradient-to-b from-yellow-300 to-yellow-500 opacity-70" />
+								<div className="relative z-10 font-bold text-yellow-800 text-sm">
+									?
+								</div>
+							</motion.button>
+						</motion.div>
+						{coinCount > 0 && (
+							<div className="text-yellow-600 font-bold flex items-center">
+								<span className="mr-1">×</span> {coinCount}
+							</div>
+						)}
+						<audio ref={audioRef} className="hidden">
+							<source
+								src="https://themushroomkingdom.net/sounds/wav/smw/smw_coin.wav"
+								type="audio/wav"
+							/>
+						</audio>
+					</div>
+
 					{/* Focus Areas Section */}
 					<motion.section variants={itemVariants} className="mb-12">
 						<motion.h2
@@ -136,14 +195,14 @@ const HomePage = () => {
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
 								<div
-									className="rounded-full bg-green-50 p-2 mb-2"
+									className="rounded-full bg-green-50 p-4 mb-2"
 									onClick={() => {
 										navigate("/green");
 									}}
 								>
 									<LeafIcon size={20} className="text-green-500" />
 								</div>
-								<h3 className="text-sm font-semibold text-green-600">
+								<h3 className="text-sm md:text-xl font-semibold text-green-600">
 									Deforestation
 								</h3>
 							</motion.div>
@@ -155,14 +214,14 @@ const HomePage = () => {
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
 								<div
-									className="rounded-full bg-blue-50 p-2 mb-2"
+									className="rounded-full bg-blue-50 p-4 mb-2"
 									onClick={() => {
 										navigate("/flood");
 									}}
 								>
 									<DropletIcon size={20} className="text-blue-500" />
 								</div>
-								<h3 className="text-sm font-semibold text-blue-600">
+								<h3 className="text-sm md:text-xl font-semibold text-blue-600">
 									Floods
 								</h3>
 							</motion.div>
@@ -174,14 +233,16 @@ const HomePage = () => {
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
 								<div
-									className="rounded-full bg-gray-50 p-2 mb-2"
+									className="rounded-full bg-gray-50 p-4 mb-2"
 									onClick={() => {
 										navigate("/coast");
 									}}
 								>
 									<AlertTriangleIcon size={20} className="text-gray-500" />
 								</div>
-								<h3 className="text-sm font-semibold text-gray-600">Coastal</h3>
+								<h3 className="text-sm md:text-xl font-semibold text-gray-600">
+									Coastal
+								</h3>
 							</motion.div>
 
 							{/* Wildfire */}
@@ -191,14 +252,16 @@ const HomePage = () => {
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
 								<div
-									className="rounded-full bg-red-50 p-2 mb-2"
+									className="rounded-full bg-red-50 p-4 mb-2"
 									onClick={() => {
 										navigate("/fire");
 									}}
 								>
 									<FlameIcon size={20} className="text-red-500" />
 								</div>
-								<h3 className="text-sm font-semibold text-red-600">Wildfires</h3>
+								<h3 className="text-sm md:text-xl font-semibold text-red-600">
+									Wildfires
+								</h3>
 							</motion.div>
 
 							{/* Glacier Melting */}
@@ -208,14 +271,14 @@ const HomePage = () => {
 								className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-gray-200/50 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300"
 							>
 								<div
-									className="rounded-full bg-cyan-50 p-2 mb-2"
+									className="rounded-full bg-cyan-50 p-4 mb-2"
 									onClick={() => {
 										navigate("/ice");
 									}}
 								>
 									<ThermometerIcon size={20} className="text-cyan-500" />
 								</div>
-								<h3 className="text-sm font-semibold text-cyan-600">
+								<h3 className="text-sm md:text-xl font-semibold text-cyan-600">
 									Glaciers
 								</h3>
 							</motion.div>
