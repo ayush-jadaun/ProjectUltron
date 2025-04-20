@@ -5,7 +5,9 @@ import { runDeforestationCheck } from "../services/google-earth/deforestation/de
 import { runFloodCheck } from "../services/google-earth/flooding/flooding.js";
 import { runGlacierMeltingCheck } from "../services/google-earth/glacier/glacier_melting.js";
 import { runCoastalErosionCheck } from "../services/google-earth/coastal_erosion/coastal_erosion.js";
+import dotenv from "dotenv"
 
+dotenv.config()
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -19,13 +21,31 @@ export async function generateGEEReport(req, res) {
       thresholdPercent,
       bufferMeters,
     } = req.body;
+     console.log("Hellooooooooooooooooooooooooooooooooooooooooooooooooo",process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
-    let credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-    if (!credentialsPath || !fs.existsSync(credentialsPath)) {
-      return res
-        .status(500)
-        .json({ success: false, error: "GEE credentials not found." });
-    }
+     
+let credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+if (
+  credentialsPath &&
+  credentialsPath.startsWith('"') &&
+  credentialsPath.endsWith('"')
+) {
+  credentialsPath = credentialsPath.slice(1, -1);
+}
+if (!credentialsPath) {
+  return res
+    .status(500)
+    .json({ success: false, error: "GEE credentials path env not set" });
+}
+if (!path.isAbsolute(credentialsPath)) {
+  credentialsPath = path.resolve(process.cwd(), credentialsPath);
+}
+console.log("Resolved credentialsPath:", credentialsPath);
+if (!fs.existsSync(credentialsPath)) {
+  return res
+    .status(500)
+    .json({ success: false, error: "GEE credentials not found" });
+}
 
     let analysisResult = null;
     try {

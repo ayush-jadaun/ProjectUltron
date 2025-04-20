@@ -26,7 +26,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import axios from "axios";
 import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
+
 
 // Chart.js registration
 ChartJS.register(
@@ -181,8 +183,8 @@ function HeatmapLayer({ points, options }) {
   }, [map, points, options]);
   return null;
 }
-const CLIENT_URL = import.meta.env.VITE_API_URL;
-const API_URL = `${CLIENT_URL}/gee-reports/generate`;
+
+const API_URL = "http://localhost:5000/api/gee-reports/generate";
 
 const ANALYSIS_OPTIONS = [
   { value: "DEFORESTATION", label: "Deforestation", extra: ["threshold"] },
@@ -246,20 +248,20 @@ const HistoricalChangePage = () => {
           : undefined;
     }
 
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || "Failed to get report");
-      setReportResult(data.result);
-    } catch (err) {
-      setError(err.message || "Failed to generate report.");
-    } finally {
-      setLoading(false);
-    }
+   try {
+     const response = await axios.post(API_URL, payload, {
+       headers: { "Content-Type": "application/json" },
+     });
+     const data = response.data;
+     if (!data.success) throw new Error(data.error || "Failed to get report");
+     setReportResult(data.result);
+   } catch (err) {
+     setError(
+       err.response?.data?.error || err.message || "Failed to generate report."
+     );
+   } finally {
+     setLoading(false);
+   }
   };
 
   // Download as PDF
@@ -351,7 +353,7 @@ const HistoricalChangePage = () => {
           <h2 className="text-center text-blue-800 mb-2.5 text-2xl font-bold">
             Historical Change Visualization & Progress Report
           </h2>
-          
+
           <div className="flex flex-wrap gap-4 justify-center mb-7">
             <label className="flex items-center">
               <span className="font-bold mr-1">From:</span>
@@ -426,7 +428,9 @@ const HistoricalChangePage = () => {
               onClick={handleGenerateReport}
               disabled={loading}
               className={`bg-blue-600 text-white border-none rounded-lg py-1.5 px-4 font-semibold text-base ml-8 shadow-md ${
-                loading ? "cursor-not-allowed opacity-70" : "cursor-pointer hover:bg-blue-700"
+                loading
+                  ? "cursor-not-allowed opacity-70"
+                  : "cursor-pointer hover:bg-blue-700"
               }`}
             >
               {loading ? "Generating..." : "Generate Report"}
@@ -435,7 +439,9 @@ const HistoricalChangePage = () => {
               onClick={handleDownload}
               disabled={!reportResult}
               className={`bg-green-600 text-white border-none rounded-lg py-1.5 px-4 font-semibold text-base ml-2 shadow-md ${
-                !reportResult ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-green-700"
+                !reportResult
+                  ? "cursor-not-allowed opacity-50"
+                  : "cursor-pointer hover:bg-green-700"
               }`}
             >
               Download PDF
@@ -506,8 +512,8 @@ const HistoricalChangePage = () => {
                 {showCompare && (
                   <div className="mb-9 bg-white rounded-xl shadow-sm p-4 text-center">
                     <h4 className="mb-4 text-lg font-semibold">
-                      {getComparisonLabel(analysisType)} Map Comparison ({fromDate}{" "}
-                      vs {toDate})
+                      {getComparisonLabel(analysisType)} Map Comparison (
+                      {fromDate} vs {toDate})
                     </h4>
                     <div className="max-w-lg mx-auto">
                       <ImageComparison
@@ -519,9 +525,11 @@ const HistoricalChangePage = () => {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="mb-9">
-                  <h4 className="text-lg font-semibold">Status: {reportResult.status}</h4>
+                  <h4 className="text-lg font-semibold">
+                    Status: {reportResult.status}
+                  </h4>
                   <h4 className="text-lg font-semibold">
                     Alert Triggered:{" "}
                     {reportResult.alert_triggered ? (
@@ -561,13 +569,19 @@ const HistoricalChangePage = () => {
                     </h4>
                   )}
                   {"threshold" in reportResult && (
-                    <h4 className="text-lg font-semibold">Threshold: {reportResult.threshold}</h4>
+                    <h4 className="text-lg font-semibold">
+                      Threshold: {reportResult.threshold}
+                    </h4>
                   )}
                   {"threshold_percent" in reportResult && (
-                    <h4 className="text-lg font-semibold">Threshold (%): {reportResult.threshold_percent}</h4>
+                    <h4 className="text-lg font-semibold">
+                      Threshold (%): {reportResult.threshold_percent}
+                    </h4>
                   )}
                   {"buffer_radius_meters" in reportResult && (
-                    <h4 className="text-lg font-semibold">Buffer (m): {reportResult.buffer_radius_meters}</h4>
+                    <h4 className="text-lg font-semibold">
+                      Buffer (m): {reportResult.buffer_radius_meters}
+                    </h4>
                   )}
                   {reportResult.message && (
                     <div className="text-gray-600 text-sm mt-2">
@@ -575,10 +589,12 @@ const HistoricalChangePage = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex flex-wrap gap-8 justify-between mb-9">
                   <div className="flex-1 min-w-[300px] bg-white rounded-xl shadow-sm p-4">
-                    <h4 className="text-lg font-semibold mb-2">{getChartLabel(analysisType)}</h4>
+                    <h4 className="text-lg font-semibold mb-2">
+                      {getChartLabel(analysisType)}
+                    </h4>
                     {indexData ? (
                       <Line data={indexData} options={{ responsive: true }} />
                     ) : (
@@ -587,7 +603,7 @@ const HistoricalChangePage = () => {
                   </div>
                   {/* Add additional charts if backend provides */}
                 </div>
-                
+
                 <div className="mb-9 bg-amber-50 rounded-xl shadow-md p-4">
                   <h4 className="text-lg font-semibold mb-2">Change Heatmap</h4>
                   <div className="h-[350px] w-full rounded-xl overflow-hidden">
@@ -611,13 +627,17 @@ const HistoricalChangePage = () => {
                     </MapContainer>
                   </div>
                 </div>
-                
+
                 <div className="bg-blue-50 rounded-lg p-4 mt-2.5">
-                  <h4 className="text-lg font-semibold mb-2">Progress Summary</h4>
+                  <h4 className="text-lg font-semibold mb-2">
+                    Progress Summary
+                  </h4>
                   <ul className="text-base text-gray-800">
                     {reportResult.mean_ndvi_change !== undefined && (
                       <li className="mb-1">
-                        <span className="font-semibold">NDVI Change Detected:</span>{" "}
+                        <span className="font-semibold">
+                          NDVI Change Detected:
+                        </span>{" "}
                         {typeof reportResult.mean_ndvi_change === "number"
                           ? reportResult.mean_ndvi_change.toFixed(4)
                           : "N/A"}
@@ -625,7 +645,9 @@ const HistoricalChangePage = () => {
                     )}
                     {reportResult.mean_ndwi_change !== undefined && (
                       <li className="mb-1">
-                        <span className="font-semibold">NDWI Change Detected:</span>{" "}
+                        <span className="font-semibold">
+                          NDWI Change Detected:
+                        </span>{" "}
                         {typeof reportResult.mean_ndwi_change === "number"
                           ? reportResult.mean_ndwi_change.toFixed(4)
                           : "N/A"}
@@ -633,7 +655,9 @@ const HistoricalChangePage = () => {
                     )}
                     {reportResult.mean_ndsi_change !== undefined && (
                       <li className="mb-1">
-                        <span className="font-semibold">NDSI Change Detected:</span>{" "}
+                        <span className="font-semibold">
+                          NDSI Change Detected:
+                        </span>{" "}
                         {typeof reportResult.mean_ndsi_change === "number"
                           ? reportResult.mean_ndsi_change.toFixed(4)
                           : "N/A"}
@@ -652,21 +676,27 @@ const HistoricalChangePage = () => {
                         </li>
                       )}
                     <li className="mb-1">
-                      <span className="font-semibold">Region ID:</span> {reportResult.region_id}
+                      <span className="font-semibold">Region ID:</span>{" "}
+                      {reportResult.region_id}
                     </li>
                     {reportResult.threshold !== undefined && (
                       <li className="mb-1">
-                        <span className="font-semibold">Threshold Used:</span> {reportResult.threshold}
+                        <span className="font-semibold">Threshold Used:</span>{" "}
+                        {reportResult.threshold}
                       </li>
                     )}
                     {reportResult.threshold_percent !== undefined && (
                       <li className="mb-1">
-                        <span className="font-semibold">Threshold Used (%):</span> {reportResult.threshold_percent}
+                        <span className="font-semibold">
+                          Threshold Used (%):
+                        </span>{" "}
+                        {reportResult.threshold_percent}
                       </li>
                     )}
                     {reportResult.buffer_radius_meters !== undefined && (
                       <li className="mb-1">
-                        <span className="font-semibold">Buffer Used (m):</span> {reportResult.buffer_radius_meters}
+                        <span className="font-semibold">Buffer Used (m):</span>{" "}
+                        {reportResult.buffer_radius_meters}
                       </li>
                     )}
                   </ul>
