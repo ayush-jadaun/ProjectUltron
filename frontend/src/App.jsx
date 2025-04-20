@@ -6,6 +6,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import PublicRoute from "./utils/PublicRoutes";
+import { ToastContainer } from "react-toastify"; 
+import "react-toastify/dist/ReactToastify.css";
 
 // Page Components
 import LoginSignup from "./pages/auth/LoginSignup";
@@ -27,6 +29,7 @@ import RealtimeSatelliteMap from "./pages/satellite";
 import AboutUs from "./pages/AboutUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 
 /*
 =============================
@@ -37,6 +40,20 @@ function App() {
   return (
     <BrowserRouter>
       <AppContent />
+      {/* =============================
+            Toast Notifications
+          ============================= */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </BrowserRouter>
   );
 }
@@ -52,11 +69,11 @@ function AppContent() {
       <Navbar />
       <main className="flex-grow">
         <Routes>
-          /*
-		==============================
-				 Public Routes
-        =============================
-		   */
+          {/*
+            ==============================
+               Public Routes
+            ==============================
+           */}
           <Route path="/" element={<HomePage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/green" element={<GreenIndex />} />
@@ -69,6 +86,7 @@ function AppContent() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/satellite" element={<RealtimeSatelliteMap />} />
           <Route path="/history" element={<HistoricalChangePage />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route
             path="/reset-password/:resetToken"
             element={<ResetPassword />}
@@ -76,10 +94,11 @@ function AppContent() {
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/analysis" element={<AnalysisPage />} />
           <Route path="/map" element={<SubscribeLocationPage />} />
-          /*
-		   ==============================
-		    Public-only Route (for login)
-		   ============================== */
+          {/*
+            ==============================
+              Public-only Route (for login)
+            ==============================
+           */}
           <Route
             path="/login"
             element={
@@ -88,10 +107,11 @@ function AppContent() {
               </PublicRoute>
             }
           />
-          /*
-		   ==============================
-		    		Catch-All Route
-           ============================== */
+          {/*
+            ==============================
+                Catch-All Route
+            ==============================
+           */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

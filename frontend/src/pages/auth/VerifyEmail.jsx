@@ -1,3 +1,8 @@
+/*
+=============================
+        Imports
+=============================
+*/
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,9 +17,17 @@ import {
 import {
   handleEmailVerification,
   clearError,
-} from "../../store/slices/authSlice"; // Adjust path as needed
+} from "../../store/slices/authSlice";
 
+/*
+=============================
+      VerifyEmail Component
+=============================
+*/
 const VerifyEmail = () => {
+  // =========================
+  //    Local State & Hooks
+  // =========================
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -24,44 +37,49 @@ const VerifyEmail = () => {
   const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth
   );
-  const [verificationStatus, setVerificationStatus] = useState("pending"); // 'pending', 'success', 'error', 'alreadyVerified', 'noToken'
 
+  const [verificationStatus, setVerificationStatus] = useState("pending");
+
+  /*
+  =============================
+    Effect: Handle Verification
+  =============================
+  */
   useEffect(() => {
-    // Clear any previous auth errors when the component mounts
     dispatch(clearError());
 
     if (!token) {
       setVerificationStatus("noToken");
-      return; // Stop processing if no token is found
+      return; 
     }
 
-    // Set status to pending explicitly when token exists and we start dispatching
     setVerificationStatus("pending");
     dispatch(handleEmailVerification(token))
       .unwrap()
       .then(() => {
-        // Fulfilled: Verification successful, user is now authenticated
         setVerificationStatus("success");
-        // Optional: Redirect after a short delay
-        // setTimeout(() => navigate('/dashboard'), 3000);
       })
       .catch((errMessage) => {
-        // Rejected: Check the error message from the slice
-        if (errMessage?.includes("already verified")) {
+        if (
+          typeof errMessage === "string" &&
+          errMessage.toLowerCase().includes("already verified")
+        ) {
           setVerificationStatus("alreadyVerified");
         } else {
           setVerificationStatus("error");
         }
-        // The error message itself is stored in the Redux state `error`
       });
 
-    // Cleanup function (optional, clearError might be sufficient)
-    // return () => {
-    //     dispatch(clearError());
-    // };
-  }, [dispatch, token]); // Depend on dispatch and token
 
+  }, [dispatch, token]);
+
+  /*
+  =============================
+        Render Content
+  =============================
+  */
   const renderContent = () => {
+    // No token in URL
     if (verificationStatus === "noToken") {
       return (
         <div className="text-center space-y-4">
@@ -83,6 +101,7 @@ const VerifyEmail = () => {
       );
     }
 
+    // Pending or loading state
     if (loading || verificationStatus === "pending") {
       return (
         <div className="text-center space-y-4">
@@ -95,6 +114,7 @@ const VerifyEmail = () => {
       );
     }
 
+    // Success (verified and logged in)
     if (verificationStatus === "success" && isAuthenticated) {
       return (
         <div className="text-center space-y-4">
@@ -106,7 +126,7 @@ const VerifyEmail = () => {
             Your account is now active. You have been automatically logged in.
           </p>
           <Link
-            to="/dashboard" // Or your main authenticated route
+            to="/" 
             className="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors"
           >
             <Home size={18} className="mr-2" /> Go to Dashboard
@@ -115,6 +135,7 @@ const VerifyEmail = () => {
       );
     }
 
+    // Already verified
     if (verificationStatus === "alreadyVerified") {
       return (
         <div className="text-center space-y-4">
@@ -136,7 +157,7 @@ const VerifyEmail = () => {
       );
     }
 
-    // Covers 'error' status
+    // Error state
     if (error || verificationStatus === "error") {
       return (
         <div className="text-center space-y-4">
@@ -150,7 +171,7 @@ const VerifyEmail = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 mt-4">
             <Link
-              to="/request-verification" // Link to request a new email
+              to="/request-verification"
               className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700"
             >
               <MailWarning size={18} className="mr-2" /> Resend Verification
@@ -167,7 +188,7 @@ const VerifyEmail = () => {
       );
     }
 
-    // Fallback - should ideally not be reached if logic is sound
+    // Fallback (should not be reached)
     return (
       <div className="text-center text-gray-500">
         Checking verification status...
@@ -175,6 +196,11 @@ const VerifyEmail = () => {
     );
   };
 
+  /*
+  =============================
+          Component Render
+  =============================
+  */
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col justify-center items-center px-4">
       <main className="w-full max-w-md">
@@ -189,4 +215,9 @@ const VerifyEmail = () => {
   );
 };
 
+/*
+=============================
+      Export Component
+=============================
+*/
 export default VerifyEmail;
