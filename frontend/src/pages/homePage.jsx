@@ -128,7 +128,7 @@ const HomePage = () => {
 							Key Environmental Focus Areas
 						</motion.h2>
 
-						<div className="grid grid-cols-5 gap-2">
+						<div className="grid grid-cols-1 md:grid-cols-5 gap-2">
 							{/* Deforestation */}
 							<motion.div
 								variants={itemVariants}
@@ -250,7 +250,7 @@ const HomePage = () => {
 					{/* Call to Action */}
 					<motion.section
 						variants={itemVariants}
-						className="bg-gradient-to-r from-green-600 to-green-800 text-white rounded-xl shadow-lg p-8 text-center relative overflow-hidden"
+						className="bg-gradient-to-r from-green-800 via-green-600 to-green-800 text-white rounded-xl shadow-lg p-8 text-center relative overflow-hidden"
 					>
 						<div className="relative z-10">
 							<motion.h2
