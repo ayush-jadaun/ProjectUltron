@@ -1,7 +1,17 @@
+/*
+=============================
+        Imports
+=============================
+*/
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "react-toastify"; // <-- for notifications
 
-// Create a reusable API instance
+/*
+=============================
+        Axios API Instance
+=============================
+*/
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   withCredentials: true,
@@ -10,7 +20,11 @@ const api = axios.create({
   },
 });
 
-// Get user's analysis results (with page and limit)
+/*
+=============================
+    Fetch User Analysis Results
+=============================
+*/
 export const fetchUserAnalysisResults = createAsyncThunk(
   "analysis/fetchUserAnalysisResults",
   async (
@@ -18,21 +32,13 @@ export const fetchUserAnalysisResults = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      console.log("[DEBUG] Fetching user analysis results with params:", {
-        page,
-        limit,
-        analysis_type,
-        alert_triggered,
-      });
       const response = await api.get("/analysis-results", {
         params: { page, limit, analysis_type, alert_triggered },
       });
-      console.log("[DEBUG] FetchUserAnalysisResults Response:", response.data);
       return response.data.data.results; // Assuming the response includes `.results`
     } catch (error) {
-      console.error(
-        "[ERROR] Failed to fetch user analysis results:",
-        error.response || error.message
+      toast.error(
+        error.response?.data?.message || "Failed to fetch analysis results"
       );
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch analysis results"
@@ -41,19 +47,20 @@ export const fetchUserAnalysisResults = createAsyncThunk(
   }
 );
 
-// Get analysis result by ID
+/*
+=============================
+    Fetch Analysis Result By ID
+=============================
+*/
 export const fetchAnalysisResultById = createAsyncThunk(
   "analysis/fetchAnalysisResultById",
   async (id, { rejectWithValue }) => {
     try {
-      console.log("[DEBUG] Fetching analysis result by ID:", id);
       const response = await api.get(`/analysis-results/${id}`);
-      console.log("[DEBUG] FetchAnalysisResultById Response:", response.data);
       return response.data.data;
     } catch (error) {
-      console.error(
-        "[ERROR] Failed to fetch analysis result by ID:",
-        error.response || error.message
+      toast.error(
+        error.response?.data?.message || "Failed to fetch analysis result"
       );
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch analysis result"
@@ -62,31 +69,25 @@ export const fetchAnalysisResultById = createAsyncThunk(
   }
 );
 
-// Get results by subscription
+/*
+=============================
+    Fetch Results By Subscription
+=============================
+*/
 export const fetchResultsBySubscription = createAsyncThunk(
   "analysis/fetchResultsBySubscription",
   async ({ subscriptionId, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      console.log("[DEBUG] Fetching results by subscription:", {
-        subscriptionId,
-        page,
-        limit,
-      });
       const response = await api.get(
         `/analysis-results/subscription/${subscriptionId}`,
         {
           params: { page, limit },
         }
       );
-      console.log(
-        "[DEBUG] FetchResultsBySubscription Response:",
-        response.data
-      );
       return response.data.data;
     } catch (error) {
-      console.error(
-        "[ERROR] Failed to fetch subscription results:",
-        error.response || error.message
+      toast.error(
+        error.response?.data?.message || "Failed to fetch subscription results"
       );
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch subscription results"
@@ -95,19 +96,20 @@ export const fetchResultsBySubscription = createAsyncThunk(
   }
 );
 
-// Get alert summary
+/*
+=============================
+        Fetch Alert Summary
+=============================
+*/
 export const fetchAlertSummary = createAsyncThunk(
   "analysis/fetchAlertSummary",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("[DEBUG] Fetching alert summary...");
       const response = await api.get("/analysis-results/alert-summary");
-      console.log("[DEBUG] FetchAlertSummary Response:", response.data);
       return response.data.data;
     } catch (error) {
-      console.error(
-        "[ERROR] Failed to fetch alert summary:",
-        error.response || error.message
+      toast.error(
+        error.response?.data?.message || "Failed to fetch alert summary"
       );
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch alert summary"
@@ -116,19 +118,21 @@ export const fetchAlertSummary = createAsyncThunk(
   }
 );
 
-// Delete analysis result by ID
+/*
+=============================
+    Delete Analysis Result By ID
+=============================
+*/
 export const deleteAnalysisResult = createAsyncThunk(
   "analysis/deleteAnalysisResult",
   async (id, { rejectWithValue }) => {
     try {
-      console.log("[DEBUG] Deleting analysis result by ID:", id);
       await api.delete(`/analysis-results/${id}`);
-      console.log("[DEBUG] DeleteAnalysisResult: Successfully deleted");
+      toast.success("Analysis result deleted successfully.");
       return id; // Return the ID to remove it from the state
     } catch (error) {
-      console.error(
-        "[ERROR] Failed to delete analysis result:",
-        error.response || error.message
+      toast.error(
+        error.response?.data?.message || "Failed to delete analysis result"
       );
       return rejectWithValue(
         error.response?.data?.message || "Failed to delete analysis result"
@@ -137,7 +141,11 @@ export const deleteAnalysisResult = createAsyncThunk(
   }
 );
 
-// Redux slice definition
+/*
+=============================
+    Analysis Slice Definition
+=============================
+*/
 const analysisSlice = createSlice({
   name: "analysis",
   initialState: {
@@ -154,61 +162,62 @@ const analysisSlice = createSlice({
     },
   },
   reducers: {
+    /*
+    =============================
+          Clear Current Result
+    =============================
+    */
     clearCurrentResult: (state) => {
       state.currentResult = null;
     },
+    /*
+    =============================
+              Clear Error
+    =============================
+    */
     clearError: (state) => {
       state.error = null;
     },
   },
+  /*
+  =============================
+        Extra Reducers
+  =============================
+  */
   extraReducers: (builder) => {
     builder
       // Fetch User Analysis Results
       .addCase(fetchUserAnalysisResults.pending, (state) => {
-        console.log("[DEBUG] FetchUserAnalysisResults: Pending...");
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchUserAnalysisResults.fulfilled, (state, action) => {
-        console.log("[DEBUG] FetchUserAnalysisResults: Fulfilled");
         state.loading = false;
         state.results = action.payload;
       })
       .addCase(fetchUserAnalysisResults.rejected, (state, action) => {
-        console.error(
-          "[DEBUG] FetchUserAnalysisResults: Rejected",
-          action.payload
-        );
         state.loading = false;
         state.error = action.payload;
       })
       // Fetch Analysis Result By ID
       .addCase(fetchAnalysisResultById.pending, (state) => {
-        console.log("[DEBUG] FetchAnalysisResultById: Pending...");
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchAnalysisResultById.fulfilled, (state, action) => {
-        console.log("[DEBUG] FetchAnalysisResultById: Fulfilled");
         state.loading = false;
         state.currentResult = action.payload;
       })
       .addCase(fetchAnalysisResultById.rejected, (state, action) => {
-        console.error(
-          "[DEBUG] FetchAnalysisResultById: Rejected",
-          action.payload
-        );
         state.loading = false;
         state.error = action.payload;
       })
       // Fetch Results By Subscription
       .addCase(fetchResultsBySubscription.pending, (state) => {
-        console.log("[DEBUG] FetchResultsBySubscription: Pending...");
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchResultsBySubscription.fulfilled, (state, action) => {
-        console.log("[DEBUG] FetchResultsBySubscription: Fulfilled");
         state.loading = false;
         state.results = action.payload.results;
         state.pagination = {
@@ -219,37 +228,28 @@ const analysisSlice = createSlice({
         };
       })
       .addCase(fetchResultsBySubscription.rejected, (state, action) => {
-        console.error(
-          "[DEBUG] FetchResultsBySubscription: Rejected",
-          action.payload
-        );
         state.loading = false;
         state.error = action.payload;
       })
       // Fetch Alert Summary
       .addCase(fetchAlertSummary.pending, (state) => {
-        console.log("[DEBUG] FetchAlertSummary: Pending...");
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchAlertSummary.fulfilled, (state, action) => {
-        console.log("[DEBUG] FetchAlertSummary: Fulfilled");
         state.loading = false;
         state.alertSummary = action.payload;
       })
       .addCase(fetchAlertSummary.rejected, (state, action) => {
-        console.error("[DEBUG] FetchAlertSummary: Rejected", action.payload);
         state.loading = false;
         state.error = action.payload;
       })
       // Delete Analysis Result
       .addCase(deleteAnalysisResult.pending, (state) => {
-        console.log("[DEBUG] DeleteAnalysisResult: Pending...");
         state.loading = true;
         state.error = null;
       })
       .addCase(deleteAnalysisResult.fulfilled, (state, action) => {
-        console.log("[DEBUG] DeleteAnalysisResult: Fulfilled");
         state.loading = false;
         // Remove the deleted result from the state
         state.results = state.results.filter(
@@ -257,13 +257,16 @@ const analysisSlice = createSlice({
         );
       })
       .addCase(deleteAnalysisResult.rejected, (state, action) => {
-        console.error("[DEBUG] DeleteAnalysisResult: Rejected", action.payload);
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-// Export reducers and actions
+/*
+=============================
+    Export Actions & Reducer
+=============================
+*/
 export const { clearCurrentResult, clearError } = analysisSlice.actions;
 export default analysisSlice.reducer;

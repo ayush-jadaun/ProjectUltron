@@ -1,7 +1,17 @@
+/*
+=============================
+        Imports
+=============================
+*/
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "react-toastify"; // <-- for notifications
 
-// Setup axios instance
+/*
+=============================
+      Axios API Instance
+=============================
+*/
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   withCredentials: true,
@@ -10,16 +20,28 @@ const api = axios.create({
   },
 });
 
-// ==================== Thunks ====================
+/*
+=============================
+        Thunks
+=============================
+*/
 
-// Create new subscription
+/*
+=============================
+    Create Subscription
+=============================
+*/
 export const createSubscription = createAsyncThunk(
   "subscription/createSubscription",
   async (subscriptionData, { rejectWithValue }) => {
     try {
       const response = await api.post("/subscriptions", subscriptionData);
+      toast.success("Subscription created successfully!"); // <-- Toast for success
       return response.data.data.subscription || response.data.data;
     } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to create subscription"
+      ); // <-- Toast for error
       return rejectWithValue(
         error.response?.data?.message || "Failed to create subscription"
       );
@@ -27,7 +49,11 @@ export const createSubscription = createAsyncThunk(
   }
 );
 
-// Get all subscriptions for the logged-in user
+/*
+=============================
+ Fetch User Subscriptions
+=============================
+*/
 export const fetchUserSubscriptions = createAsyncThunk(
   "subscription/fetchUserSubscriptions",
   async (_, { rejectWithValue }) => {
@@ -35,6 +61,9 @@ export const fetchUserSubscriptions = createAsyncThunk(
       const response = await api.get("/subscriptions");
       return response.data.data.subscriptions || response.data.data;
     } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to fetch subscriptions"
+      ); // <-- Toast for error
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch subscriptions"
       );
@@ -42,7 +71,11 @@ export const fetchUserSubscriptions = createAsyncThunk(
   }
 );
 
-// Get a single subscription by ID
+/*
+=============================
+    Fetch Subscription By ID
+=============================
+*/
 export const fetchSubscriptionById = createAsyncThunk(
   "subscription/fetchSubscriptionById",
   async (id, { rejectWithValue }) => {
@@ -50,6 +83,9 @@ export const fetchSubscriptionById = createAsyncThunk(
       const response = await api.get(`/subscriptions/${id}`);
       return response.data.data.subscription || response.data.data;
     } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to fetch subscription"
+      ); // <-- Toast for error
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch subscription"
       );
@@ -57,14 +93,22 @@ export const fetchSubscriptionById = createAsyncThunk(
   }
 );
 
-// Update a subscription
+/*
+=============================
+      Update Subscription
+=============================
+*/
 export const updateSubscription = createAsyncThunk(
   "subscription/updateSubscription",
   async ({ id, updateData }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/subscriptions/${id}`, updateData);
+      toast.success("Subscription updated successfully!"); // <-- Toast for success
       return response.data.data.subscription || response.data.data;
     } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to update subscription"
+      ); // <-- Toast for error
       return rejectWithValue(
         error.response?.data?.message || "Failed to update subscription"
       );
@@ -72,14 +116,22 @@ export const updateSubscription = createAsyncThunk(
   }
 );
 
-// Delete a subscription
+/*
+=============================
+      Delete Subscription
+=============================
+*/
 export const deleteSubscription = createAsyncThunk(
   "subscription/deleteSubscription",
   async (id, { rejectWithValue }) => {
     try {
       await api.delete(`/subscriptions/${id}`);
+      toast.success("Subscription deleted successfully!"); // <-- Toast for success
       return id;
     } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to delete subscription"
+      ); // <-- Toast for error
       return rejectWithValue(
         error.response?.data?.message || "Failed to delete subscription"
       );
@@ -87,8 +139,11 @@ export const deleteSubscription = createAsyncThunk(
   }
 );
 
-// ==================== Slice ====================
-
+/*
+=============================
+      Slice Definition
+=============================
+*/
 const subscriptionSlice = createSlice({
   name: "subscription",
   initialState: {
@@ -104,18 +159,38 @@ const subscriptionSlice = createSlice({
     deleteSuccess: false,
   },
   reducers: {
+    /*
+    =============================
+      Clear Current Subscription
+    =============================
+    */
     clearCurrentSubscription: (state) => {
       state.currentSubscription = null;
     },
+    /*
+    =============================
+            Clear Error
+    =============================
+    */
     clearError: (state) => {
       state.error = null;
     },
+    /*
+    =============================
+         Reset Success Flags
+    =============================
+    */
     resetSuccessFlags: (state) => {
       state.createSuccess = false;
       state.updateSuccess = false;
       state.deleteSuccess = false;
     },
   },
+  /*
+  =============================
+        Extra Reducers
+  =============================
+  */
   extraReducers: (builder) => {
     builder
       // Create Subscription
@@ -208,6 +283,11 @@ const subscriptionSlice = createSlice({
   },
 });
 
+/*
+=============================
+    Export Actions & Reducer
+=============================
+*/
 export const { clearCurrentSubscription, clearError, resetSuccessFlags } =
   subscriptionSlice.actions;
 export default subscriptionSlice.reducer;
