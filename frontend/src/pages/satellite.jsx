@@ -32,7 +32,7 @@ const SATELLITES = {
   ],
 };
 
-// Better satellite icons with improved visibility
+// Satellite icons
 const SATELLITE_ICONS = {
   ISS: L.icon({
     iconUrl:
@@ -278,6 +278,20 @@ const RealtimeSatelliteMap = () => {
   const [activeSatellites, setActiveSatellites] = useState(["ISS", "HUBBLE"]);
   const [followingSatellite, setFollowingSatellite] = useState(null);
 
+  // 1. FILTER: Prepare filtered entries first
+  const activeSatelliteEntries = useMemo(
+    () =>
+      Object.entries(SATELLITES).filter(([name]) =>
+        activeSatellites.includes(name)
+      ),
+    [activeSatellites]
+  );
+
+  // 2. HOOKS: Call hook for each filtered satellite (order always matches render)
+  const satelliteTracks = activeSatelliteEntries.map(([_, tle]) =>
+    useSatelliteTrack(tle)
+  );
+
   const handleToggleSatellite = (name) => {
     setActiveSatellites((current) =>
       current.includes(name)
@@ -286,7 +300,7 @@ const RealtimeSatelliteMap = () => {
     );
 
     // If we're unfollowing the satellite we're following, stop following
-    if (followingSatellite === name && !activeSatellites.includes(name)) {
+    if (followingSatellite === name && activeSatellites.includes(name)) {
       setFollowingSatellite(null);
     }
   };
@@ -322,13 +336,10 @@ const RealtimeSatelliteMap = () => {
 
           <ZoomControl position="bottomleft" />
 
-          {/* Add satellite markers and tracks for active satellites */}
-          {Object.entries(SATELLITES).map(([name, tle]) => {
-            if (!activeSatellites.includes(name)) return null;
-
-            const [pastTrack, futureTrack] = useSatelliteTrack(tle);
+          {/* 3. RENDER: Use the same filtered array and hooks result */}
+          {activeSatelliteEntries.map(([name, tle], idx) => {
+            const [pastTrack, futureTrack] = satelliteTracks[idx];
             const color = TRACK_COLORS[name];
-
             return (
               <React.Fragment key={name}>
                 <Polyline

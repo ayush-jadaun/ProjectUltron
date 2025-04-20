@@ -12,6 +12,7 @@ import {
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import EnvironmentBackgroundLayers from "../assets/EnvironmentBackgroundLayers";
 
 // Satellite layers configuration
 const { BaseLayer } = LayersControl;
@@ -168,13 +169,14 @@ const SubscribeLocationPage = () => {
   };
 
   return (
+    <EnvironmentBackgroundLayers>
     <div
       className="subscribe-location-page"
       style={{
         maxWidth: 800,
         margin: "0 auto",
         padding: 32,
-        background: "#f7fafd",
+        background: "beige",
         borderRadius: 12,
         boxShadow: "0 4px 24px 0 rgba(30,80,180,0.07)",
       }}
@@ -322,7 +324,7 @@ const SubscribeLocationPage = () => {
               flexWrap: "wrap",
               gap: 18,
               marginTop: 7,
-              background: "#f3f9fe",
+              background: "beige",
               padding: "10px 8px",
               borderRadius: 7,
             }}
@@ -507,6 +509,7 @@ const SubscribeLocationPage = () => {
         )}
       </form>
     </div>
+    </EnvironmentBackgroundLayers>
   );
 };
 
