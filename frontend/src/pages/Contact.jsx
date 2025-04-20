@@ -48,22 +48,22 @@ const Contact = () => {
 
 	const contactInfo = [
 		{
-			icon: <Mail size={20} className="text-green-600" />,
-			title: "Email",
-			details: ["contact@ecoalert.com"],
+			icon: <Mail size={20} className="text-green-100" />,
+			title: "Ayush Agarwal",
+			details: ["ayush.agr101@gmail.com"],
 		},
 		{
-			icon: <Phone size={20} className="text-green-600" />,
+			icon: <Phone size={20} className="text-green-100" />,
 			title: "Phone",
-			details: ["+1 (555) 123-4567"],
+			details: ["+91 9026695299"],
 		},
 		{
-			icon: <MapPin size={20} className="text-green-600" />,
+			icon: <MapPin size={20} className="text-green-100" />,
 			title: "Address",
-			details: ["123 Green Street", "Eco City, EC 12345"],
+			details: ["MNNIT", "Allahabad"],
 		},
 		{
-			icon: <Clock size={20} className="text-green-600" />,
+			icon: <Clock size={20} className="text-green-100" />,
 			title: "Business Hours",
 			details: ["Mon-Fri: 9AM - 6PM", "Weekends: Closed"],
 		},
@@ -120,20 +120,6 @@ const Contact = () => {
 											</div>
 										</div>
 									))}
-								</div>
-
-								<div className="mt-12">
-									<h3 className="font-medium text-white/90 mb-3">Follow Us</h3>
-									<div className="flex space-x-3">
-										{["Twitter", "LinkedIn", "Facebook"].map((platform, i) => (
-											<button
-												key={i}
-												className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
-											>
-												<span className="sr-only">{platform}</span>
-											</button>
-										))}
-									</div>
 								</div>
 							</motion.div>
 

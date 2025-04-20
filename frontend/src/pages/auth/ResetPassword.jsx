@@ -95,7 +95,9 @@ const ResetPassword = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col justify-center items-center px-4">
+		<div className="min-h-screen">
+			<EnvironmentBackgroundLayers>
+				<div className="flex justify-center items-center align-items-center px-4 py-25">
 			<main className="w-full max-w-md">
 				<div className="bg-white rounded-xl shadow-2xl p-8 space-y-6 border border-gray-200">
 					<h2 className="text-3xl font-bold mb-2 text-center text-green-800 flex items-center justify-center gap-2">
@@ -245,10 +247,8 @@ const ResetPassword = () => {
 					)}
 				</div>
 			</main>
-
-			<footer className="mt-8 text-center text-gray-500 text-sm">
-				© {new Date().getFullYear()} Project Ultron. Environmental Monitoring.
-			</footer>
+			</div>
+			</EnvironmentBackgroundLayers>
 		</div>
 	);
 };
