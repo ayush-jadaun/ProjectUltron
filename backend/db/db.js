@@ -47,7 +47,7 @@ export const connectDb = asyncHandler(async () => {
     import("../models/analysisResult.model.js");
     
     // Sync Database
-    await sequelize.sync({alter:true});
+    await sequelize.sync();
     console.log("Database & tables have been recreated!");
   } catch (error) {
     console.error("Error connecting to database:", error);
