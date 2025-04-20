@@ -10,7 +10,7 @@
   <a href="https://youtu.be/Rut1XPlhNoI">Youtube Link</a>
   
 ## Presentation Link:
-  <a href="docs.google.com/presentation/d/1Hyn-CmMexxla0tFaOCMH1NAxsxATpD-74hSVbXCobLk/edit"> PPT link </a>
+  <a href="https://docs.google.com/presentation/d/1Hyn-CmMexxla0tFaOCMH1NAxsxATpD-74hSVbXCobLk/edit"> PPT link </a>
   
   
 ## Table of Contents:
