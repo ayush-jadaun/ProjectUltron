@@ -134,9 +134,8 @@ export const loginUser = asyncHandler(async (req, res, next) => {
   // Set cookie options
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production" ? "true":"false",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
     path: "/",
     maxAge: 1 * 60 * 60 * 1000,
   };
