@@ -183,8 +183,8 @@ function HeatmapLayer({ points, options }) {
   }, [map, points, options]);
   return null;
 }
-
-const API_URL = "http://localhost:5000/api/gee-reports/generate";
+const url=import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = `${url}/gee-reports/generate`;
 
 const ANALYSIS_OPTIONS = [
   { value: "DEFORESTATION", label: "Deforestation", extra: ["threshold"] },
