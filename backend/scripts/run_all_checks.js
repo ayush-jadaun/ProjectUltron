@@ -15,7 +15,7 @@ import { runGlacierMeltingCheck } from "../services/google-earth/glacier/glacier
 // --- Import coastal erosion runner ---
 import { runCoastalErosionCheck } from "../services/google-earth/coastal_erosion/coastal_erosion.js";
 // --- Import fire protection runner ---
-import { runFireProtectionCheck } from "../services/google-earth/fire/fireProtection.js";
+import { runFireProtectionCheck } from "../services/google-earth/fire/fire_protection.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
