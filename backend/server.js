@@ -44,7 +44,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://project-ultron-one.vercel.app",
+      "https://project-ultron-liard.vercel.app",
       "https://projectultron.onrender.com",
     ],
     credentials: true,
